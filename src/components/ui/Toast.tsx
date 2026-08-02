@@ -46,12 +46,21 @@ export interface ToastProps {
   id?: string;
 }
 
+import { IconInfoCircle, IconCheck, IconAlertTriangle, IconX } from "@tabler/icons-react";
+
 function Toast({ message, type, onClose }: ToastProps) {
   const styles = {
-    info: "bg-back-2",
-    success: "bg-green-500",
-    warn: "bg-yellow-500",
-    error: "bg-main",
+    info: "bg-contaner border border-secondary/20 text-text",
+    success: "bg-contaner border border-green-500/50 text-green-400",
+    warn: "bg-contaner border border-yellow-500/50 text-yellow-400",
+    error: "bg-contaner border border-main/50 text-main",
+  }
+
+  const icons = {
+    info: <IconInfoCircle size={20} className="text-secondary/70" />,
+    success: <IconCheck size={20} className="text-green-500" />,
+    warn: <IconAlertTriangle size={20} className="text-yellow-500" />,
+    error: <IconAlertTriangle size={20} className="text-main" />,
   }
 
   useEffect(() => {
@@ -60,15 +69,19 @@ function Toast({ message, type, onClose }: ToastProps) {
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: -10, scale: 0.95 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, y: -10, scale: 0.95 }}
-      transition={{ duration: 0.2 }}
-      className={`text-white px-4 py-2 rounded-lg shadow-lg flex items-center gap-3 ${styles[type as keyof typeof styles] || styles.info}`}
+      layout
+      initial={{ opacity: 0, x: 20, scale: 0.95 }}
+      animate={{ opacity: 1, x: 0, scale: 1 }}
+      exit={{ opacity: 0, x: 20, scale: 0.95 }}
+      transition={{ duration: 0.2, type: "spring", stiffness: 300, damping: 25 }}
+      className={`px-4 py-3 min-w-64 rounded-xl shadow-2xl flex items-center justify-between gap-3 font-main backdrop-blur-md ${styles[type as keyof typeof styles] || styles.info}`}
     >
-      <span className="text-sm">{message}</span>
-      <button onClick={onClose} className="text-white/70 hover:text-white text-xs">
-        ✕
+      <div className="flex items-center gap-3">
+        {icons[type as keyof typeof icons] || icons.info}
+        <span className="text-sm font-medium">{message}</span>
+      </div>
+      <button onClick={onClose} className="text-white/40 hover:text-white transition-colors p-1">
+        <IconX size={16} />
       </button>
     </motion.div>
   )

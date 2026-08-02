@@ -522,8 +522,8 @@ export default function Table({
           </div>
           <div>
             <div
-              className="ag-theme-alpine"
-              style={{ width: 1000 }}
+              className="ag-theme-alpine w-full"
+              style={{ width: '100%' }}
               ref={gridContainerRef}
             >
               <AgGridReact

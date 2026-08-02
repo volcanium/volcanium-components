@@ -15,56 +15,61 @@ type ButtonProps = {
   onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
 } & ButtonHTMLAttributes<HTMLButtonElement>;
 
-const Button = forwardRef<HTMLButtonElement, ButtonProps>(({
-  children,
-  className = "",
-  link,
-  onClick,
-  loading = false,
-  disabled,
-  variant = "primary",
-  linkClassName,
-  ...props
-}: ButtonProps, ref) => {
-  const navigate = useNavigate();
+const Button = forwardRef<HTMLButtonElement, ButtonProps>(
+  (
+    {
+      children,
+      className = "",
+      link,
+      onClick,
+      loading = false,
+      disabled,
+      variant = "primary",
+      linkClassName,
+      ...props
+    }: ButtonProps,
+    ref,
+  ) => {
+    const navigate = useNavigate();
 
-  const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
-    if (loading) return;
-    else if (onClick) onClick(e);
-  };
+    const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+      if (loading) return;
+      else if (onClick) onClick(e);
+    };
 
-  const styles = {
-    primary: "bg-main text-white",
-    secondary: "bg-back  text-white",
-    tertiary: "bg-back-2/50 text-white",
-    lum: "bg-secondary text-black",
-  };
+    const styles = {
+      primary: "bg-main text-white",
+      secondary: "bg-back  text-white",
+      tertiary: "bg-contaner text-white",
+      lum: "bg-secondary text-black",
+    };
 
-  const btn = (
-    <button
-      ref={ref}
-      {...props}
-      disabled={loading || disabled}
-      className={clsx(
-        "sm:py-1 sm:px-4 py-2 px-5 rounded-lg hover:scale-105 cursor-pointer flex flex-row gap-2 justify-center items-center transition disabled:opacity-50 disabled:cursor-not-allowed",
-        styles[variant],
-        className,
-      )}
-      onClick={handleClick}
-    >
-      {loading && <Spinner />}
-      {children}
-    </button>
-  );
+    const btn = (
+      <button
+        ref={ref}
+        {...props}
+        disabled={loading || disabled}
+        className={clsx(
+          "sm:py-1 sm:px-4 py-2 px-5 rounded-lg hover:scale-105 cursor-pointer flex flex-row gap-2 justify-center items-center transition disabled:opacity-50 disabled:cursor-not-allowed",
+          styles[variant],
+          className,
+        )}
+        onClick={handleClick}
+      >
+        {loading && <Spinner />}
+        {children}
+      </button>
+    );
 
-  return link ? (
-    <Link className={linkClassName || undefined} to={link}>
-      {btn}
-    </Link>
-  ) : (
-    btn
-  );
-});
+    return link ? (
+      <Link className={linkClassName || undefined} to={link}>
+        {btn}
+      </Link>
+    ) : (
+      btn
+    );
+  },
+);
 
 function Spinner() {
   return (

@@ -10,10 +10,15 @@ const meta: Meta<typeof Select> = {
     placeholder: { control: 'text' },
   },
   parameters: {
-    // Add layout parameter to center the select in the canvas, 
-    // making it easier to see dropdown positioning
     layout: 'centered',
-  }
+  },
+  decorators: [
+    (Story) => (
+      <div style={{ minHeight: '300px', display: 'flex', justifyContent: 'center', alignItems: 'flex-start', paddingTop: '2rem' }}>
+        <Story />
+      </div>
+    ),
+  ],
 };
 
 export default meta;

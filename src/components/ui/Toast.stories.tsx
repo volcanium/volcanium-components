@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react';
 import ToastProvider from './Toast';
 import { notify } from './notify';
-import Button from './Button'; // Assuming you have this or standard HTML button
+import Button from './Button';
 
 const meta: Meta<typeof ToastProvider> = {
   title: 'UI/Toast',
@@ -15,31 +15,31 @@ type Story = StoryObj<typeof ToastProvider>;
 export const Interactive: Story = {
   render: () => (
     <ToastProvider>
-      <div className="p-10 flex gap-4">
-        <button 
-          className="px-4 py-2 bg-blue-500 text-white rounded"
-          onClick={() => notify('Info message', 'info')}
+      <div className="p-10 flex flex-wrap gap-4">
+        <Button 
+          variant="secondary"
+          onClick={() => notify.info('Info message')}
         >
           Show Info
-        </button>
-        <button 
-          className="px-4 py-2 bg-green-500 text-white rounded"
-          onClick={() => notify('Success message!', 'success')}
+        </Button>
+        <Button 
+          variant="primary"
+          onClick={() => notify.success('Success message!')}
         >
           Show Success
-        </button>
-        <button 
-          className="px-4 py-2 bg-yellow-500 text-white rounded"
-          onClick={() => notify('Warning message', 'warn')}
+        </Button>
+        <Button 
+          variant="lum"
+          onClick={() => notify.warn('Warning message')}
         >
           Show Warning
-        </button>
-        <button 
-          className="px-4 py-2 bg-red-500 text-white rounded"
-          onClick={() => notify('Error message!', 'error')}
+        </Button>
+        <Button 
+          variant="tertiary"
+          onClick={() => notify.error('Error message!')}
         >
           Show Error
-        </button>
+        </Button>
       </div>
     </ToastProvider>
   ),

@@ -1,0 +1,30 @@
+import { Meta } from "@storybook/blocks";
+
+<Meta title="Documentation/Dependencies" />
+
+# Dependencies
+
+Here is the list of key dependencies that are used by **Volcanium Components**. When integrating this library, you may need to ensure these are available in your host application (often as peer dependencies) depending on your setup.
+
+### UI & Styling
+- **[Tailwind CSS (v4)](https://tailwindcss.com/)**: Core styling framework used across all components. Make sure your host app processes the Tailwind classes properly.
+- **[@tabler/icons-react](https://tabler.io/icons)**: Used for all iconography (e.g., `IconLayoutSidebar`, `IconUser`, etc.).
+- **[Framer Motion](https://www.framer.com/motion/)**: Used for animations, dialogs, and smooth interactive elements.
+- **[clsx](https://github.com/lukeed/clsx) & [tailwind-merge](https://github.com/dcastil/tailwind-merge)**: Utility libraries for conditionally merging Tailwind classes without CSS specificity conflicts.
+
+### Routing & Navigation
+- **[React Router DOM](https://reactrouter.com/)**: Used by navigation components like `Sidebar`, `TopNav`, and `Button` (when passing the `link` prop) to handle routing natively.
+
+### Data & Grids
+- **[AG Grid React](https://www.ag-grid.com/)**: Used for advanced data tables (`ag-grid-community` and `ag-grid-react`).
+
+### Internationalization & Formatting
+- **[i18next & react-i18next](https://react.i18next.com/)**: Used for component translations.
+- **[date-fns](https://date-fns.org/)**: Used for reliable date parsing and formatting.
+
+### Authentication
+- **[better-auth](https://better-auth.com/)**: Used by user-related components for handling user sessions and authentication data.
+
+---
+
+> **Tip:** If you encounter errors like `require is not defined` or duplicate React versions, verify that your host app resolves these packages to the same version used by `volcanium-components`.
