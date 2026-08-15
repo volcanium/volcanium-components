@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useRef, Fragment, useCallback } from "react";
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  Fragment,
+  useCallback,
+} from "react";
 import { Link } from "react-router-dom";
 import {
   IconLayoutSidebar,
@@ -84,16 +90,16 @@ function Header({ openFnc, open, openDelay, title, subtitle }: any) {
         {btnHover ? (
           open ? (
             <IconLayoutSidebarLeftCollapse
-              className={`text-secondary transition-all duration-300 cursor-pointer absolute z-2 ${openDelay ? "sm:left-65 right-5" : "left-5"}`}
+              className={`text-secondary transition-all duration-300 cursor-pointer absolute z-2 ${openDelay ? "sm:left-65 right-3" : "left-3"}`}
             />
           ) : (
             <IconLayoutSidebarLeftExpand
-              className={`text-secondary transition-all duration-300 cursor-pointer absolute z-2 ${openDelay ? "sm:left-65 right-5" : "left-5"}`}
+              className={`text-secondary transition-all duration-300 cursor-pointer absolute z-2 ${openDelay ? "sm:left-65 right-3" : "left-3"}`}
             />
           )
         ) : (
           <IconLayoutSidebar
-            className={`text-secondary transition-all duration-300 cursor-pointer absolute z-2 ${openDelay ? "sm:left-65 right-5" : "left-5"}`}
+            className={`text-secondary transition-all duration-300 cursor-pointer absolute z-2 ${openDelay ? "sm:left-65 right-3" : "left-3"}`}
           />
         )}
       </div>
@@ -101,7 +107,16 @@ function Header({ openFnc, open, openDelay, title, subtitle }: any) {
   );
 }
 
-function UserCard({ name, roleName, avatarUrl, initials = "U", onModif, className, open = true, ...props }: any) {
+function UserCard({
+  name,
+  roleName,
+  avatarUrl,
+  initials = "U",
+  onModif,
+  className,
+  open = true,
+  ...props
+}: any) {
   return (
     <div
       {...props}
@@ -127,7 +142,12 @@ function UserCard({ name, roleName, avatarUrl, initials = "U", onModif, classNam
         </div>
       )}
       {onModif && open && (
-        <div onClick={(e) => { e.stopPropagation(); onModif(); }}>
+        <div
+          onClick={(e) => {
+            e.stopPropagation();
+            onModif();
+          }}
+        >
           <IconUserEdit className="text-secondary transition hover:text-main cursor-pointer w-6 h-6 shrink-0" />
         </div>
       )}
@@ -135,7 +155,15 @@ function UserCard({ name, roleName, avatarUrl, initials = "U", onModif, classNam
   );
 }
 
-function NavButton({ open, children, active = false, onClick, page, loading, ...props }: any) {
+function NavButton({
+  open,
+  children,
+  active = false,
+  onClick,
+  page,
+  loading,
+  ...props
+}: any) {
   const baseClasses = `px-2 py-1 flex w-full relative flex-row gap-2 items-center hover:scale-100! text-xl rounded-lg cursor-pointer transition-colors duration-200`;
   const sizeClasses = `${loading && !open ? "w-44 justify-start" : ""} ${open ? "justify-start h-11" : "h-11"}`;
   const activeClasses = active
@@ -153,20 +181,34 @@ function NavButton({ open, children, active = false, onClick, page, loading, ...
   }
 
   return (
-    <button className={className} onClick={onClick} disabled={loading} {...props}>
+    <button
+      className={className}
+      onClick={onClick}
+      disabled={loading}
+      {...props}
+    >
       {children}
     </button>
   );
 }
 
-function Nav({ tabs, open = true, openDelay = true, activePath, specificTabs = [], userRole }: any) {
+function Nav({
+  tabs,
+  open = true,
+  openDelay = true,
+  activePath,
+  specificTabs = [],
+  userRole,
+}: any) {
   const isPageActive = (btn: any) => {
     if (btn.notActive) return false;
     const normalizedPath = (activePath || "/").replace(/\/+$/, "") || "/";
     const normalizedPage = (btn.page || "/").replace(/\/+$/, "") || "/";
     return (
       normalizedPath === normalizedPage ||
-      (normalizedPage !== "/" && normalizedPage !== "/account" && normalizedPath.startsWith(`${normalizedPage}/`))
+      (normalizedPage !== "/" &&
+        normalizedPage !== "/account" &&
+        normalizedPath.startsWith(`${normalizedPage}/`))
     );
   };
 
@@ -183,7 +225,9 @@ function Nav({ tabs, open = true, openDelay = true, activePath, specificTabs = [
   };
 
   return (
-    <div className={`flex flex-col gap-2 ${open ? "sm:p-0 p-8 sm:px-0 px-10" : "sm:p-0 p-0 sm:px-0 px-0"} transition-all duration-300`}>
+    <div
+      className={`flex flex-col gap-2 ${open ? "sm:p-0 p-8 sm:px-0 px-10" : "sm:p-0 p-0 sm:px-0 px-0"} transition-all duration-300`}
+    >
       {tabs.map((btn: any) => {
         const isActive = isPageActive(btn);
         return (
@@ -196,11 +240,15 @@ function Nav({ tabs, open = true, openDelay = true, activePath, specificTabs = [
             page={btn.page}
           >
             {IconSystem(btn, isActive)}
-            <div className={`truncate transition-all duration-300 absolute left-10 ${open && openDelay ? "opacity-100" : "opacity-0 pointer-events-none"}`}>
+            <div
+              className={`truncate transition-all duration-300 absolute left-10 ${open && openDelay ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+            >
               {btn.name}
             </div>
             {btn.alert && (
-              <div className={`flex justify-center absolute duration-0 transition-none ${open ? "left-8" : "right-1.5"} items-center w-2 h-2 bg-main/50 rounded-full -mt-2 -ml-1`}>
+              <div
+                className={`flex justify-center absolute duration-0 transition-none ${open ? "left-8" : "right-1.5"} items-center w-2 h-2 bg-main/50 rounded-full -mt-2 -ml-1`}
+              >
                 <div className="w-1 h-1 bg-main rounded-full"></div>
               </div>
             )}
@@ -227,7 +275,9 @@ function Nav({ tabs, open = true, openDelay = true, activePath, specificTabs = [
                       active={isActive}
                     >
                       {IconSystem(btn, isActive)}
-                      <div className={`truncate transition-all duration-300 absolute left-10 ${open && openDelay ? "opacity-100" : "opacity-0 pointer-events-none"}`}>
+                      <div
+                        className={`truncate transition-all duration-300 absolute left-10 ${open && openDelay ? "opacity-100" : "opacity-0 pointer-events-none"}`}
+                      >
                         {btn.name}
                       </div>
                     </NavButton>
@@ -294,10 +344,18 @@ export default function Sidebar({
         className={`flex overflow-y-auto overflow-x-hidden transition-all duration-300 ${open ? "sm:w-75 w-full" : openDelay ? "sm:w-85" : "w-15"} ${open ? "sm:static fixed h-full z-20" : ""} px-2 z-10 items-center justify-between gap-5 py-4 flex-col bg-contaner`}
       >
         <div className="flex flex-col sm:gap-5 w-full">
-          <Header openFnc={toggleOpen} open={open} openDelay={openDelay} title={title} subtitle={subtitle} />
-          
+          <Header
+            openFnc={toggleOpen}
+            open={open}
+            openDelay={openDelay}
+            title={title}
+            subtitle={subtitle}
+          />
+
           {user && (
-            <div className={`sm:p-0 sm:px-0 px-2 sm:mt-0 mt-3 transition-all duration-300 overflow-hidden`}>
+            <div
+              className={`sm:p-0 sm:px-0 px-2 sm:mt-0 mt-3 transition-all duration-300 overflow-hidden`}
+            >
               <UserCard
                 onClick={open ? undefined : toggleOpen}
                 className="transition-all duration-300"
@@ -323,11 +381,16 @@ export default function Sidebar({
 
         {bottomTabs.length > 0 && (
           <div className="flex flex-col sm:gap-5 w-full">
-            <Nav open={open} openDelay={openDelay} activePath={activePath} tabs={bottomTabs} />
+            <Nav
+              open={open}
+              openDelay={openDelay}
+              activePath={activePath}
+              tabs={bottomTabs}
+            />
           </div>
         )}
       </div>
-      
+
       <div className="overflow-auto flex-1 sm:p-0 pb-4 w-full h-full relative">
         {children}
       </div>

@@ -118,10 +118,10 @@ export const Default: Story = {
                 Main Content
               </h1>
               <p className="text-white/70 text-lg">
-                This is a simulated content area. It perfectly aligns next to the
-                sidebar and scrolls independently. The sidebar is now perfectly
-                customized, perfectly responsive, and exactly identical to the
-                original application.
+                This is a simulated content area. It perfectly aligns next to
+                the sidebar and scrolls independently. The sidebar is now
+                perfectly customized, perfectly responsive, and exactly
+                identical to the original application.
               </p>
               <div className="mt-8 grid grid-cols-2 gap-4">
                 <div className="h-32 bg-main/20 rounded-xl border border-main/30 flex items-center justify-center text-main font-semibold">
