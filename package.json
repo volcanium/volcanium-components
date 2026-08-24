@@ -15,7 +15,8 @@
         "types": "./dist/index.d.ts",
         "default": "./dist/index.js"
       }
-    }
+    },
+    "./index.css": "./src/index.css"
   },
   "bin": {
     "link-volcanium": "./bin/link-dev.mjs"
