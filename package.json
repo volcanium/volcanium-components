@@ -17,6 +17,9 @@
       }
     }
   },
+  "bin": {
+    "link-volcanium": "./bin/link-dev.mjs"
+  },
   "scripts": {
     "build": "tsup",
     "dev": "tsup --watch",

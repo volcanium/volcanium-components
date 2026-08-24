@@ -5,7 +5,7 @@ import React, {
   Fragment,
   useCallback,
 } from "react";
-import { Link } from "react-router-dom";
+import { Link, useInRouterContext } from "react-router-dom";
 import {
   IconLayoutSidebar,
   IconLayoutSidebarLeftCollapse,
@@ -164,6 +164,7 @@ function NavButton({
   loading,
   ...props
 }: any) {
+  const inRouterContext = useInRouterContext();
   const baseClasses = `px-2 py-1 flex w-full relative flex-row gap-2 items-center hover:scale-100! text-xl rounded-lg cursor-pointer transition-colors duration-200`;
   const sizeClasses = `${loading && !open ? "w-44 justify-start" : ""} ${open ? "justify-start h-11" : "h-11"}`;
   const activeClasses = active
@@ -173,10 +174,17 @@ function NavButton({
   const className = `${baseClasses} ${sizeClasses} ${activeClasses}`;
 
   if (page) {
+    if (inRouterContext) {
+      return (
+        <Link to={page} className={className} onClick={onClick} {...props}>
+          {children}
+        </Link>
+      );
+    }
     return (
-      <Link to={page} className={className} onClick={onClick} {...props}>
+      <a href={page} className={className} onClick={onClick} {...props}>
         {children}
-      </Link>
+      </a>
     );
   }
 

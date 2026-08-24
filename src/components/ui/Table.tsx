@@ -411,9 +411,9 @@ export default function Table({
 
   return (
     <div className="flex flex-col gap-2">
-      <Center className="p-5 flex flex-col text-left gap-5">
+      <Center className="p-5 flex flex-col text-left gap-5 w-full">
         <Title>{title}</Title>
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-1 w-full max-w-full">
           <div className="flex flex-row gap-1 justify-between">
             <div className="flex flex-1 flex-row items-center gap-2">
               <Input

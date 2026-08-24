@@ -1,6 +1,6 @@
 import clsx from "clsx";
 import { motion } from "framer-motion";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useInRouterContext } from "react-router-dom";
 import { ButtonHTMLAttributes, ReactNode, forwardRef } from "react";
 
 type Variant = "primary" | "secondary" | "tertiary" | "lum";
@@ -30,7 +30,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     }: ButtonProps,
     ref,
   ) => {
-    const navigate = useNavigate();
+    const inRouterContext = useInRouterContext();
 
     const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
       if (loading) return;
@@ -61,13 +61,21 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       </button>
     );
 
-    return link ? (
-      <Link className={linkClassName || undefined} to={link}>
-        {btn}
-      </Link>
-    ) : (
-      btn
-    );
+    if (link) {
+      if (inRouterContext) {
+        return (
+          <Link className={linkClassName || undefined} to={link}>
+            {btn}
+          </Link>
+        );
+      }
+      return (
+        <a className={linkClassName || undefined} href={link}>
+          {btn}
+        </a>
+      );
+    }
+    return btn;
   },
 );
 
