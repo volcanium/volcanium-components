@@ -1,4 +1,5 @@
 import { useId, ReactNode, InputHTMLAttributes } from "react";
+import { IconRefresh } from "@tabler/icons-react";
 
 export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "label"> {
   children?: string;
@@ -6,6 +7,7 @@ export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, 
   label?: ReactNode;
   id?: string;
   variant?: "one" | "secondary";
+  loading?: boolean;
 }
 
 export default function Input({
@@ -14,6 +16,7 @@ export default function Input({
   label,
   id,
   variant = "one",
+  loading,
   ...props
 }: InputProps) {
   const varaiants = {
@@ -36,10 +39,11 @@ export default function Input({
     <div className="flex flex-col gap-1">
       {InputEl}
       <label
-        className="w-full -mt-1 mb-1 text-start text-sm text-white/50"
+        className="w-full -mt-1 mb-1 flex items-center gap-2 text-start text-sm text-white/50"
         htmlFor={inputId}
       >
         {label}
+        {loading && <IconRefresh size={14} className="animate-spin text-main" />}
       </label>
     </div>
   ) : (

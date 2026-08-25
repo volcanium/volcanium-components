@@ -50,3 +50,5 @@ export { default as Nav } from './components/layout/Nav';
 export { default as Cursus } from './components/ui/Cursus';
 export { default as RoadMap } from './components/ui/RoadMap';
 export { default as Stage } from './components/ui/Stage';
+export { default as Toggle } from './components/ui/Toggle';
+export * from './components/ui/Toggle';
