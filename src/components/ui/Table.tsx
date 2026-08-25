@@ -114,7 +114,7 @@ function NewRowModal({
     >
       <Form
         id={id}
-        btn={<Button type="submit">Submit</Button>}
+        btn={null}
         onSubmit={async (values: any) => {
           setLoaderBtn(true);
           if (!newRow.method) {

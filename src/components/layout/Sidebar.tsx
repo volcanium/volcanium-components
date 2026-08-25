@@ -6,6 +6,7 @@ import React, {
   useCallback,
 } from "react";
 import { Link, useInRouterContext } from "react-router-dom";
+import LinkV from "../ui/Link";
 import {
   IconLayoutSidebar,
   IconLayoutSidebarLeftCollapse,
@@ -79,7 +80,7 @@ function Header({ openFnc, open, openDelay, title, subtitle }: any) {
         className={`flex flex-col transition-all duration-300 items-start ${open ? "opacity-100" : "opacity-0 pointer-events-none"}`}
       >
         <Title className="text-3xl">{title}</Title>
-        <Title className="text-lg text-main!">{subtitle}</Title>
+        <Title className="text-lg text-main! truncate">{subtitle}</Title>
       </div>
       <div
         onMouseEnter={() => setBtnHover(true)}
@@ -306,7 +307,7 @@ function Nav({
 export default function Sidebar({
   isOpen = true,
   onToggle,
-  title = "Account",
+  title = "Name",
   subtitle = "App",
   tabs = [],
   specificTabs = [],
@@ -349,7 +350,7 @@ export default function Sidebar({
   return (
     <main className="flex h-screen font-main text-text bg-back overflow-hidden">
       <div
-        className={`flex overflow-y-auto overflow-x-hidden transition-all duration-300 ${open ? "sm:w-75 w-full" : openDelay ? "sm:w-85" : "w-15"} ${open ? "sm:static fixed h-full z-20" : ""} px-2 z-10 items-center justify-between gap-5 py-4 flex-col bg-contaner`}
+        className={`flex overflow-y-auto overflow-x-hidden transition-all duration-300 ${open ? "sm:w-75 w-full" : openDelay ? "sm:w-85" : "w-15"} ${open ? "sm:static fixed h-full z-20" : ""} px-2 z-10 items-center justify-between gap-5 pt-4 py-1 flex-col bg-contaner`}
       >
         <div className="flex flex-col sm:gap-5 w-full">
           <Header
@@ -387,16 +388,26 @@ export default function Sidebar({
           />
         </div>
 
-        {bottomTabs.length > 0 && (
-          <div className="flex flex-col sm:gap-5 w-full">
-            <Nav
-              open={open}
-              openDelay={openDelay}
-              activePath={activePath}
-              tabs={bottomTabs}
-            />
-          </div>
-        )}
+        <div className="flex flex-col sm:gap-1 w-full">
+          {bottomTabs.length > 0 && (
+            <div className="flex flex-col sm:gap-5 w-full">
+              <Nav
+                open={open}
+                openDelay={openDelay}
+                activePath={activePath}
+                tabs={bottomTabs}
+              />
+            </div>
+          )}
+          <small
+            className={`text-center items-center justify-center truncate ${open ? "opacity-100" : "opacity-0"}`}
+          >
+            Panel powered by{" "}
+            <LinkV onClick={() => window.open("https://volcanium-studio.com/")}>
+              volcanium studio
+            </LinkV>
+          </small>
+        </div>
       </div>
 
       <div className="overflow-auto flex-1 sm:p-0 pb-4 w-full h-full relative">
