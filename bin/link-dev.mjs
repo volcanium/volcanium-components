@@ -28,7 +28,7 @@ async function linkDev() {
   }
 
   const libSrcPath = path.resolve(__dirname, '../src').replace(/\\/g, '/');
-  const libName = 'volcanium-components';
+  const libName = '@volcanium/volcanium-components';
   
   const possibleCssFiles = ['src/index.css', 'src/main.css', 'src/App.css', 'src/globals.css', 'src/style.css'];
   for (const file of possibleCssFiles) {
