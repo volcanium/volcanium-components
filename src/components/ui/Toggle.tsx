@@ -12,7 +12,7 @@ export interface ToggleProps {
 export default function Toggle({ checked, onChange, disabled, label, loading }: ToggleProps) {
   return (
     <div className="flex items-center justify-between gap-3 mt-1">
-      {label && (
+      {(label || loading) && (
         <span className="text-white/50 text-sm flex items-center gap-2">
           {label}
           {loading && <IconRefresh size={14} className="animate-spin text-main" />}
@@ -25,7 +25,7 @@ export default function Toggle({ checked, onChange, disabled, label, loading }: 
         disabled={disabled || loading}
         onClick={() => !(disabled || loading) && onChange(!checked)}
         className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
-          checked ? "bg-main" : "bg-void shadow-inner"
+          checked ? "bg-main" : "bg-back shadow-inner"
         }`}
       >
         <span

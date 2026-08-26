@@ -17,7 +17,7 @@ export default function Loader({ hide, full = false }: LoaderProps) {
         transition={{ duration: 0.2 }}
       >
         <div
-          className={`${full ? "w-full" : "w-32"} ${hide ? "opacity-0" : "opacity-100"} h-0.5 bg-back-2 overflow-hidden rounded`}
+          className={`${full ? "w-full" : "w-32"} ${hide ? "opacity-0" : "opacity-100"} h-0.5 bg-contaner overflow-hidden rounded`}
         >
           <motion.div
             className="h-full w-1/2 bg-main"
