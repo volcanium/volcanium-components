@@ -153,3 +153,11 @@ export const Default: Story = {
     onUserModif: () => notify.info("Edit User clicked"),
   },
 };
+
+export const WithoutBranding: Story = {
+  ...Default,
+  args: {
+    ...Default.args,
+    showBranding: false,
+  },
+};

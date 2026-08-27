@@ -63,6 +63,8 @@ export interface SidebarProps {
   };
   /** Callback when the user edit button is clicked */
   onUserModif?: () => void;
+  /** Whether to show the "Panel powered by volcanium studio" branding at the bottom of the sidebar. Defaults to true. */
+  showBranding?: boolean;
   /** Content to display next to the sidebar (via children) */
   children?: React.ReactNode;
 }
@@ -315,6 +317,7 @@ export default function Sidebar({
   activePath = "/",
   user,
   onUserModif,
+  showBranding = true,
   children,
 }: SidebarProps) {
   const [internalOpen, setInternalOpen] = useState(isOpen);
@@ -399,14 +402,18 @@ export default function Sidebar({
               />
             </div>
           )}
-          <small
-            className={`text-center items-center justify-center truncate ${open ? "opacity-100" : "opacity-0"}`}
-          >
-            Panel powered by{" "}
-            <LinkV onClick={() => window.open("https://volcanium-studio.com/")}>
-              volcanium studio
-            </LinkV>
-          </small>
+          {showBranding && (
+            <small
+              className={`text-center items-center justify-center truncate ${open ? "opacity-100" : "opacity-0"}`}
+            >
+              Panel powered by{" "}
+              <LinkV
+                onClick={() => window.open("https://volcanium-studio.com/")}
+              >
+                volcanium studio
+              </LinkV>
+            </small>
+          )}
         </div>
       </div>
 
