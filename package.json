@@ -1,6 +1,6 @@
 {
   "name": "@volcanium/volcanium-components",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "UI Components Library for Volcanium",
   "main": "dist/index.js",
   "module": "dist/index.mjs",

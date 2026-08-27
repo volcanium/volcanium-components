@@ -12,6 +12,7 @@ type ButtonProps = {
   loading?: boolean;
   variant?: Variant;
   linkClassName?: string;
+  icon?: ReactNode;
   onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
 } & ButtonHTMLAttributes<HTMLButtonElement>;
 
@@ -26,6 +27,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       disabled,
       variant = "primary",
       linkClassName,
+      icon,
       ...props
     }: ButtonProps,
     ref,
@@ -56,7 +58,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         )}
         onClick={handleClick}
       >
-        {loading && <Spinner />}
+        {loading ? <Spinner /> : icon}
         {children}
       </button>
     );
