@@ -6,6 +6,7 @@ import api from "../../lib/api";
 import Button from "./Button";
 import TooltipButton from "./TooltipButton";
 import Input from "./Input";
+import Select from "./Select";
 import {
   themeQuartz,
   iconSetMaterial,
@@ -21,6 +22,8 @@ import {
   IconTrash,
   IconFileImport,
   IconEdit,
+  IconChevronLeft,
+  IconChevronRight,
 } from "@tabler/icons-react";
 import useKeyPress from "../../utils/useKeyPress";
 import Modal from "./Modal";
@@ -253,6 +256,31 @@ function DeleteRowModal({
  * @returns {JSX.Element} Composant Table complet.
  */
 
+export interface TableFilterOption {
+  label: ReactNode;
+  value: any;
+}
+
+/**
+ * Filtre affiché sous forme de menu déroulant à côté de la recherche.
+ * Sa valeur est incluse dans les paramètres transmis à `fetchMethod`/`fetchUrl`
+ * lorsque `serverSide` est activé.
+ */
+export interface TableFilter {
+  key: string;
+  label?: string;
+  options: TableFilterOption[];
+  defaultValue?: any;
+  className?: string;
+}
+
+export interface TableFetchParams {
+  search: string;
+  page: number;
+  pageSize: number;
+  filters: Record<string, any>;
+}
+
 export interface TableProps {
   fetchUrl?: string;
   colsDefs: any[];
@@ -265,9 +293,24 @@ export interface TableProps {
   newRow?: any;
   deleteRow?: boolean;
   openRequest?: (selectedRows: any[]) => void;
-  fetchMethod?: () => Promise<any>;
+  /**
+   * En mode `serverSide`, reçoit `{ search, page, pageSize, filters }` et doit
+   * retourner soit un tableau de lignes, soit `{ data, total }` pour activer
+   * la pagination serveur.
+   */
+  fetchMethod?: (params?: TableFetchParams) => Promise<any>;
   modifMethod?: (params: any) => void;
   copyButton?: boolean;
+  /**
+   * Active la recherche, la pagination et les filtres côté serveur : la
+   * saisie de recherche (débouncée), la page courante et les filtres sont
+   * envoyés à `fetchMethod`, ou en paramètres de requête à `fetchUrl`
+   * (`search`, `page`, `pageSize`, et une clé par filtre).
+   */
+  serverSide?: boolean;
+  pageSize?: number;
+  filters?: TableFilter[];
+  searchPlaceholder?: string;
 }
 
 export default function Table({
@@ -285,6 +328,10 @@ export default function Table({
   fetchMethod,
   modifMethod,
   copyButton = false,
+  serverSide = false,
+  pageSize = 25,
+  filters,
+  searchPlaceholder = "Rechercher...",
 }: TableProps) {
   const [showModal, setShowModal] = useState(false);
   const [modalDelete, setModalDelete] = useState(false);
@@ -292,10 +339,37 @@ export default function Table({
   const gridContainerRef = useRef<HTMLDivElement>(null);
   const [rowData, setRowData] = useState<any>();
   const [quickFilter, setQuickFilter] = useState("");
+  const [searchInput, setSearchInput] = useState("");
+  const [search, setSearch] = useState("");
+  const [page, setPage] = useState(0);
+  const [total, setTotal] = useState(0);
+  const [filterValues, setFilterValues] = useState<Record<string, any>>(() => {
+    const initial: Record<string, any> = {};
+    filters?.forEach((f) => {
+      initial[f.key] = f.defaultValue ?? f.options[0]?.value;
+    });
+    return initial;
+  });
   const [RotateBtnReload, setRotateBtnReload] = useState(true);
   const [loadingTable, setLoadingTable] = useState(true);
   const [selectedRows, setSelectedRows] = useState([]);
   const [selectedCell, setSelectedCell] = useState<any>(null);
+
+  // Debounce la recherche saisie avant de déclencher un appel serveur.
+  useEffect(() => {
+    if (!serverSide) {
+      setQuickFilter(searchInput);
+      return;
+    }
+    const t = setTimeout(() => {
+      setSearch(searchInput);
+      setPage(0);
+    }, 300);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [searchInput, serverSide]);
+
+  const totalPages = Math.max(1, Math.ceil(total / pageSize));
 
   useKeyPress("Delete", () => {
     if (selectedRows.length > 0)
@@ -338,6 +412,25 @@ export default function Table({
   };
 
   const fethData = async () => {
+    if (serverSide) {
+      const params: TableFetchParams = { search, page, pageSize, filters: filterValues };
+      if (fetchMethod) {
+        const res = await fetchMethod(params);
+        const data = Array.isArray(res) ? res : res?.data ?? [];
+        const nextTotal = Array.isArray(res) ? res.length : res?.total ?? data.length;
+        setRowData(data);
+        setTotal(nextTotal);
+      } else {
+        const res = await api.get(fetchUrl || "", {
+          params: { search, page, pageSize, ...filterValues },
+        });
+        setRowData(res.data.data);
+        setTotal(res.data.total ?? res.data.data.length);
+      }
+      setLoadingTable(false);
+      return;
+    }
+
     const res = fetchMethod ? await fetchMethod() : await api.get(fetchUrl || "");
     setRowData(fetchMethod ? res : res.data.data);
     setLoadingTable(false);
@@ -369,13 +462,7 @@ export default function Table({
     setLoadingTable(true);
     handleClickBtnReload();
     setRowData(undefined);
-    if (!fetchMethod) {
-      const res = await api.get(fetchUrl || "");
-      setRowData(res.data.data);
-      setLoadingTable(false);
-    } else {
-      await fethData();
-    }
+    await fethData();
   };
 
   const deleteRowAuto = () => {
@@ -384,7 +471,8 @@ export default function Table({
 
   useEffect(() => {
     fethData();
-  }, [fetchUrl, realodKey]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [fetchUrl, realodKey, serverSide && search, serverSide && page, serverSide && JSON.stringify(filterValues)]);
 
   useEffect(() => {
     if (gridRef.current && gridRef.current.api) {
@@ -419,11 +507,29 @@ export default function Table({
               <Input
                 variant="secondary"
                 className="w-100! py-0.5!"
-                value={quickFilter}
-                onChange={(e) => setQuickFilter(e.target.value)}
+                value={serverSide ? searchInput : quickFilter}
+                onChange={(e) =>
+                  serverSide
+                    ? setSearchInput(e.target.value)
+                    : setQuickFilter(e.target.value)
+                }
               >
-                Rechercher...
+                {searchPlaceholder}
               </Input>
+              {filters?.map((f) => (
+                <Select
+                  key={f.key}
+                  variant="secondary"
+                  className={f.className || "w-40!"}
+                  options={f.options}
+                  value={filterValues[f.key]}
+                  onChange={(v: any) => {
+                    setFilterValues((prev) => ({ ...prev, [f.key]: v }));
+                    setPage(0);
+                  }}
+                  placeholder={f.label}
+                />
+              ))}
               <p
                 className={`flex-row flex-1 gap-1  text-left  text-nowrap ${selectedRows.length > 0 ? "flex" : "hidden"}`}
               >
@@ -552,7 +658,7 @@ export default function Table({
                 noRowsOverlayComponent={() => <div>Aucun résultat</div>}
                 loading={loadingTable}
                 domLayout="autoHeight"
-                quickFilterText={quickFilter}
+                quickFilterText={serverSide ? undefined : quickFilter}
                 rowSelection={rowSelection}
                 undoRedoCellEditing={true}
                 onCellValueChanged={async (params: any) => {
@@ -580,6 +686,31 @@ export default function Table({
                 onGridReady={(params: any) => params.api.sizeColumnsToFit()}
               />
             </div>
+            {serverSide && (
+              <div className="flex items-center justify-between gap-2 pt-1">
+                <p className="text-xs text-white/50">
+                  {total} résultat{total > 1 ? "s" : ""} — page {page + 1} / {totalPages}
+                </p>
+                <div className="flex items-center gap-2">
+                  <ButtonTable
+                    tooltip="Page précédente"
+                    className={page === 0 ? "opacity-30 pointer-events-none" : ""}
+                    onClick={() => setPage((p) => Math.max(0, p - 1))}
+                  >
+                    <IconChevronLeft />
+                  </ButtonTable>
+                  <ButtonTable
+                    tooltip="Page suivante"
+                    className={
+                      page >= totalPages - 1 ? "opacity-30 pointer-events-none" : ""
+                    }
+                    onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+                  >
+                    <IconChevronRight />
+                  </ButtonTable>
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </Center>
