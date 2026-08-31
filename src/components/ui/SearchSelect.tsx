@@ -7,6 +7,7 @@ import {
   useId,
   ReactNode,
 } from "react";
+import { createPortal } from "react-dom";
 import { IconSearch, IconSelector, IconX } from "@tabler/icons-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useLanguage } from "../../utils/useLanguage";
@@ -46,12 +47,28 @@ function normalize(value: string): string {
     .trim();
 }
 
+interface PanelPosition {
+  left: number;
+  width: number;
+  top?: number;
+  bottom?: number;
+}
+
 /**
  * A `Select` with a search box in the dropdown — for option lists too long
  * to scan by eye (a full station catalogue, a user directory, ...). Filters
  * `options` client-side by default (accent-insensitive substring match on
  * `label`); pass `onSearchChange` to instead drive the filtering yourself
  * (e.g. a server-side search) and hand back only the matching `options`.
+ *
+ * The dropdown panel renders through a portal into `document.body`,
+ * positioned in `fixed` coordinates measured from the trigger — not
+ * `position: absolute` nested under the trigger. A field used inside a
+ * modal or any other container with its own scroll/overflow clips an
+ * absolutely-positioned descendant at that container's edge, which cut the
+ * panel off mid-list; a portal sidesteps that entirely, the same fix a
+ * plain `Select` doesn't need as often since its unfiltered list is usually
+ * short enough to fit inside its container's remaining space.
  */
 export default function SearchSelect({
   options = [],
@@ -71,10 +88,10 @@ export default function SearchSelect({
   const actualPlaceholder = placeholder || t("select_placeholder");
 
   const [open, setOpen] = useState(false);
-  const [openUpward, setOpenUpward] = useState(false);
-  const [ready, setReady] = useState(false);
+  const [position, setPosition] = useState<PanelPosition | null>(null);
   const [query, setQuery] = useState("");
-  const ref = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
   const searchInputRef = useRef<HTMLInputElement>(null);
 
   const generatedId = useId();
@@ -82,32 +99,35 @@ export default function SearchSelect({
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+      const target = e.target as Node;
+      if (
+        triggerRef.current &&
+        !triggerRef.current.contains(target) &&
+        panelRef.current &&
+        !panelRef.current.contains(target)
+      ) {
+        setOpen(false);
+      }
     };
     window.addEventListener("click", handler);
     return () => window.removeEventListener("click", handler);
   }, []);
 
   useLayoutEffect(() => {
-    const updatePosition = () => {
-      const rect = ref.current?.getBoundingClientRect();
-      if (!rect) return;
-      const spaceBelow = window.innerHeight - rect.bottom;
-      const spaceAbove = rect.top;
-      setOpenUpward(spaceBelow < 260 && spaceAbove > spaceBelow);
-    };
-    updatePosition();
-    setReady(true);
-  }, [open]);
-
-  useEffect(() => {
     if (!open) return;
     const updatePosition = () => {
-      const rect = ref.current?.getBoundingClientRect();
+      const rect = triggerRef.current?.getBoundingClientRect();
       if (!rect) return;
+      const margin = 8;
+      const maxPanelHeight = 260;
       const spaceBelow = window.innerHeight - rect.bottom;
       const spaceAbove = rect.top;
-      setOpenUpward(spaceBelow < 260 && spaceAbove > spaceBelow);
+      const openUpward = spaceBelow < maxPanelHeight && spaceAbove > spaceBelow;
+      setPosition(
+        openUpward
+          ? { left: rect.left, width: rect.width, bottom: window.innerHeight - rect.top + margin }
+          : { left: rect.left, width: rect.width, top: rect.bottom + margin },
+      );
     };
     updatePosition();
     window.addEventListener("resize", updatePosition);
@@ -145,10 +165,11 @@ export default function SearchSelect({
 
   const TriggerElement = isInputVariant ? (
     <button
+      ref={triggerRef}
       id={selectId}
       type="button"
       onClick={() => setOpen(!open)}
-      className={`p-2 ${inputBg} flex flex-1 rounded-lg px-10 outline-0 justify-between items-center relative ${className}`}
+      className={`p-2 ${inputBg} flex flex-1 rounded-lg px-10 outline-0 justify-between items-center relative w-full ${className}`}
     >
       <span className={`truncate ${selected ? "" : "opacity-50"}`}>
         {selected ? selected.label : actualPlaceholder}
@@ -159,6 +180,7 @@ export default function SearchSelect({
     </button>
   ) : (
     <button
+      ref={triggerRef}
       id={selectId}
       type="button"
       onClick={() => setOpen(!open)}
@@ -180,65 +202,76 @@ export default function SearchSelect({
     </button>
   );
 
-  const SelectWrapper = (
-    <div ref={ref} className="relative inline-block font-main text-text w-full">
-      {TriggerElement}
+  const panel =
+    open && position
+      ? createPortal(
+          <AnimatePresence>
+            <motion.div
+              ref={panelRef}
+              initial={{ opacity: 0, y: position.bottom !== undefined ? 5 : -5 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: position.bottom !== undefined ? 5 : -5 }}
+              transition={{ duration: 0.2, ease: "easeInOut" }}
+              style={{
+                position: "fixed",
+                left: position.left,
+                width: Math.max(position.width, 256),
+                top: position.top,
+                bottom: position.bottom,
+              }}
+              className="z-[999] font-main text-text"
+            >
+              <div className="bg-contaner rounded-xl shadow-2xl border border-overlay/10 backdrop-blur flex flex-col overflow-hidden">
+                <div className="flex items-center gap-2 px-3 py-2 border-b border-overlay/10 shrink-0">
+                  <IconSearch size={16} className="opacity-50 shrink-0" />
+                  <input
+                    ref={searchInputRef}
+                    type="text"
+                    value={query}
+                    onChange={(e) => handleQueryChange(e.target.value)}
+                    placeholder={searchPlaceholder || t("select_search_placeholder")}
+                    className="flex-1 bg-transparent outline-0 text-sm min-w-0"
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                </div>
+                <div className="p-2 flex flex-col gap-1 max-h-60 overflow-y-auto">
+                  {loading ? (
+                    <div className="px-3 py-2 text-sm opacity-50">{t("select_loading")}</div>
+                  ) : filtered.length === 0 ? (
+                    <div className="px-3 py-2 text-sm opacity-50">
+                      {noResultsText ?? t("select_no_results")}
+                    </div>
+                  ) : (
+                    filtered.map((opt) => (
+                      <button
+                        key={opt.value}
+                        type="button"
+                        onClick={() => {
+                          onChange?.(opt.value);
+                          setOpen(false);
+                        }}
+                        className={`
+                          px-3 py-2 rounded-lg text-left text-sm transition-all duration-150 truncate shrink-0
+                          hover:bg-main hover:scale-[1.02]
+                          ${value === opt.value ? "bg-main/80" : "bg-transparent"}
+                        `}
+                      >
+                        {opt.label}
+                      </button>
+                    ))
+                  )}
+                </div>
+              </div>
+            </motion.div>
+          </AnimatePresence>,
+          document.body,
+        )
+      : null;
 
-      <AnimatePresence>
-        {open && ready && (
-          <motion.div
-            initial={{ opacity: 0, y: openUpward ? 5 : -5 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: openUpward ? 5 : -5 }}
-            transition={{ duration: 0.25, ease: "easeInOut" }}
-            className={`absolute left-0 w-full min-w-64 z-50
-              ${openUpward ? "bottom-full mb-2 origin-bottom" : "top-full mt-2 origin-top"}
-            `}
-          >
-            <div className="bg-contaner rounded-xl shadow-2xl border border-overlay/10 backdrop-blur flex flex-col overflow-hidden">
-              <div className="flex items-center gap-2 px-3 py-2 border-b border-overlay/10 shrink-0">
-                <IconSearch size={16} className="opacity-50 shrink-0" />
-                <input
-                  ref={searchInputRef}
-                  type="text"
-                  value={query}
-                  onChange={(e) => handleQueryChange(e.target.value)}
-                  placeholder={searchPlaceholder || t("select_search_placeholder")}
-                  className="flex-1 bg-transparent outline-0 text-sm min-w-0"
-                  onClick={(e) => e.stopPropagation()}
-                />
-              </div>
-              <div className="p-2 flex flex-col gap-1 max-h-60 overflow-y-auto">
-                {loading ? (
-                  <div className="px-3 py-2 text-sm opacity-50">{t("select_loading")}</div>
-                ) : filtered.length === 0 ? (
-                  <div className="px-3 py-2 text-sm opacity-50">
-                    {noResultsText ?? t("select_no_results")}
-                  </div>
-                ) : (
-                  filtered.map((opt) => (
-                    <button
-                      key={opt.value}
-                      type="button"
-                      onClick={() => {
-                        onChange?.(opt.value);
-                        setOpen(false);
-                      }}
-                      className={`
-                        px-3 py-2 rounded-lg text-left text-sm transition-all duration-150 truncate
-                        hover:bg-main hover:scale-[1.02]
-                        ${value === opt.value ? "bg-main/80" : "bg-transparent"}
-                      `}
-                    >
-                      {opt.label}
-                    </button>
-                  ))
-                )}
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+  const SelectWrapper = (
+    <div className="relative inline-block font-main text-text w-full">
+      {TriggerElement}
+      {panel}
     </div>
   );
 
