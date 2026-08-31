@@ -8,7 +8,10 @@ export function useLanguage() {
         not_provided: "Non renseigné",
         account: "Compte",
         cancel: "Annuler",
-        confirm: "Confirmer"
+        confirm: "Confirmer",
+        select_search_placeholder: "Rechercher...",
+        select_loading: "Chargement...",
+        select_no_results: "Aucun résultat"
       };
       return translations[key] || key;
     },

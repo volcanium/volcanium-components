@@ -4,6 +4,7 @@ export * from './components/ui/LiCheck';
 export * from './components/ui/Button';
 export * from './components/ui/Contaner'; // Named exports inside
 export * from './components/ui/Select';
+export * from './components/ui/SearchSelect';
 export * from './components/ui/Modal';
 export * from './components/ui/Toast';
 export * from './components/ui/notify';  // Named exports inside
@@ -31,6 +32,7 @@ export { default as Title } from './components/ui/Title';
 export { default as LiCheck } from './components/ui/LiCheck';
 export { default as Button } from './components/ui/Button';
 export { default as Select } from './components/ui/Select';
+export { default as SearchSelect } from './components/ui/SearchSelect';
 export { default as Modal } from './components/ui/Modal';
 export { default as ToastProvider } from './components/ui/Toast';
 export { default as InDev } from './components/ui/InDev';
