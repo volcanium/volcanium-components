@@ -1,6 +1,6 @@
-import type { Meta, StoryObj } from '@storybook/react';
+﻿import type { Meta, StoryObj } from '@storybook/react';
 import Select from './Select';
-import { Contaner } from './Contaner';
+import { Container } from './Container';
 
 const OPTIONS = [
   { label: 'Option 1', value: 'opt1' },
@@ -56,9 +56,9 @@ export const InputVariantOne: Story = {
   },
   decorators: [
     (Story) => (
-      <Contaner title="Input variant — one">
+      <Container title="Input variant — one">
         <Story />
-      </Contaner>
+      </Container>
     ),
   ],
 };
@@ -72,9 +72,9 @@ export const InputVariantSecondary: Story = {
   },
   decorators: [
     (Story) => (
-      <Contaner title="Input variant — secondary">
+      <Container title="Input variant — secondary">
         <Story />
-      </Contaner>
+      </Container>
     ),
   ],
 };

@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, ReactNode } from "react"
+﻿import { useEffect, useState, useCallback, ReactNode } from "react"
 import { motion, AnimatePresence } from "framer-motion";
 import { registerNotify } from "./notify"
 
@@ -6,8 +6,14 @@ export interface ToastProviderProps {
   children: ReactNode;
 }
 
+interface ToastEntry {
+  id: string;
+  message: string;
+  type: string;
+}
+
 export default function ToastProvider({ children }: ToastProviderProps) {
-  const [toasts, setToasts] = useState<any[]>([])
+  const [toasts, setToasts] = useState<ToastEntry[]>([])
 
   const remove = useCallback((id: string) => {
     setToasts(t => t.filter(x => x.id !== id))
@@ -50,10 +56,10 @@ import { IconInfoCircle, IconCheck, IconAlertTriangle, IconX } from "@tabler/ico
 
 function Toast({ message, type, onClose }: ToastProps) {
   const styles = {
-    info: "bg-contaner border border-secondary/20 text-text",
-    success: "bg-contaner border border-green-500/50 text-green-400",
-    warn: "bg-contaner border border-yellow-500/50 text-yellow-400",
-    error: "bg-contaner border border-main/50 text-main",
+    info: "bg-container border border-secondary/20 text-text",
+    success: "bg-container border border-green-500/50 text-green-400",
+    warn: "bg-container border border-yellow-500/50 text-yellow-400",
+    error: "bg-container border border-main/50 text-main",
   }
 
   const icons = {
@@ -62,10 +68,6 @@ function Toast({ message, type, onClose }: ToastProps) {
     warn: <IconAlertTriangle size={20} className="text-yellow-500" />,
     error: <IconAlertTriangle size={20} className="text-main" />,
   }
-
-  useEffect(() => {
-    console.log(`[${type.toUpperCase()}] ${message}`)
-  }, [type, message])
 
   return (
     <motion.div

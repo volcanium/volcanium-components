@@ -1,9 +1,17 @@
-import clsx from "clsx";
+﻿import clsx from "clsx";
 import { motion } from "framer-motion";
 import { Link, useInRouterContext } from "react-router-dom";
 import { ButtonHTMLAttributes, ReactNode, forwardRef } from "react";
+import { Squircle } from "@squircle-js/react";
 
-type Variant = "primary" | "secondary" | "tertiary" | "lum";
+type Variant =
+  | "primary"
+  | "accent"
+  | "secondary"
+  | "dangerous"
+  | "discret"
+  | "tertiary"
+  | "lum";
 
 type ButtonProps = {
   children: ReactNode;
@@ -40,27 +48,34 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     };
 
     const styles = {
-      primary: "bg-main text-white",
-      secondary: "bg-back  text-white",
-      tertiary: "bg-contaner text-white",
+      accent: "bg-main border-1 border-secondary/40 text-white",
+      primary: "bg-accent hover:bg-main border-1 border-secondary/40",
+      secondary:
+        "bg-container hover:bg-main/50 border-1 border-secondary/40 text-white",
+      discret: "border-1 border-secondary/70 hover:bg-main/10",
+      dangerous:
+        "bg-container border-1 border-red-500/50 hover:border-red-500 hover:bg-red-500/10 text-white",
+      tertiary: "bg-container text-white",
       lum: "bg-secondary text-black",
     };
 
     const btn = (
-      <button
-        ref={ref}
-        {...props}
-        disabled={loading || disabled}
-        className={clsx(
-          "sm:py-1 sm:px-4 py-2 px-5 rounded-lg hover:scale-105 cursor-pointer flex flex-row gap-2 justify-center items-center transition disabled:opacity-50 disabled:cursor-not-allowed",
-          styles[variant],
-          className,
-        )}
-        onClick={handleClick}
-      >
-        {loading ? <Spinner /> : icon}
-        {children}
-      </button>
+      <Squircle asChild cornerRadius={10} cornerSmoothing={1}>
+        <button
+          ref={ref}
+          {...props}
+          disabled={loading || disabled}
+          className={clsx(
+            "px-6 py-1 hover:scale-103 active:scale-100 cursor-pointer flex flex-row gap-2 justify-center items-center transition disabled:opacity-50 disabled:cursor-not-allowed",
+            styles[variant],
+            className,
+          )}
+          onClick={handleClick}
+        >
+          {loading ? <Spinner /> : icon}
+          {children}
+        </button>
+      </Squircle>
     );
 
     if (link) {

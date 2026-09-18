@@ -1,7 +1,11 @@
-import { useId, ReactNode, InputHTMLAttributes } from "react";
+﻿import { useId, ReactNode, InputHTMLAttributes } from "react";
 import { IconRefresh } from "@tabler/icons-react";
+import { Squircle } from "@squircle-js/react";
 
-export interface InputProps extends Omit<InputHTMLAttributes<HTMLInputElement>, "label"> {
+export interface InputProps extends Omit<
+  InputHTMLAttributes<HTMLInputElement>,
+  "label"
+> {
   children?: string;
   className?: string;
   label?: ReactNode;
@@ -20,20 +24,22 @@ export default function Input({
   ...props
 }: InputProps) {
   const varaiants = {
-    one: "bg-back",
-    secondary: "bg-contaner",
+    one: "bg-container",
+    secondary: "bg-container",
   };
 
   const generatedId = useId();
   const inputId = id || generatedId;
 
   const InputEl = (
-    <input
-      {...props}
-      id={inputId}
-      className={`p-2 ${varaiants[variant]} rounded-lg outline-0 ${className || ""}`}
-      placeholder={children}
-    />
+    <Squircle asChild cornerRadius={10} cornerSmoothing={1}>
+      <input
+        {...props}
+        id={inputId}
+        className={`w-52 px-3 py-1 border border-secondary/20 focus:border-accent/50 ${varaiants[variant]} outline-0 ${className || ""}`}
+        placeholder={children}
+      />
+    </Squircle>
   );
   return label ? (
     <div className="flex flex-col gap-1">
@@ -43,7 +49,9 @@ export default function Input({
         htmlFor={inputId}
       >
         {label}
-        {loading && <IconRefresh size={14} className="animate-spin text-main" />}
+        {loading && (
+          <IconRefresh size={14} className="animate-spin text-main/90" />
+        )}
       </label>
     </div>
   ) : (

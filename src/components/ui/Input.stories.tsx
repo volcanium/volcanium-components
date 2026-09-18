@@ -1,6 +1,6 @@
-import type { Meta, StoryObj } from "@storybook/react";
+﻿import type { Meta, StoryObj } from "@storybook/react";
 import Input from "./Input";
-import { Contaner } from "./Contaner";
+import { Container } from "./Container";
 
 const meta: Meta<typeof Input> = {
   title: "UI/Input",
@@ -8,9 +8,9 @@ const meta: Meta<typeof Input> = {
   tags: ["autodocs"],
   decorators: [
     (Story) => (
-      <Contaner title="Exemple input">
+      <Container title="Exemple input">
         <Story />
-      </Contaner>
+      </Container>
     ),
   ],
 };

@@ -1,6 +1,10 @@
-import { useId, ReactNode, TextareaHTMLAttributes } from "react";
+﻿import { useId, ReactNode, TextareaHTMLAttributes } from "react";
+import { Squircle } from "@squircle-js/react";
 
-export interface TextareaProps extends Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, "label"> {
+export interface TextareaProps extends Omit<
+  TextareaHTMLAttributes<HTMLTextAreaElement>,
+  "label"
+> {
   className?: string;
   label?: ReactNode;
   id?: string;
@@ -17,8 +21,8 @@ export default function Textarea({
   ...props
 }: TextareaProps) {
   const variants = {
-    one: "bg-back",
-    secondary: "bg-contaner",
+    one: "bg-container",
+    secondary: "bg-container",
   };
 
   const resizeMap = {
@@ -32,11 +36,13 @@ export default function Textarea({
   const textareaId = id || generatedId;
 
   const TextareaEl = (
-    <textarea
-      {...props}
-      id={textareaId}
-      className={`p-2 ${variants[variant]} ${resizeMap[resize]} rounded-lg outline-0 min-h-24 w-full ${className || ""}`}
-    />
+    <Squircle asChild cornerRadius={10} cornerSmoothing={1}>
+      <textarea
+        {...props}
+        id={textareaId}
+        className={`px-3 py-1 ${variants[variant]} ${resizeMap[resize]} w-52 max-w-100 min-w-30 min-h-20 max-h-100 border border-secondary/20 focus:border-accent/50 outline-0 ${className || ""}`}
+      />
+    </Squircle>
   );
 
   return label ? (

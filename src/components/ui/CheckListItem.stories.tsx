@@ -1,14 +1,14 @@
 import type { Meta, StoryObj } from '@storybook/react';
-import LiCheck from './LiCheck';
+import CheckListItem from './CheckListItem';
 
-const meta: Meta<typeof LiCheck> = {
-  title: 'UI/LiCheck',
-  component: LiCheck,
+const meta: Meta<typeof CheckListItem> = {
+  title: 'UI/CheckListItem',
+  component: CheckListItem,
   tags: ['autodocs'],
 };
 
 export default meta;
-type Story = StoryObj<typeof LiCheck>;
+type Story = StoryObj<typeof CheckListItem>;
 
 export const Default: Story = {
   args: {

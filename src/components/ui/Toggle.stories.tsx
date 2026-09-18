@@ -1,6 +1,6 @@
-import type { Meta, StoryObj } from "@storybook/react";
+﻿import type { Meta, StoryObj } from "@storybook/react";
 import Toggle from "./Toggle";
-import { Contaner } from "./Contaner";
+import { Container } from "./Container";
 
 const meta: Meta<typeof Toggle> = {
   title: "UI/Toggle",
@@ -8,9 +8,9 @@ const meta: Meta<typeof Toggle> = {
   tags: ["autodocs"],
   decorators: [
     (Story) => (
-      <Contaner title="Exemple toggle">
+      <Container title="Exemple toggle">
         <Story />
-      </Contaner>
+      </Container>
     ),
   ],
 };

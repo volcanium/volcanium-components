@@ -1,4 +1,4 @@
-import React, {
+﻿import React, {
   useState,
   useEffect,
   useRef,
@@ -129,11 +129,11 @@ function UserCard({
         <img
           src={avatarUrl}
           alt="Avatar"
-          className={`h-10 w-10 ${open ? "ml-0" : "ml-0.5"} rounded-full bg-contaner object-cover shrink-0`}
+          className={`h-10 w-10 ${open ? "ml-0" : "ml-0.5"} rounded-full bg-container object-cover shrink-0`}
         />
       ) : (
         <div
-          className={`h-10 w-10 rounded-full transition-all duration-300 ${open ? "bg-contaner" : "bg-back"} flex items-center justify-center text-lg font-bold text-secondary shrink-0`}
+          className={`h-10 w-10 rounded-full transition-all duration-300 ${open ? "bg-container" : "bg-back"} flex items-center justify-center text-lg font-bold text-secondary shrink-0`}
         >
           {initials}
         </div>
@@ -353,7 +353,7 @@ export default function Sidebar({
   return (
     <main className="flex h-screen font-main text-text bg-back overflow-hidden">
       <div
-        className={`flex overflow-y-auto overflow-x-hidden transition-all duration-300 ${open ? "sm:w-75 w-full" : openDelay ? "sm:w-85" : "w-15"} ${open ? "sm:static fixed h-full z-20" : ""} px-2 z-10 items-center justify-between gap-5 pt-4 py-1 flex-col bg-contaner`}
+        className={`flex overflow-y-auto overflow-x-hidden transition-all duration-300 ${open ? "sm:w-75 w-full" : openDelay ? "sm:w-85" : "w-15"} ${open ? "sm:static fixed h-full z-20" : ""} px-2 z-10 items-center justify-between gap-5 pt-4 py-1 flex-col bg-container`}
       >
         <div className="flex flex-col sm:gap-5 w-full">
           <Header

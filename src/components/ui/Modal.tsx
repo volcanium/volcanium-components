@@ -1,6 +1,6 @@
-import { motion, AnimatePresence } from "framer-motion";
+﻿import { motion, AnimatePresence } from "framer-motion";
 import Button from "./Button";
-import { useId, isValidElement, ReactNode, ReactElement } from "react";
+import { useId, isValidElement, ReactNode, ReactElement, useRef } from "react";
 import React from "react";
 import useKeyPress from "../../utils/useKeyPress";
 import { useEffect } from "react";
@@ -69,11 +69,12 @@ export default function Modal(props: ModalProps) {
     onRefuse = () => {},
   } = props;
   const { t } = useLanguage();
-  
+  const modalRef = useRef<HTMLDivElement>(null);
+
   useEffect(() => {
     if (isOpen) {
-      let inputs = document.querySelectorAll("input, textarea, select");
-      if (inputs.length > 0) {
+      const inputs = modalRef.current?.querySelectorAll("input, textarea, select");
+      if (inputs && inputs.length > 0) {
         (inputs[0] as HTMLElement).focus();
       }
     }
@@ -155,12 +156,16 @@ export default function Modal(props: ModalProps) {
             className="backdropFilter fixed inset-0 z-50 flex items-center justify-center bg-back/60"
           >
             <motion.div
+              ref={modalRef}
+              role="dialog"
+              aria-modal="true"
+              aria-label={title}
               variants={modalVariants as any}
               initial="hidden"
               animate="visible"
               exit="exit"
               onClick={(e: React.MouseEvent) => e.stopPropagation()}
-              className="sm:w-11/12 sm:min-w-125 max-w-2xl sm:h-auto h-full w-full sm:justify-start justify-between flex flex-col sm:rounded-2xl bg-contaner p-4 sm:p-4"
+              className="sm:w-11/12 sm:min-w-125 max-w-2xl sm:h-auto h-full w-full sm:justify-start justify-between flex flex-col sm:rounded-2xl bg-container p-4 sm:p-4"
             >
               <div>
                 {title && (

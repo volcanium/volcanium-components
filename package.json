@@ -38,7 +38,9 @@
     "build": "tsup",
     "dev": "tsup --watch",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "docs:dev": "npm --prefix docs-site run dev",
+    "docs:build": "npm --prefix docs-site run build"
   },
   "peerDependencies": {
     "better-auth": "*",
@@ -77,5 +79,8 @@
     "tailwindcss": "^4.3.3",
     "tsup": "^8.2.4",
     "typescript": "5.6.3"
+  },
+  "dependencies": {
+    "@squircle-js/react": "^1.3.0"
   }
 }

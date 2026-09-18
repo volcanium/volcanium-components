@@ -1,4 +1,4 @@
-import { ReactNode, useState, useEffect, useRef } from "react";
+﻿import { ReactNode, useState, useEffect, useRef } from "react";
 import { IconArrowUp, IconMenu2, IconX } from "@tabler/icons-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Button from "../ui/Button";
@@ -275,7 +275,7 @@ export default function Nav({
                   }}
                   className={`px-4 py-3 rounded-xl cursor-pointer active:text-main text-sm font-medium transition-colors duration-200 block ${
                     (a.id && activeSection === a.id)
-                      ? "text-main bg-contaner border-main"
+                      ? "text-main bg-container border-main"
                       : "text-white/70 hover:text-secondary hover:bg-white/5"
                   }`}
                 >
@@ -336,8 +336,8 @@ export default function Nav({
                 href={a.href}
                 className={`whitespace-nowrap cursor-pointer rounded-lg transition-all px-3 py-0.5 duration-300 ${
                   (a.id && activeSection === a.id)
-                    ? "text-main bg-contaner/50"
-                    : "hover:bg-contaner/40 active:text-main hover:text-secondary"
+                    ? "text-main bg-container/50"
+                    : "hover:bg-container/40 active:text-main hover:text-secondary"
                 }`}
                 onClick={(e) => {
                   if (a.id) {

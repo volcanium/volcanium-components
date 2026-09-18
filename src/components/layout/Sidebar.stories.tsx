@@ -1,4 +1,4 @@
-import type { Meta, StoryObj } from "@storybook/react";
+﻿import type { Meta, StoryObj } from "@storybook/react";
 import React, { useState } from "react";
 import { useLocation } from "react-router-dom";
 import ToastProvider from "./../ui/Toast";
@@ -113,7 +113,7 @@ export const Default: Story = {
           activePath={currentPath}
         >
           <div className="p-10 w-full h-full bg-back text-text flex items-center justify-center">
-            <div className="bg-contaner p-8 rounded-2xl w-full max-w-4xl border border-white/5 shadow-2xl">
+            <div className="bg-container p-8 rounded-2xl w-full max-w-4xl border border-white/5 shadow-2xl">
               <h1 className="text-4xl font-title text-secondary mb-4">
                 Main Content
               </h1>

@@ -1,14 +1,15 @@
 import type { Meta, StoryObj } from "@storybook/react";
-import { Contaner, InformationButton } from "./Contaner";
+import { Container } from "./Container";
+import { InformationButton } from "./InformationButton";
 
-const meta: Meta<typeof Contaner> = {
-  title: "UI/Contaner",
-  component: Contaner,
+const meta: Meta<typeof Container> = {
+  title: "UI/Container",
+  component: Container,
   tags: ["autodocs"],
 };
 
 export default meta;
-type Story = StoryObj<typeof Contaner>;
+type Story = StoryObj<typeof Container>;
 
 export const Default: Story = {
   args: {
@@ -29,9 +30,9 @@ export const WithLink: Story = {
 
 export const InfoButtonExample: StoryObj<typeof InformationButton> = {
   render: (args) => (
-    <Contaner title="Info button">
+    <Container title="Info button">
       <InformationButton {...args} />
-    </Contaner>
+    </Container>
   ),
   args: {
     info: {

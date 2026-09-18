@@ -1,6 +1,6 @@
-import type { Meta, StoryObj } from "@storybook/react";
+﻿import type { Meta, StoryObj } from "@storybook/react";
 import Textarea from "./Textarea";
-import { Contaner } from "./Contaner";
+import { Container } from "./Container";
 
 const meta: Meta<typeof Textarea> = {
   title: "UI/Textarea",
@@ -8,9 +8,9 @@ const meta: Meta<typeof Textarea> = {
   tags: ["autodocs"],
   decorators: [
     (Story) => (
-      <Contaner title="Exemple textarea">
+      <Container title="Exemple textarea">
         <Story />
-      </Contaner>
+      </Container>
     ),
   ],
 };

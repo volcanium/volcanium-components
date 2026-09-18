@@ -1,6 +1,6 @@
-import type { Meta, StoryObj } from '@storybook/react';
+﻿import type { Meta, StoryObj } from '@storybook/react';
 import Grid from './Grid';
-import { Contaner } from '../ui/Contaner';
+import { Container } from '../ui/Container';
 
 const meta: Meta<typeof Grid> = {
   title: 'Layout/Grid',
@@ -16,11 +16,11 @@ export const Default: Story = {
     min: 200,
     children: (
       <>
-        <Contaner title="Widget 1"><p>Content 1</p></Contaner>
-        <Contaner title="Widget 2"><p>Content 2</p></Contaner>
-        <Contaner title="Widget 3"><p>Content 3</p></Contaner>
-        <Contaner title="Widget 4"><p>Content 4</p></Contaner>
-        <Contaner title="Widget 5"><p>Content 5</p></Contaner>
+        <Container title="Widget 1"><p>Content 1</p></Container>
+        <Container title="Widget 2"><p>Content 2</p></Container>
+        <Container title="Widget 3"><p>Content 3</p></Container>
+        <Container title="Widget 4"><p>Content 4</p></Container>
+        <Container title="Widget 5"><p>Content 5</p></Container>
       </>
     ),
   },

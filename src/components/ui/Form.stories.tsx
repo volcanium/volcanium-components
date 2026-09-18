@@ -1,7 +1,7 @@
-import type { Meta, StoryObj } from '@storybook/react';
+﻿import type { Meta, StoryObj } from '@storybook/react';
 import Form from './Form';
 import Button from './Button';
-import { Contaner } from './Contaner';
+import { Container } from './Container';
 
 const meta: Meta<typeof Form> = {
   title: 'UI/Form',
@@ -9,9 +9,9 @@ const meta: Meta<typeof Form> = {
   tags: ['autodocs'],
   decorators: [
     (Story) => (
-      <Contaner title="Authentication" fix>
+      <Container title="Authentication" fix>
         <Story />
-      </Contaner>
+      </Container>
     ),
   ],
 };
