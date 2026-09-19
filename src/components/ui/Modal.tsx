@@ -1,5 +1,8 @@
 ﻿import { motion, AnimatePresence } from "framer-motion";
+import { Squircle } from "@squircle-js/react";
 import Button from "./Button";
+import Title from "./Title";
+import { IconX } from "@tabler/icons-react";
 import { useId, isValidElement, ReactNode, ReactElement, useRef } from "react";
 import React from "react";
 import useKeyPress from "../../utils/useKeyPress";
@@ -80,6 +83,34 @@ export default function Modal(props: ModalProps) {
     }
   }, [isOpen]);
 
+  // Prevent the page behind the modal from scrolling while it's open.
+  useEffect(() => {
+    if (!isOpen) return;
+    const original = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      document.body.style.overflow = original;
+    };
+  }, [isOpen]);
+
+  // Basic focus trap: keep Tab/Shift+Tab cycling within the dialog.
+  const handleTrapFocus = (e: React.KeyboardEvent) => {
+    if (e.key !== "Tab" || !modalRef.current) return;
+    const focusable = modalRef.current.querySelectorAll<HTMLElement>(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
+    );
+    if (focusable.length === 0) return;
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  };
+
   const handleConfrimBtn = () => {
     if (autoClose) onClose();
     SubmitFn();
@@ -87,32 +118,32 @@ export default function Modal(props: ModalProps) {
   const formId = useId();
   const backdropVariants = {
     hidden: { opacity: 0 },
-    visible: { opacity: 1 },
-    exit: { opacity: 0 },
+    visible: { opacity: 1, transition: { duration: 0.2, ease: "easeOut" } },
+    exit: { opacity: 0, transition: { duration: 0.15, ease: "easeIn" } },
   };
 
   const modalVariants = {
     hidden: {
       opacity: 0,
-      scale: 0.75,
-      y: -50,
+      scale: 0.97,
+      y: 8,
     },
     visible: {
       opacity: 1,
       scale: 1,
       y: 0,
       transition: {
-        type: "spring",
-        damping: 25,
-        stiffness: 300,
+        duration: 0.25,
+        ease: [0.16, 1, 0.3, 1],
       },
     },
     exit: {
       opacity: 0,
-      scale: 0.75,
-      y: -50,
+      scale: 0.98,
+      y: 6,
       transition: {
-        duration: 0.2,
+        duration: 0.15,
+        ease: "easeIn",
       },
     },
   };
@@ -142,19 +173,19 @@ export default function Modal(props: ModalProps) {
   return (
     <AnimatePresence>
       {isOpen && (
-        <>
-          <motion.div
-            variants={backdropVariants}
-            initial="hidden"
-            animate="visible"
-            exit="exit"
-            onMouseDown={(e: React.MouseEvent) => {
-              if (e.target === e.currentTarget) {
-                onClose();
-              }
-            }}
-            className="backdropFilter fixed inset-0 z-50 flex items-center justify-center bg-back/60"
-          >
+        <motion.div
+          variants={backdropVariants}
+          initial="hidden"
+          animate="visible"
+          exit="exit"
+          onMouseDown={(e: React.MouseEvent) => {
+            if (e.target === e.currentTarget) {
+              onClose();
+            }
+          }}
+          className="fixed inset-0 z-50 flex items-center justify-center bg-back/70 backdrop-blur-sm p-3 sm:p-6"
+        >
+          <Squircle cornerRadius={22} cornerSmoothing={1} asChild>
             <motion.div
               ref={modalRef}
               role="dialog"
@@ -165,47 +196,38 @@ export default function Modal(props: ModalProps) {
               animate="visible"
               exit="exit"
               onClick={(e: React.MouseEvent) => e.stopPropagation()}
-              className="sm:w-11/12 sm:min-w-125 max-w-2xl sm:h-auto h-full w-full sm:justify-start justify-between flex flex-col sm:rounded-2xl bg-container p-4 sm:p-4"
+              onKeyDown={handleTrapFocus}
+              className="sm:w-11/12 sm:min-w-125 max-w-2xl sm:h-auto h-full w-full sm:justify-start justify-between flex flex-col bg-container border border-line shadow-[0_24px_60px_-20px_rgba(0,0,0,0.55)] p-5 sm:p-7"
             >
               <div>
                 {title && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.1 }}
-                    className="mb-6 flex items-center justify-between gap-10"
-                  >
-                    <h2 className="text-3xl font-bold text-secondary">
-                      {title}
-                    </h2>
+                  <div className="mb-4 flex items-center justify-between gap-10">
+                    <Title level="lg">{title}</Title>
                     <button
                       onClick={(e: React.MouseEvent) => {
                         e.stopPropagation();
                         onClose();
                       }}
-                      className="sm:flex hidden h-7 cursor-pointer w-7 items-center justify-center border-none bg-none text-2xl text-secondary transition-colors duration-300 hover:text-main"
+                      aria-label={t("close")}
+                      className="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-full border border-transparent text-secondary/60 transition-colors duration-200 hover:border-line hover:bg-veil hover:text-secondary"
                     >
-                      ✕
+                      <IconX className="w-4 h-4" />
                     </button>
-                  </motion.div>
+                  </div>
                 )}
 
-                <motion.div
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: 0.15 }}
-                  className={`flex flex-col gap-2 px-2 sm:px-20 leading-relaxed text-text ${className || ""}`}
+                <div
+                  className={`h-px bg-line mb-5 transition-opacity duration-200 ${title ? "opacity-100" : "opacity-0"}`}
+                />
+
+                <div
+                  className={`flex flex-col gap-2 leading-relaxed text-text ${className || ""}`}
                 >
                   {content}
-                </motion.div>
+                </div>
               </div>
-              <motion.div
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 0.2 }}
-                className="mt-6 flex justify-end gap-3"
-              >
-                {buttons && (
+              {buttons && (
+                <div className="mt-6 flex justify-end gap-3">
                   <div className="flex gap-3 flex-row sm:w-auto w-full">
                     <Button
                       onClick={() => {
@@ -228,11 +250,11 @@ export default function Modal(props: ModalProps) {
                       {btn?.confirm?.label || t("confirm")}
                     </Button>
                   </div>
-                )}
-              </motion.div>
+                </div>
+              )}
             </motion.div>
-          </motion.div>
-        </>
+          </Squircle>
+        </motion.div>
       )}
     </AnimatePresence>
   );

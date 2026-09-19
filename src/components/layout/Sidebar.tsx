@@ -1,16 +1,14 @@
-﻿import React, {
-  useState,
-  useEffect,
-  useRef,
-  Fragment,
-  useCallback,
-} from "react";
+import React, { useEffect, useRef, useState } from "react";
+import clsx from "clsx";
+import { motion } from "framer-motion";
 import { Link, useInRouterContext } from "react-router-dom";
+import { Squircle } from "@squircle-js/react";
 import LinkV from "../ui/Link";
 import {
-  IconLayoutSidebar,
   IconLayoutSidebarLeftCollapse,
   IconLayoutSidebarLeftExpand,
+  IconMenu2,
+  IconX,
   IconUserEdit,
 } from "@tabler/icons-react";
 import Title from "../ui/Title";
@@ -69,42 +67,57 @@ export interface SidebarProps {
   children?: React.ReactNode;
 }
 
+const ICON_BOX = "w-10 h-10";
+
 // ---------------------------------------------
 // Sub-components
 // ---------------------------------------------
 
-function Header({ openFnc, open, openDelay, title, subtitle }: any) {
-  const [btnHover, setBtnHover] = useState(false);
-
+function Header({ openFnc, open, title, subtitle }: any) {
   return (
-    <header className="flex flex-row w-full relative">
-      <div
-        className={`flex flex-col transition-all duration-300 items-start ${open ? "opacity-100" : "opacity-0 pointer-events-none"}`}
-      >
-        <Title className="text-3xl">{title}</Title>
-        <Title className="text-lg text-main! truncate">{subtitle}</Title>
-      </div>
-      <div
-        onMouseEnter={() => setBtnHover(true)}
-        onMouseLeave={() => setBtnHover(false)}
-        className="pt-1 cursor-pointer"
-        onClick={openFnc}
-      >
-        {btnHover ? (
-          open ? (
-            <IconLayoutSidebarLeftCollapse
-              className={`text-secondary transition-all duration-300 cursor-pointer absolute z-2 ${openDelay ? "sm:left-65 right-3" : "left-3"}`}
-            />
+    <header className="flex flex-row items-center gap-3 flex-1 min-w-0 h-10">
+      <Squircle cornerRadius={9} cornerSmoothing={1} asChild>
+        <button
+          type="button"
+          onClick={openFnc}
+          aria-label={open ? "Réduire le menu" : "Déplier le menu"}
+          className={clsx(
+            ICON_BOX,
+            "shrink-0 hidden sm:flex items-center justify-center text-secondary/70 hover:text-secondary hover:bg-veil active:scale-95 transition-all duration-200 cursor-pointer",
+          )}
+        >
+          {open ? (
+            <IconLayoutSidebarLeftCollapse size={19} stroke={1.75} />
           ) : (
-            <IconLayoutSidebarLeftExpand
-              className={`text-secondary transition-all duration-300 cursor-pointer absolute z-2 ${openDelay ? "sm:left-65 right-3" : "left-3"}`}
-            />
-          )
-        ) : (
-          <IconLayoutSidebar
-            className={`text-secondary transition-all duration-300 cursor-pointer absolute z-2 ${openDelay ? "sm:left-65 right-3" : "left-3"}`}
-          />
+            <IconLayoutSidebarLeftExpand size={19} stroke={1.75} />
+          )}
+        </button>
+      </Squircle>
+      {/* Always mounted, flex-1 + min-w-0 — same pattern as the nav labels: it's the
+          header row's own width (driven by the panel's width transition) that
+          naturally shrinks this to nothing, so it fades in sync instead of
+          vanishing the instant `open` flips. No "truncate" here either, since its
+          ellipsis would recompute every frame while shrinking and flicker. */}
+      <div
+        className={clsx(
+          "flex flex-col items-start min-w-0 flex-1 overflow-hidden transition-opacity duration-300 ease-in-out",
+          open ? "opacity-100 delay-150" : "opacity-0",
         )}
+      >
+        <Title
+          variant="brand"
+          level="md"
+          className="leading-tight whitespace-nowrap overflow-hidden w-full"
+        >
+          {title}
+        </Title>
+        <Title
+          variant="brand"
+          level="sm"
+          className="text-main! whitespace-nowrap overflow-hidden w-full"
+        >
+          {subtitle}
+        </Title>
       </div>
     </header>
   );
@@ -121,92 +134,144 @@ function UserCard({
   ...props
 }: any) {
   return (
-    <div
-      {...props}
-      className={`transition-all duration-300 overflow-hidden py-2 ${open ? "min-w-50 px-2 bg-back pr-5" : "min-w-11 max-w-11 px-0 bg-transparent cursor-pointer sm:-ml-0 -ml-1"} w-full rounded-lg flex flex-row items-center gap-3 ${className || ""}`}
-    >
-      {avatarUrl ? (
-        <img
-          src={avatarUrl}
-          alt="Avatar"
-          className={`h-10 w-10 ${open ? "ml-0" : "ml-0.5"} rounded-full bg-container object-cover shrink-0`}
-        />
-      ) : (
+    <Squircle cornerRadius={12} cornerSmoothing={1} asChild>
+      <div
+        {...props}
+        className={clsx(
+          "group flex flex-row items-center gap-4 h-14 transition-[width,padding-left,background-color] duration-300 ease-in-out overflow-hidden",
+          open
+            ? "w-full pl-3 bg-veil hover:bg-veil-strong"
+            : "w-10 pl-0 bg-transparent cursor-pointer",
+          className,
+        )}
+      >
+        {/* Fixed-size slot, always centered inside it — but unlike justify-content,
+            padding-left DOES animate smoothly, so the avatar genuinely slides over to
+            make room when opening and slides back to dead-center when collapsed,
+            instead of jumping. */}
+        <div className={clsx(ICON_BOX, "flex items-center justify-center shrink-0")}>
+          {avatarUrl ? (
+            <img
+              src={avatarUrl}
+              alt="Avatar"
+              className="h-9 w-9 rounded-full ring-1 ring-line bg-back object-cover"
+            />
+          ) : (
+            <div className="h-9 w-9 rounded-full ring-1 ring-line bg-main/20 flex items-center justify-center text-sm font-bold text-main">
+              {initials}
+            </div>
+          )}
+        </div>
         <div
-          className={`h-10 w-10 rounded-full transition-all duration-300 ${open ? "bg-container" : "bg-back"} flex items-center justify-center text-lg font-bold text-secondary shrink-0`}
+          className={clsx(
+            "flex flex-col min-w-0 flex-1 transition-opacity duration-300 ease-in-out pr-1",
+            open ? "opacity-100 delay-150" : "opacity-0",
+          )}
         >
-          {initials}
+          <h2 className="text-[14.5px] font-medium leading-tight truncate w-40">
+            {name || "Name"}
+          </h2>
+          <h3 className="text-secondary/50 truncate text-xs mt-0.5">
+            {roleName}
+          </h3>
         </div>
-      )}
-      {open && (
-        <div className="flex flex-col min-w-0 flex-1">
-          <h2 className="text-[17px] truncate w-40">{name || "Name"}</h2>
-          <h3 className="text-white/50 truncate text-sm -mt-1">{roleName}</h3>
-        </div>
-      )}
-      {onModif && open && (
-        <div
-          onClick={(e) => {
-            e.stopPropagation();
-            onModif();
-          }}
-        >
-          <IconUserEdit className="text-secondary transition hover:text-main cursor-pointer w-6 h-6 shrink-0" />
-        </div>
-      )}
-    </div>
+        {onModif && open && (
+          <div
+            onClick={(e) => {
+              e.stopPropagation();
+              onModif();
+            }}
+            className="shrink-0 pr-2.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+          >
+            <IconUserEdit
+              className="text-secondary/70 hover:text-main cursor-pointer w-[18px] h-[18px]"
+              stroke={1.75}
+            />
+          </div>
+        )}
+      </div>
+    </Squircle>
   );
 }
 
 function NavButton({
   open,
   children,
+  label,
+  alert,
   active = false,
+  loading,
   onClick,
   page,
-  loading,
   ...props
 }: any) {
   const inRouterContext = useInRouterContext();
-  const baseClasses = `px-2 py-1 flex w-full relative flex-row gap-2 items-center hover:scale-100! text-xl rounded-lg cursor-pointer transition-colors duration-200`;
-  const sizeClasses = `${loading && !open ? "w-44 justify-start" : ""} ${open ? "justify-start h-11" : "h-11"}`;
-  const activeClasses = active
-    ? "bg-main hover:brightness-110 text-white"
-    : "bg-transparent text-secondary hover:bg-back font-normal";
-
-  const className = `${baseClasses} ${sizeClasses} ${activeClasses}`;
-
-  if (page) {
-    if (inRouterContext) {
-      return (
-        <Link to={page} className={className} onClick={onClick} {...props}>
-          {children}
-        </Link>
-      );
-    }
-    return (
-      <a href={page} className={className} onClick={onClick} {...props}>
-        {children}
-      </a>
-    );
-  }
-
-  return (
-    <button
-      className={className}
-      onClick={onClick}
-      disabled={loading}
-      {...props}
-    >
-      {children}
-    </button>
+  const className = clsx(
+    "flex items-center h-10 rounded-lg cursor-pointer overflow-hidden transition-[width,background-color] duration-300 hover:scale-100!",
+    open ? "w-full" : ICON_BOX,
+    active
+      ? "bg-main text-white"
+      : "bg-transparent text-secondary/85 hover:bg-veil hover:text-secondary font-normal",
   );
+
+  const inner = (
+    <>
+      {/* Fixed-size slot: the icon never moves, regardless of open state */}
+      <div className={clsx(ICON_BOX, "flex items-center justify-center shrink-0")}>
+        {children}
+      </div>
+      {/* Always flex-1 + min-w-0: it's the button's own width transition (above) that
+          naturally shrinks this to nothing as it collapses. No text-overflow ellipsis
+          here on purpose — "truncate" recomputes the "…" every frame as the width
+          shrinks, which flashes. Plain overflow-hidden just gets covered cleanly by
+          the same edge that's already animating, in sync with the fade. */}
+      <span
+        className={clsx(
+          "whitespace-nowrap overflow-hidden text-left min-w-0 flex-1 pr-3 transition-opacity duration-300 ease-in-out",
+          open ? "opacity-100 delay-150" : "opacity-0",
+        )}
+      >
+        {label}
+      </span>
+      {alert && (
+        <span className="mr-3 flex items-center justify-center w-2 h-2 shrink-0">
+          <span className="w-1.5 h-1.5 bg-main rounded-full ring-2 ring-main/30 animate-pulse" />
+        </span>
+      )}
+    </>
+  );
+
+  const content = (
+    <Squircle cornerRadius={10} cornerSmoothing={1} asChild>
+      {page ? (
+        inRouterContext ? (
+          <Link to={page} className={className} onClick={onClick} {...props}>
+            {inner}
+          </Link>
+        ) : (
+          <a href={page} className={className} onClick={onClick} {...props}>
+            {inner}
+          </a>
+        )
+      ) : (
+        <button
+          className={className}
+          onClick={onClick}
+          disabled={loading}
+          {...props}
+        >
+          {inner}
+        </button>
+      )}
+    </Squircle>
+  );
+
+  return content;
 }
 
 function Nav({
   tabs,
   open = true,
-  openDelay = true,
   activePath,
   specificTabs = [],
   userRole,
@@ -223,22 +288,25 @@ function Nav({
     );
   };
 
-  const IconSystem = (btn: any, isActive: boolean) => {
+  const renderIcon = (btn: any, isActive: boolean) => {
+    if (btn.loading) {
+      return (
+        <motion.div
+          animate={{ rotate: 360 }}
+          transition={{ repeat: Infinity, duration: 0.8, ease: "linear" }}
+          className="w-[19px] h-[19px] shrink-0 border-2 border-current border-t-transparent rounded-full opacity-70"
+        />
+      );
+    }
     const IconFilled = btn.iconFilled;
     const IconOutline = btn.icon;
-    return isActive && !btn.loading && IconFilled ? (
-      <IconFilled className="w-6 h-6 absolute left-2.5" />
-    ) : (
-      !btn.loading && IconOutline && (
-        <IconOutline className="absolute left-2.5" stroke={isActive ? 3 : 2} />
-      )
-    );
+    const Icon = isActive && IconFilled ? IconFilled : IconOutline;
+    if (!Icon) return <span className="w-[19px] h-[19px] shrink-0" />;
+    return <Icon className="shrink-0" size={19} stroke={isActive ? 2.25 : 1.75} />;
   };
 
   return (
-    <div
-      className={`flex flex-col gap-2 ${open ? "sm:p-0 p-8 sm:px-0 px-10" : "sm:p-0 p-0 sm:px-0 px-0"} transition-all duration-300`}
-    >
+    <div className="flex flex-col gap-1">
       {tabs.map((btn: any) => {
         const isActive = isPageActive(btn);
         return (
@@ -249,20 +317,10 @@ function Nav({
             open={open}
             active={isActive}
             page={btn.page}
+            label={btn.name}
+            alert={open && btn.alert}
           >
-            {IconSystem(btn, isActive)}
-            <div
-              className={`truncate transition-all duration-300 absolute left-10 ${open && openDelay ? "opacity-100" : "opacity-0 pointer-events-none"}`}
-            >
-              {btn.name}
-            </div>
-            {btn.alert && (
-              <div
-                className={`flex justify-center absolute duration-0 transition-none ${open ? "left-8" : "right-1.5"} items-center w-2 h-2 bg-main/50 rounded-full -mt-2 -ml-1`}
-              >
-                <div className="w-1 h-1 bg-main rounded-full"></div>
-              </div>
-            )}
+            {renderIcon(btn, isActive)}
           </NavButton>
         );
       })}
@@ -270,9 +328,9 @@ function Nav({
         specificTabs.map((section: any) => {
           return (
             section.role === userRole && (
-              <Fragment key={section.groupName}>
+              <React.Fragment key={section.groupName}>
                 <Center>
-                  <div className="w-[80%] h-0.5 my-2 bg-secondary/50 rounded-2xl"></div>
+                  <div className="w-[85%] h-px my-3 bg-line"></div>
                 </Center>
                 {section.tabs.map((btn: any) => {
                   const isActive = isPageActive(btn);
@@ -284,17 +342,14 @@ function Nav({
                       loading={btn.loading}
                       open={open}
                       active={isActive}
+                      label={btn.name}
+                      alert={open && btn.alert}
                     >
-                      {IconSystem(btn, isActive)}
-                      <div
-                        className={`truncate transition-all duration-300 absolute left-10 ${open && openDelay ? "opacity-100" : "opacity-0 pointer-events-none"}`}
-                      >
-                        {btn.name}
-                      </div>
+                      {renderIcon(btn, isActive)}
                     </NavButton>
                   );
                 })}
-              </Fragment>
+              </React.Fragment>
             )
           );
         })}
@@ -322,68 +377,106 @@ export default function Sidebar({
 }: SidebarProps) {
   const [internalOpen, setInternalOpen] = useState(isOpen);
   const open = onToggle ? isOpen : internalOpen;
-  const [openDelay, setOpenDelay] = useState(open);
-  const delayTimerRef = useRef<number | null>(null);
 
-  const toggleOpen = useCallback(() => {
-    if (delayTimerRef.current) {
-      clearTimeout(delayTimerRef.current);
-      delayTimerRef.current = null;
-    }
+  const toggleOpen = () => {
     const nextOpen = !open;
     if (onToggle) onToggle(nextOpen);
     else setInternalOpen(nextOpen);
+  };
 
-    delayTimerRef.current = window.setTimeout(() => {
-      setOpenDelay(nextOpen);
-      delayTimerRef.current = null;
-    }, 100);
-  }, [open, onToggle]);
-
+  // Close the drawer on navigation — but only on mobile, where it's a
+  // full-screen overlay covering the destination page. On desktop `open`
+  // is the user's persisted collapse preference (icon strip <-> full
+  // sidebar), unrelated to which page is active, so it must stay untouched.
+  const isFirstRender = useRef(true);
   useEffect(() => {
-    setOpenDelay(open);
-  }, [open]);
-
-  useEffect(() => {
-    return () => {
-      if (delayTimerRef.current) clearTimeout(delayTimerRef.current);
-    };
-  }, []);
+    if (isFirstRender.current) {
+      isFirstRender.current = false;
+      return;
+    }
+    if (!open) return;
+    if (typeof window === "undefined" || window.matchMedia("(min-width: 640px)").matches) {
+      return;
+    }
+    if (onToggle) onToggle(false);
+    else setInternalOpen(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activePath]);
 
   return (
-    <main className="flex h-screen font-main text-text bg-back overflow-hidden">
+    <main className="flex h-screen font-main text-text bg-back overflow-hidden relative">
+      {/* Mobile-only hamburger trigger — replaces the collapsed icon strip entirely below `sm` */}
+      {!open && (
+        <Squircle cornerRadius={10} cornerSmoothing={1} asChild>
+          <button
+            type="button"
+            onClick={toggleOpen}
+            aria-label="Ouvrir le menu"
+            className="sm:hidden fixed top-4 left-4 z-30 w-10 h-10 flex items-center justify-center bg-container text-secondary border border-line active:scale-95 transition-transform duration-150 cursor-pointer"
+          >
+            <IconMenu2 size={20} stroke={1.75} />
+          </button>
+        </Squircle>
+      )}
+
+      {/* Mobile-only backdrop, tap to close */}
+      {open && (
+        <div
+          onClick={toggleOpen}
+          aria-hidden="true"
+          className="sm:hidden fixed inset-0 bg-black/60 z-10"
+        />
+      )}
+
       <div
-        className={`flex overflow-y-auto overflow-x-hidden transition-all duration-300 ${open ? "sm:w-75 w-full" : openDelay ? "sm:w-85" : "w-15"} ${open ? "sm:static fixed h-full z-20" : ""} px-2 z-10 items-center justify-between gap-5 pt-4 py-1 flex-col bg-container`}
+        className={clsx(
+          // Mobile: a plain slide (transform), the drawer is always full-width and
+          // just moves on/off screen — no width animation involved there at all.
+          // Desktop: unaffected, still the icon-strip <-> full-width expand/collapse.
+          "flex flex-col overflow-y-auto overflow-x-hidden shrink-0 w-full px-3 pt-5 py-3",
+          "fixed sm:static h-full z-20 bg-back border-r border-line",
+          "transition-transform sm:transition-[width] duration-300 ease-in-out",
+          open
+            ? "translate-x-0 sm:w-72"
+            : "-translate-x-full sm:translate-x-0 sm:w-16",
+        )}
       >
-        <div className="flex flex-col sm:gap-5 w-full">
-          <Header
-            openFnc={toggleOpen}
-            open={open}
-            openDelay={openDelay}
-            title={title}
-            subtitle={subtitle}
-          />
+        <div className="flex flex-col gap-5 w-full">
+          <div className="flex flex-row items-center gap-3 w-full h-10">
+            <Header openFnc={toggleOpen} open={open} title={title} subtitle={subtitle} />
+            {open && (
+              <button
+                type="button"
+                onClick={toggleOpen}
+                aria-label="Fermer le menu"
+                className="sm:hidden shrink-0 w-10 h-10 flex items-center justify-center text-secondary/70 hover:text-secondary hover:bg-veil rounded-lg transition-colors duration-200 cursor-pointer"
+              >
+                <IconX size={19} stroke={1.75} />
+              </button>
+            )}
+          </div>
 
           {user && (
-            <div
-              className={`sm:p-0 sm:px-0 px-2 sm:mt-0 mt-3 transition-all duration-300 overflow-hidden`}
-            >
-              <UserCard
-                onClick={open ? undefined : toggleOpen}
-                className="transition-all duration-300"
-                open={open}
-                onModif={onUserModif}
-                name={user.name}
-                roleName={user.roleName}
-                avatarUrl={user.avatarUrl}
-                initials={user.initials}
-              />
-            </div>
+            <UserCard
+              onClick={open ? undefined : toggleOpen}
+              open={open}
+              onModif={onUserModif}
+              name={user.name}
+              roleName={user.roleName}
+              avatarUrl={user.avatarUrl}
+              initials={user.initials}
+            />
           )}
+
+          <div
+            className={clsx(
+              "w-full h-px bg-line transition-opacity duration-300",
+              open ? "opacity-100" : "opacity-0",
+            )}
+          />
 
           <Nav
             open={open}
-            openDelay={openDelay}
             activePath={activePath}
             tabs={tabs}
             specificTabs={specificTabs}
@@ -391,25 +484,27 @@ export default function Sidebar({
           />
         </div>
 
-        <div className="flex flex-col sm:gap-1 w-full">
+        <div className="flex flex-col gap-3 w-full mt-auto">
           {bottomTabs.length > 0 && (
-            <div className="flex flex-col sm:gap-5 w-full">
-              <Nav
-                open={open}
-                openDelay={openDelay}
-                activePath={activePath}
-                tabs={bottomTabs}
+            <div className="flex flex-col w-full">
+              <div
+                className={clsx(
+                  "w-full h-px bg-line mb-3 transition-opacity duration-300",
+                  open ? "opacity-100" : "opacity-0",
+                )}
               />
+              <Nav open={open} activePath={activePath} tabs={bottomTabs} />
             </div>
           )}
           {showBranding && (
             <small
-              className={`text-center items-center justify-center truncate ${open ? "opacity-100" : "opacity-0"}`}
+              className={clsx(
+                "text-center truncate text-[11px] tracking-wide transition-opacity duration-200",
+                open ? "opacity-100 delay-150" : "opacity-0",
+              )}
             >
               Panel powered by{" "}
-              <LinkV
-                onClick={() => window.open("https://volcanium-studio.com/")}
-              >
+              <LinkV onClick={() => window.open("https://volcanium-studio.com/")}>
                 volcanium studio
               </LinkV>
             </small>
@@ -417,7 +512,7 @@ export default function Sidebar({
         </div>
       </div>
 
-      <div className="overflow-auto flex-1 sm:p-0 pb-4 w-full h-full relative">
+      <div className="overflow-auto flex-1 pt-16 sm:pt-0 sm:p-0 pb-4 w-full h-full relative">
         {children}
       </div>
     </main>

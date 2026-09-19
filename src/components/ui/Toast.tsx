@@ -82,7 +82,7 @@ function Toast({ message, type, onClose }: ToastProps) {
         {icons[type as keyof typeof icons] || icons.info}
         <span className="text-sm font-medium">{message}</span>
       </div>
-      <button onClick={onClose} className="text-white/40 hover:text-white transition-colors p-1">
+      <button onClick={onClose} className="text-text/40 hover:text-text transition-colors p-1">
         <IconX size={16} />
       </button>
     </motion.div>

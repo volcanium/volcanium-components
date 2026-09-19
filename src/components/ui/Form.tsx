@@ -3,6 +3,7 @@ import Button from "./Button";
 import Input from "./Input";
 import Textarea, { TextareaProps } from "./Textarea";
 import Select, { SelectOption } from "./Select";
+import DatePicker from "./DatePicker";
 import Toggle from "./Toggle";
 import Center from "../layout/Center";
 import { clsx } from "clsx";
@@ -10,8 +11,8 @@ import { clsx } from "clsx";
 export interface FormField {
   name: string;
   label?: string;
-  /** `"textarea"`, `"select"` and `"toggle"` render those components; anything else is passed as an `<input type>`. */
-  type?: "textarea" | "select" | "toggle" | string;
+  /** `"textarea"`, `"select"`, `"toggle"` and `"date"` render those components; anything else is passed as an `<input type>`. */
+  type?: "textarea" | "select" | "toggle" | "date" | string;
   value?: unknown;
   default?: unknown;
   autoComplete?: string;
@@ -78,7 +79,7 @@ export default function Form({ fields, btn, onSubmit, className, id }: FormProps
   return (
     <form
       onSubmit={handleSubmit}
-      className={clsx("flex flex-col gap-3 w-full max-w-md", className)}
+      className={clsx("flex flex-col gap-3 w-full", className)}
       id={id || undefined}
     >
       {fields.map((field) => {
@@ -112,6 +113,21 @@ export default function Form({ fields, btn, onSubmit, className, id }: FormProps
               onChange={(v) => setFieldValue(field.name, v)}
               placeholder={field.placeholder}
               searchable={field.searchable}
+              className={fieldClassName}
+              {...field.props}
+            />
+          );
+        }
+
+        if (field.type === "date") {
+          return (
+            <DatePicker
+              key={field.name}
+              id={field.name}
+              label={field.label || null}
+              value={getFieldValue(field) as string}
+              onChange={(v) => setFieldValue(field.name, v)}
+              placeholder={field.placeholder}
               className={fieldClassName}
               {...field.props}
             />

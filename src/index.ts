@@ -1,19 +1,21 @@
 // --- config ---
 export * from "./components/config/VolcaniumProvider";
+export { useTheme } from "./utils/useTheme";
+export { default as ThemeToggle } from "./components/ui/ThemeToggle";
 
 // --- ui ---
 export { default as Title } from "./components/ui/Title";
+export type { TitleProps, TitleLevel, TitleVariant } from "./components/ui/Title";
 export { default as CheckListItem } from "./components/ui/CheckListItem";
 export { default as Button } from "./components/ui/Button";
 export { Container } from "./components/ui/Container";
 export type { ContainerProps } from "./components/ui/Container";
 export { InformationButton } from "./components/ui/InformationButton";
-export type {
-  InformationButtonProps,
-  InfoItem,
-} from "./components/ui/InformationButton";
+export type { InformationButtonProps } from "./components/ui/InformationButton";
 export { default as Select } from "./components/ui/Select";
 export type { SelectProps, SelectOption } from "./components/ui/Select";
+export { default as DatePicker } from "./components/ui/DatePicker";
+export type { DatePickerProps } from "./components/ui/DatePicker";
 export { default as Modal } from "./components/ui/Modal";
 export type { ModalProps, ModalButtonConfig } from "./components/ui/Modal";
 export { default as ToastProvider } from "./components/ui/Toast";

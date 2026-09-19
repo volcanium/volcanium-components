@@ -13,7 +13,10 @@ export function useClickOutside<T extends HTMLElement, P extends HTMLElement = H
       const insidePanel = panelRef?.current?.contains(target);
       if (!insideTrigger && !insidePanel) onOutsideClick();
     };
-    window.addEventListener("click", handler);
-    return () => window.removeEventListener("click", handler);
+    // Capture phase: a dropdown opened from inside a `Modal` (whose dialog
+    // stops click propagation to avoid closing on inside-clicks) would
+    // otherwise never see clicks elsewhere in that same dialog.
+    window.addEventListener("click", handler, true);
+    return () => window.removeEventListener("click", handler, true);
   }, [triggerRef, panelRef, onOutsideClick]);
 }
