@@ -35,6 +35,13 @@ export type TranslationKey =
   | "table_network_error"
   | "table_unexpected_error"
   | "table_internal_error"
+  | "table_show_filters"
+  | "table_hide_filters"
+  | "table_filter_all"
+  | "table_filter_yes"
+  | "table_filter_no"
+  | "table_filter_placeholder"
+  | "table_add"
   | "stepper_empty_cursus"
   | "stepper_empty_roadmap"
   | "stepper_done";
@@ -77,6 +84,13 @@ const dictionaries: Record<"fr" | "en", Dictionary> = {
     table_network_error: "Erreur réseau ou serveur : {message}",
     table_unexpected_error: "Une erreur inattendue est survenue.",
     table_internal_error: "Erreur interne",
+    table_show_filters: "Afficher les filtres",
+    table_hide_filters: "Masquer les filtres",
+    table_filter_all: "Tous",
+    table_filter_yes: "Oui",
+    table_filter_no: "Non",
+    table_filter_placeholder: "Filtrer...",
+    table_add: "Ajouter",
     stepper_empty_cursus: "Aucune étape n'a été ajoutée au cursus.",
     stepper_empty_roadmap: "Aucune étape n'a été ajoutée à la roadmap.",
     stepper_done: "Fait",
@@ -116,6 +130,13 @@ const dictionaries: Record<"fr" | "en", Dictionary> = {
     table_network_error: "Network or server error: {message}",
     table_unexpected_error: "An unexpected error occurred.",
     table_internal_error: "Internal error",
+    table_show_filters: "Show filters",
+    table_hide_filters: "Hide filters",
+    table_filter_all: "All",
+    table_filter_yes: "Yes",
+    table_filter_no: "No",
+    table_filter_placeholder: "Filter...",
+    table_add: "Add",
     stepper_empty_cursus: "No step has been added to the cursus yet.",
     stepper_empty_roadmap: "No step has been added to the roadmap yet.",
     stepper_done: "Done",

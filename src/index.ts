@@ -24,7 +24,13 @@ export { notify } from "./components/ui/notify";
 export { default as InDev } from "./components/ui/InDev";
 export { default as Input } from "./components/ui/Input";
 export { default as Table } from "./components/ui/Table";
-export type { TableProps, TableFilter, TableFetchParams } from "./components/ui/Table";
+export type {
+  TableProps,
+  TableColumnDef,
+  TableCellType,
+  TableCellValueParams,
+  CellValueChangedEvent,
+} from "./components/ui/Table";
 export { default as TooltipButton } from "./components/ui/TooltipButton";
 export { default as Form } from "./components/ui/Form";
 export { default as Link } from "./components/ui/Link";

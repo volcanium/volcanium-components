@@ -87,9 +87,9 @@ export default function Select<T = unknown>({
       aria-expanded={open}
       aria-controls={listboxId}
       onClick={() => setOpen(!open)}
-      className={`w-52 px-3.5! justify-between! bg-container border border-secondary/20 text-start text-secondary transition-colors duration-200 hover:border-main/40 focus-visible:border-main/60 relative ${open ? "border-main/60!" : ""} ${className}`}
+      className={`w-fit min-w-52 max-w-full px-3.5! justify-between! bg-container border border-secondary/20 text-start text-secondary transition-colors duration-200 hover:border-main/40 focus-visible:border-main/60 relative ${open ? "border-main/60!" : ""} ${className}`}
     >
-      <span className={`truncate ${selected ? "" : "text-secondary/40"}`}>
+      <span className={`min-w-0 truncate pr-5 ${selected ? "" : "text-secondary/40"}`}>
         {selected ? selected.label : actualPlaceholder}
       </span>
       <span
