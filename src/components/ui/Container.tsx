@@ -32,9 +32,9 @@ export function Container({ title, fix, children, link }: ContainerProps) {
         onMouseEnter={() => setHover(true)}
         onMouseLeave={() => setHover(false)}
         className={clsx(
-          "flex flex-col gap-4 p-5 sm:p-8 text-start bg-container border border-line transition-all duration-300",
+          "flex flex-col gap-4 p-5 sm:p-8 text-start bg-vc-container border border-vc-line transition-all duration-300",
           link &&
-            "cursor-pointer hover:border-line-strong hover:-translate-y-0.5 hover:shadow-[0_16px_36px_-20px_rgba(0,0,0,0.6)]",
+            "cursor-pointer hover:border-vc-line-strong hover:-translate-y-0.5 hover:shadow-[0_16px_36px_-20px_rgba(0,0,0,0.6)]",
           fix ? "w-full sm:w-200" : "w-full",
         )}
       >
@@ -44,7 +44,7 @@ export function Container({ title, fix, children, link }: ContainerProps) {
             <IconArrowRight
               size={20}
               className={clsx(
-                "shrink-0 text-secondary transition-all duration-300",
+                "shrink-0 text-vc-secondary transition-all duration-300",
                 hover ? "opacity-100 translate-x-0" : "-translate-x-2 opacity-0",
               )}
             />
@@ -52,7 +52,7 @@ export function Container({ title, fix, children, link }: ContainerProps) {
         </div>
         <div
           className={clsx(
-            "h-px bg-line transition-opacity duration-300",
+            "h-px bg-vc-line transition-opacity duration-300",
             hover && link ? "opacity-100" : "opacity-70",
           )}
         />
@@ -66,7 +66,7 @@ export function Container({ title, fix, children, link }: ContainerProps) {
   return (
     <Link
       to={link}
-      className="block rounded-[20px] focus-visible:outline-2 focus-visible:outline-main focus-visible:outline-offset-2"
+      className="block rounded-[20px] focus-visible:outline-2 focus-visible:outline-vc-main focus-visible:outline-offset-2"
     >
       {card}
     </Link>

@@ -178,7 +178,7 @@ export default function Nav({
         <div className="flex justify-between items-center w-full">
           <h1
             onClick={() => (window.location.href = brandLink)}
-            className={`font-title cursor-pointer text-main transition-[font-size] duration-300 ${
+            className={`font-vc-title cursor-pointer text-vc-main transition-[font-size] duration-300 ${
               isStickyStyle ? "text-lg" : "text-xl"
             }`}
           >
@@ -195,7 +195,7 @@ export default function Nav({
             {displayNav && links.length > 0 && (
               <motion.button
                 onClick={() => setIsMenuOpen((p) => !p)}
-                className="relative w-9 h-9 flex items-center justify-center rounded-lg text-main overflow-hidden"
+                className="relative w-9 h-9 flex items-center justify-center rounded-lg text-vc-main overflow-hidden"
                 whileTap={{ scale: 0.88 }}
                 style={{
                   backgroundColor: isMenuOpen
@@ -273,10 +273,10 @@ export default function Nav({
                       handleScrollTo(a.id);
                     }
                   }}
-                  className={`px-4 py-3 rounded-xl cursor-pointer active:text-main text-sm font-medium transition-colors duration-200 block ${
+                  className={`px-4 py-3 rounded-xl cursor-pointer active:text-vc-main text-sm font-medium transition-colors duration-200 block ${
                     (a.id && activeSection === a.id)
-                      ? "text-main bg-container border-main"
-                      : "text-white/70 hover:text-secondary hover:bg-white/5"
+                      ? "text-vc-main bg-vc-container border-vc-main"
+                      : "text-white/70 hover:text-vc-secondary hover:bg-white/5"
                   }`}
                 >
                   {a.label}
@@ -322,7 +322,7 @@ export default function Nav({
         <div>
           <h1
             onClick={() => (window.location.href = brandLink)}
-            className={`font-title cursor-pointer text-main justify-self-start duration-300 text-xl`}
+            className={`font-vc-title cursor-pointer text-vc-main justify-self-start duration-300 text-xl`}
           >
             {brandName}
           </h1>
@@ -336,8 +336,8 @@ export default function Nav({
                 href={a.href}
                 className={`whitespace-nowrap cursor-pointer rounded-lg transition-all px-3 py-0.5 duration-300 ${
                   (a.id && activeSection === a.id)
-                    ? "text-main bg-container/50"
-                    : "hover:bg-container/40 active:text-main hover:text-secondary"
+                    ? "text-vc-main bg-vc-container/50"
+                    : "hover:bg-vc-container/40 active:text-vc-main hover:text-vc-secondary"
                 }`}
                 onClick={(e) => {
                   if (a.id) {
@@ -354,7 +354,7 @@ export default function Nav({
         ) : (
           title && (
             <Center>
-              <Title className="font-secondary">{title}</Title>
+              <Title className="font-vc-secondary">{title}</Title>
             </Center>
           )
         )}

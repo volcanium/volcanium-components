@@ -89,9 +89,9 @@ export default function TableCell<Row>({
           role="checkbox"
           className={clsx(
             "flex h-5 w-5 items-center justify-center rounded-md border transition-all duration-150",
-            value ? "bg-main border-main" : "bg-container border-secondary/25",
+            value ? "bg-vc-main border-vc-main" : "bg-vc-container border-vc-secondary/25",
             column.editable
-              ? "cursor-pointer hover:border-main/60 active:scale-90"
+              ? "cursor-pointer hover:border-vc-main/60 active:scale-90"
               : "cursor-default",
           )}
         >
@@ -119,12 +119,12 @@ export default function TableCell<Row>({
               column.onImageClick({ value, data: row });
             }}
             className={clsx(
-              "h-8 w-8 rounded-lg object-cover ring-1 ring-line transition-all duration-150",
-              column.onImageClick && "cursor-pointer hover:ring-main/50 hover:scale-105",
+              "h-8 w-8 rounded-lg object-cover ring-1 ring-vc-line transition-all duration-150",
+              column.onImageClick && "cursor-pointer hover:ring-vc-main/50 hover:scale-105",
             )}
           />
         ) : (
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-veil text-secondary/40">
+          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-vc-veil text-vc-secondary/40">
             <IconPhoto size={15} />
           </div>
         )}
@@ -146,11 +146,11 @@ export default function TableCell<Row>({
         className={clsx(
           TABLE_ROW_HEIGHT,
           "flex items-center rounded-lg px-1 -mx-1 truncate transition-colors duration-150",
-          column.editable && "cursor-text hover:bg-veil",
+          column.editable && "cursor-text hover:bg-vc-veil",
         )}
       >
         <span className="truncate">
-          {content || (column.editable && <span className="text-secondary/30">—</span>)}
+          {content || (column.editable && <span className="text-vc-secondary/30">—</span>)}
         </span>
       </div>
     );

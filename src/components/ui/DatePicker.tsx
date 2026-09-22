@@ -296,15 +296,15 @@ export default function DatePicker({
             top: position.top,
             bottom: position.bottom,
           }}
-          className="z-999 font-main text-text"
+          className="z-999 font-vc-main text-vc-text"
         >
           <Squircle cornerRadius={16} cornerSmoothing={1} asChild>
-            <div className="bg-container shadow-[0_16px_40px_-16px_rgba(0,0,0,0.55)] border border-line p-3 flex flex-col gap-3">
+            <div className="bg-vc-container shadow-[0_16px_40px_-16px_rgba(0,0,0,0.55)] border border-vc-line p-3 flex flex-col gap-3">
               <div className="flex items-center justify-between gap-2">
                 <button
                   type="button"
                   onClick={() => setCursor((c) => subMonths(c, 1))}
-                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-secondary/60 transition-colors duration-150 hover:bg-veil hover:text-secondary cursor-pointer"
+                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-vc-secondary/60 transition-colors duration-150 hover:bg-vc-veil hover:text-vc-secondary cursor-pointer"
                   aria-label="Previous month"
                 >
                   <IconChevronLeft size={16} />
@@ -315,10 +315,10 @@ export default function DatePicker({
                     <button
                       type="button"
                       onClick={() => setMonthMenuOpen((v) => !v)}
-                      className="flex items-center gap-1 px-2 py-1 rounded-md text-sm font-semibold text-secondary capitalize transition-colors duration-150 hover:bg-veil cursor-pointer"
+                      className="flex items-center gap-1 px-2 py-1 rounded-md text-sm font-semibold text-vc-secondary capitalize transition-colors duration-150 hover:bg-vc-veil cursor-pointer"
                     >
                       {monthLabels[cursor.getMonth()]}
-                      <IconChevronDown size={13} className="text-secondary/50" />
+                      <IconChevronDown size={13} className="text-vc-secondary/50" />
                     </button>
                     <AnimatePresence>
                       {monthMenuOpen && (
@@ -327,7 +327,7 @@ export default function DatePicker({
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: -4 }}
                           transition={{ duration: 0.15, ease: "easeOut" }}
-                          className="absolute left-0 top-full mt-1 z-10 grid grid-cols-3 gap-1 p-2 w-48 bg-container border border-line rounded-xl shadow-[0_16px_40px_-16px_rgba(0,0,0,0.55)]"
+                          className="absolute left-0 top-full mt-1 z-10 grid grid-cols-3 gap-1 p-2 w-48 bg-vc-container border border-vc-line rounded-xl shadow-[0_16px_40px_-16px_rgba(0,0,0,0.55)]"
                         >
                           {monthLabels.map((m, i) => (
                             <button
@@ -337,8 +337,8 @@ export default function DatePicker({
                                 setCursor((c) => setMonth(c, i));
                                 setMonthMenuOpen(false);
                               }}
-                              className={`px-2 py-1.5 rounded-md text-xs capitalize truncate transition-colors duration-150 cursor-pointer hover:bg-veil-strong ${
-                                i === cursor.getMonth() ? "bg-main/20 text-secondary" : "text-secondary/75"
+                              className={`px-2 py-1.5 rounded-md text-xs capitalize truncate transition-colors duration-150 cursor-pointer hover:bg-vc-veil-strong ${
+                                i === cursor.getMonth() ? "bg-vc-main/20 text-vc-secondary" : "text-vc-secondary/75"
                               }`}
                             >
                               {m}
@@ -365,21 +365,21 @@ export default function DatePicker({
                       }
                     }}
                     onBlur={() => setYearText(String(cursor.getFullYear()))}
-                    className="w-14 bg-transparent text-sm font-semibold text-secondary outline-none text-center rounded-md py-1 transition-colors duration-150 hover:bg-veil focus:bg-veil"
+                    className="w-14 bg-transparent text-sm font-semibold text-vc-secondary outline-none text-center rounded-md py-1 transition-colors duration-150 hover:bg-vc-veil focus:bg-vc-veil"
                   />
                 </div>
 
                 <button
                   type="button"
                   onClick={() => setCursor((c) => addMonths(c, 1))}
-                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-secondary/60 transition-colors duration-150 hover:bg-veil hover:text-secondary cursor-pointer"
+                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-vc-secondary/60 transition-colors duration-150 hover:bg-vc-veil hover:text-vc-secondary cursor-pointer"
                   aria-label="Next month"
                 >
                   <IconChevronRight size={16} />
                 </button>
               </div>
 
-              <div className="grid grid-cols-7 gap-1 text-center text-xs text-secondary/40 uppercase">
+              <div className="grid grid-cols-7 gap-1 text-center text-xs text-vc-secondary/40 uppercase">
                 {weekdayLabels.map((wd, i) => (
                   <div key={i}>{wd}</div>
                 ))}
@@ -400,10 +400,10 @@ export default function DatePicker({
                       onClick={() => selectDay(day)}
                       className={`
                         aspect-square rounded-lg text-sm transition-colors duration-150
-                        ${!inMonth ? "text-secondary/25" : "text-secondary/85"}
-                        ${disabledDay ? "opacity-30 cursor-not-allowed" : "cursor-pointer hover:bg-veil-strong"}
-                        ${isSelected ? "bg-main text-white hover:bg-main" : ""}
-                        ${!isSelected && isToday ? "border border-main/50" : ""}
+                        ${!inMonth ? "text-vc-secondary/25" : "text-vc-secondary/85"}
+                        ${disabledDay ? "opacity-30 cursor-not-allowed" : "cursor-pointer hover:bg-vc-veil-strong"}
+                        ${isSelected ? "bg-vc-main text-white hover:bg-vc-main" : ""}
+                        ${!isSelected && isToday ? "border border-vc-main/50" : ""}
                       `}
                     >
                       {format(day, "d")}
@@ -420,10 +420,10 @@ export default function DatePicker({
   );
 
   const Wrapper = (
-    <div ref={wrapperRef} className="relative flex w-full font-main text-text">
+    <div ref={wrapperRef} className="relative flex w-full font-vc-main text-vc-text">
       <Squircle asChild cornerRadius={10} cornerSmoothing={1}>
         <div
-          className={`flex items-center w-full gap-2 pl-3.5 pr-2 border border-secondary/20 bg-container transition-colors duration-200 focus-within:border-main/60 ${disabled ? "opacity-50" : ""} ${className}`}
+          className={`flex items-center w-full gap-2 pl-3.5 pr-2 border border-vc-secondary/20 bg-vc-container transition-colors duration-200 focus-within:border-vc-main/60 ${disabled ? "opacity-50" : ""} ${className}`}
         >
           <input
             id={pickerId}
@@ -434,7 +434,7 @@ export default function DatePicker({
             placeholder={placeholder || PLACEHOLDERS[lang]}
             onChange={(e) => handleTextChange(e.target.value)}
             onBlur={handleTextBlur}
-            className="flex-1 w-full min-w-0 bg-transparent py-2 outline-none placeholder:text-secondary/40 disabled:cursor-not-allowed"
+            className="flex-1 w-full min-w-0 bg-transparent py-2 outline-none placeholder:text-vc-secondary/40 disabled:cursor-not-allowed"
           />
           <button
             type="button"
@@ -443,7 +443,7 @@ export default function DatePicker({
             aria-label="Open calendar"
             aria-haspopup="dialog"
             aria-expanded={open}
-            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-secondary/50 transition-colors duration-150 hover:bg-veil-strong hover:text-secondary cursor-pointer disabled:cursor-not-allowed"
+            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-vc-secondary/50 transition-colors duration-150 hover:bg-vc-veil-strong hover:text-vc-secondary cursor-pointer disabled:cursor-not-allowed"
           >
             <IconCalendar size={16} />
           </button>
@@ -456,7 +456,7 @@ export default function DatePicker({
   return label ? (
     <div className="flex flex-col gap-1">
       {Wrapper}
-      <label className="-mt-1 mb-1 text-start text-sm text-text/50" htmlFor={pickerId}>
+      <label className="-mt-1 mb-1 text-start text-sm text-vc-text/50" htmlFor={pickerId}>
         {label}
       </label>
     </div>

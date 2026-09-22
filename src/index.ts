@@ -30,6 +30,8 @@ export type {
   TableCellType,
   TableCellValueParams,
   CellValueChangedEvent,
+  TableFetchParams,
+  TableSort,
 } from "./components/ui/Table";
 export { default as TooltipButton } from "./components/ui/TooltipButton";
 export { default as Form } from "./components/ui/Form";

@@ -21,8 +21,8 @@ export default function Textarea({
   ...props
 }: TextareaProps) {
   const variants = {
-    one: "bg-container",
-    secondary: "bg-container",
+    one: "bg-vc-container",
+    secondary: "bg-vc-container",
   };
 
   const resizeMap = {
@@ -40,7 +40,7 @@ export default function Textarea({
       <textarea
         {...props}
         id={textareaId}
-        className={`px-3 py-1 ${variants[variant]} ${resizeMap[resize]} w-52 max-w-100 min-w-30 min-h-20 max-h-100 border border-secondary/20 focus:border-accent/50 outline-0 ${className || ""}`}
+        className={`px-3 py-1 ${variants[variant]} ${resizeMap[resize]} w-52 max-w-100 min-w-30 min-h-20 max-h-100 border border-vc-secondary/20 focus:border-vc-accent/50 outline-0 ${className || ""}`}
       />
     </Squircle>
   );

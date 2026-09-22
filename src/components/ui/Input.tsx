@@ -27,8 +27,8 @@ export default function Input({
   ...props
 }: InputProps) {
   const varaiants = {
-    one: "bg-container",
-    secondary: "bg-container",
+    one: "bg-vc-container",
+    secondary: "bg-vc-container",
   };
 
   const generatedId = useId();
@@ -49,7 +49,7 @@ export default function Input({
           id={inputId}
           disabled={disabled}
           className={clsx(
-            "w-full px-3.5 py-2 border border-secondary/20 outline-none transition-colors duration-200 focus:border-main/60 disabled:cursor-not-allowed placeholder:text-secondary/40",
+            "w-full px-3.5 py-2 border border-vc-secondary/20 outline-none transition-colors duration-200 focus:border-vc-main/60 disabled:cursor-not-allowed placeholder:text-vc-secondary/40",
             isPassword && "pr-10",
             varaiants[variant],
           )}
@@ -68,7 +68,7 @@ export default function Input({
           disabled={disabled}
           onClick={() => setVisible((v) => !v)}
           aria-label={visible ? "Masquer le mot de passe" : "Afficher le mot de passe"}
-          className="absolute right-0 top-0 h-full px-3 flex items-center text-main/70 transition-colors duration-150 hover:text-main disabled:cursor-not-allowed cursor-pointer"
+          className="absolute right-0 top-0 h-full px-3 flex items-center text-vc-main/70 transition-colors duration-150 hover:text-vc-main disabled:cursor-not-allowed cursor-pointer"
         >
           {visible ? <IconEyeOff size={17} /> : <IconEye size={17} />}
         </button>
@@ -79,12 +79,12 @@ export default function Input({
     <div className="flex flex-col gap-1">
       {InputEl}
       <label
-        className="w-full -mt-1 mb-1 flex items-center gap-2 text-start text-sm text-text/50"
+        className="w-full -mt-1 mb-1 flex items-center gap-2 text-start text-sm text-vc-text/50"
         htmlFor={inputId}
       >
         {label}
         {loading && (
-          <IconRefresh size={14} className="animate-spin text-main/90" />
+          <IconRefresh size={14} className="animate-spin text-vc-main/90" />
         )}
       </label>
     </div>

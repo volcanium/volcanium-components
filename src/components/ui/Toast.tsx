@@ -56,17 +56,17 @@ import { IconInfoCircle, IconCheck, IconAlertTriangle, IconX } from "@tabler/ico
 
 function Toast({ message, type, onClose }: ToastProps) {
   const styles = {
-    info: "bg-container border border-secondary/20 text-text",
-    success: "bg-container border border-green-500/50 text-green-400",
-    warn: "bg-container border border-yellow-500/50 text-yellow-400",
-    error: "bg-container border border-main/50 text-main",
+    info: "bg-vc-container border border-vc-secondary/20 text-vc-text",
+    success: "bg-vc-container border border-green-500/50 text-green-400",
+    warn: "bg-vc-container border border-yellow-500/50 text-yellow-400",
+    error: "bg-vc-container border border-vc-main/50 text-vc-main",
   }
 
   const icons = {
-    info: <IconInfoCircle size={20} className="text-secondary/70" />,
+    info: <IconInfoCircle size={20} className="text-vc-secondary/70" />,
     success: <IconCheck size={20} className="text-green-500" />,
     warn: <IconAlertTriangle size={20} className="text-yellow-500" />,
-    error: <IconAlertTriangle size={20} className="text-main" />,
+    error: <IconAlertTriangle size={20} className="text-vc-main" />,
   }
 
   return (
@@ -76,13 +76,13 @@ function Toast({ message, type, onClose }: ToastProps) {
       animate={{ opacity: 1, x: 0, scale: 1 }}
       exit={{ opacity: 0, x: 20, scale: 0.95 }}
       transition={{ duration: 0.2, type: "spring", stiffness: 300, damping: 25 }}
-      className={`px-4 py-3 min-w-64 rounded-xl shadow-2xl flex items-center justify-between gap-3 font-main backdrop-blur-md ${styles[type as keyof typeof styles] || styles.info}`}
+      className={`px-4 py-3 min-w-64 rounded-xl shadow-2xl flex items-center justify-between gap-3 font-vc-main backdrop-blur-md ${styles[type as keyof typeof styles] || styles.info}`}
     >
       <div className="flex items-center gap-3">
         {icons[type as keyof typeof icons] || icons.info}
         <span className="text-sm font-medium">{message}</span>
       </div>
-      <button onClick={onClose} className="text-text/40 hover:text-text transition-colors p-1">
+      <button onClick={onClose} className="text-vc-text/40 hover:text-vc-text transition-colors p-1">
         <IconX size={16} />
       </button>
     </motion.div>

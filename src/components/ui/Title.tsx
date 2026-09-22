@@ -39,9 +39,9 @@ export default function Title({
   return (
     <h2
       className={twMerge(
-        "text-secondary leading-snug",
+        "text-vc-secondary leading-snug",
         LEVEL_STYLES[level],
-        variant === "brand" ? "font-title tracking-wide" : "font-main",
+        variant === "brand" ? "font-vc-title tracking-wide" : "font-vc-main",
         className,
       )}
     >

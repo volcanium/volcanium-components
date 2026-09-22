@@ -130,14 +130,14 @@ export function InformationButton({
   };
 
   const baseClassName = clsx(
-    "flex w-full flex-1 items-center gap-3 text-left py-2.5 px-4 bg-back border border-line transition-all duration-300 ease-out",
+    "flex w-full flex-1 items-center gap-3 text-left py-2.5 px-4 bg-vc-back border border-vc-line transition-all duration-300 ease-out",
     className,
   );
 
   const labelRow = (
-    <span className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-secondary/55">
+    <span className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wide text-vc-secondary/55">
       {label}
-      {pending && <IconRefresh size={12} className="animate-spin text-main/90" />}
+      {pending && <IconRefresh size={12} className="animate-spin text-vc-main/90" />}
     </span>
   );
 
@@ -147,7 +147,7 @@ export function InformationButton({
     <span
       className={clsx(
         "text-base font-medium truncate w-full",
-        displayValue == null && placeholder ? "text-secondary/50 italic" : "text-secondary",
+        displayValue == null && placeholder ? "text-vc-secondary/50 italic" : "text-vc-secondary",
       )}
     >
       {displayValue ?? placeholder}
@@ -175,7 +175,7 @@ export function InformationButton({
               setTextEditing(false);
             }
           }}
-          className="w-full bg-transparent p-0 border-0 outline-none text-base font-medium text-secondary shadow-[inset_0_-1px_0_0_color-mix(in_srgb,var(--color-main)_28%,transparent)]"
+          className="w-full bg-transparent p-0 border-0 outline-none text-base font-medium text-vc-secondary shadow-[inset_0_-1px_0_0_color-mix(in_srgb,var(--color-vc-main)_28%,transparent)]"
         />
       ) : (
         valueDisplay
@@ -184,11 +184,11 @@ export function InformationButton({
   );
 
   const chevron = !disabled && (
-    <IconChevronRight className="w-4 h-4 shrink-0 text-secondary/30 transition-transform duration-300 ease-out group-hover:translate-x-0.5" />
+    <IconChevronRight className="w-4 h-4 shrink-0 text-vc-secondary/30 transition-transform duration-300 ease-out group-hover:translate-x-0.5" />
   );
 
   const pencil = !disabled && !textEditing && (
-    <IconPencil className="w-4 h-4 shrink-0 text-secondary/30 transition-transform duration-300 ease-out group-hover:scale-110" />
+    <IconPencil className="w-4 h-4 shrink-0 text-vc-secondary/30 transition-transform duration-300 ease-out group-hover:scale-110" />
   );
 
   if (!isInteractive) {
@@ -200,10 +200,10 @@ export function InformationButton({
   }
 
   const interactiveClassName = clsx(
-    "group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-main/50",
+    "group focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vc-main/50",
     disabled
       ? "opacity-60 cursor-not-allowed"
-      : "cursor-pointer hover:bg-info-hover hover:border-line-strong active:scale-[0.99] active:duration-150",
+      : "cursor-pointer hover:bg-vc-info-hover hover:border-vc-line-strong active:scale-[0.99] active:duration-150",
   );
 
   // Select mode: this row IS the trigger (own ref, own minimal affordance
@@ -236,7 +236,7 @@ export function InformationButton({
             <IconChevronDown
               size={16}
               className={clsx(
-                "shrink-0 text-secondary/40 transition-transform duration-200 ease-out",
+                "shrink-0 text-vc-secondary/40 transition-transform duration-200 ease-out",
                 selectOpen && "rotate-180",
               )}
             />

@@ -12,7 +12,7 @@ export default function Link({ children, link, ...props }: LinkProps) {
     <a
       onClick={link ? () => navigate(link) : undefined}
       {...props}
-      className="hover:underline cursor-pointer active:text-secondary"
+      className="hover:underline cursor-pointer active:text-vc-secondary"
     >
       {children}
     </a>

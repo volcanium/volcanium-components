@@ -17,7 +17,7 @@ type Story = StoryObj<typeof meta>;
 
 export const Default: Story = {
   render: (args) => (
-    <div className="h-[200vh] bg-back">
+    <div className="h-[200vh] bg-vc-back">
       <Nav {...args} />
       <div className="p-10 text-white/70">
         Scroll down to see the sticky effect.
@@ -40,7 +40,7 @@ export const Default: Story = {
 
 export const CustomClasses: Story = {
   render: (args) => (
-    <div className="h-[200vh] bg-back">
+    <div className="h-[200vh] bg-vc-back">
       <Nav {...args} />
       <div className="p-10 text-white/70">
         This Nav uses custom CSS classes for both desktop and mobile versions.

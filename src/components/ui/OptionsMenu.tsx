@@ -143,19 +143,19 @@ export default function OptionsMenu<T = unknown>({
             top: position.top,
             bottom: position.bottom,
           }}
-          className="z-999 font-main text-text"
+          className="z-999 font-vc-main text-vc-text"
         >
-          <div className="bg-container rounded-xl shadow-[0_16px_40px_-16px_rgba(0,0,0,0.55)] border border-line backdrop-blur flex flex-col overflow-hidden">
+          <div className="bg-vc-container rounded-xl shadow-[0_16px_40px_-16px_rgba(0,0,0,0.55)] border border-vc-line backdrop-blur flex flex-col overflow-hidden">
             {searchable && (
-              <div className="flex items-center gap-2 px-3 py-2 border-b border-line shrink-0 focus-within:border-main/40 transition-colors duration-200">
-                <IconSearch size={16} className="text-secondary/50 shrink-0" />
+              <div className="flex items-center gap-2 px-3 py-2 border-b border-vc-line shrink-0 focus-within:border-vc-main/40 transition-colors duration-200">
+                <IconSearch size={16} className="text-vc-secondary/50 shrink-0" />
                 <input
                   ref={searchInputRef}
                   type="text"
                   value={query}
                   onChange={(e) => handleQueryChange(e.target.value)}
                   placeholder={searchPlaceholder || t("select_search_placeholder")}
-                  className="flex-1 bg-transparent outline-0 text-sm min-w-0 placeholder:text-secondary/40"
+                  className="flex-1 bg-transparent outline-0 text-sm min-w-0 placeholder:text-vc-secondary/40"
                   onClick={(e) => e.stopPropagation()}
                 />
               </div>
@@ -196,8 +196,8 @@ export default function OptionsMenu<T = unknown>({
                       transition={{ duration: 0.12 }}
                       className={`
                         px-3 py-2 rounded-lg text-left text-sm transition-colors duration-150 truncate shrink-0
-                        hover:bg-veil hover:text-secondary
-                        ${value === opt.value ? "bg-main/20 text-secondary" : "bg-transparent text-secondary/80"}
+                        hover:bg-vc-veil hover:text-vc-secondary
+                        ${value === opt.value ? "bg-vc-main/20 text-vc-secondary" : "bg-transparent text-vc-secondary/80"}
                       `}
                     >
                       {opt.label}

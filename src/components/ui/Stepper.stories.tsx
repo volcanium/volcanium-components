@@ -12,7 +12,7 @@ type Story = StoryObj<typeof meta>;
 
 export const Linear: Story = {
   render: (args) => (
-    <div className="p-10 bg-back min-h-screen">
+    <div className="p-10 bg-vc-back min-h-screen">
       <Stepper {...args} />
     </div>
   ),
@@ -46,7 +46,7 @@ export const Linear: Story = {
 
 export const Zigzag: Story = {
   render: (args) => (
-    <div className="p-10 bg-back min-h-screen">
+    <div className="p-10 bg-vc-back min-h-screen">
       <Stepper {...args} />
     </div>
   ),
@@ -58,7 +58,7 @@ export const Zigzag: Story = {
         content: "Planifier le concept, choisir les plugins et préparer l'architecture.",
         done: true,
         sideContent: (
-          <div className="bg-container p-4 rounded-xl flex items-center justify-center aspect-square max-w-[150px] border border-white/5 shadow-xl">
+          <div className="bg-vc-container p-4 rounded-xl flex items-center justify-center aspect-square max-w-[150px] border border-white/5 shadow-xl">
             <span className="text-4xl">📅</span>
           </div>
         ),
@@ -67,7 +67,7 @@ export const Zigzag: Story = {
         title: "Design",
         content: "Création des maquettes, wireframes et validation du parcours utilisateur avec le client.",
         sideContent: (
-          <div className="bg-container p-4 rounded-xl flex items-center justify-center aspect-square max-w-[150px] border border-white/5 shadow-xl">
+          <div className="bg-vc-container p-4 rounded-xl flex items-center justify-center aspect-square max-w-[150px] border border-white/5 shadow-xl">
             <span className="text-4xl">🎨</span>
           </div>
         ),
@@ -76,7 +76,7 @@ export const Zigzag: Story = {
         title: "Développement",
         content: "Intégration du code frontend et backend avec des technologies modernes et robustes.",
         sideContent: (
-          <div className="bg-container p-4 rounded-xl flex items-center justify-center aspect-square max-w-[150px] border border-white/5 shadow-xl">
+          <div className="bg-vc-container p-4 rounded-xl flex items-center justify-center aspect-square max-w-[150px] border border-white/5 shadow-xl">
             <span className="text-4xl">💻</span>
           </div>
         ),
@@ -85,7 +85,7 @@ export const Zigzag: Story = {
         title: "Lancement",
         content: "Déploiement en production, optimisation des performances et vérification du référencement (SEO).",
         sideContent: (
-          <div className="bg-container p-4 rounded-xl flex items-center justify-center aspect-square max-w-[150px] border border-white/5 shadow-xl">
+          <div className="bg-vc-container p-4 rounded-xl flex items-center justify-center aspect-square max-w-[150px] border border-white/5 shadow-xl">
             <span className="text-4xl">🚀</span>
           </div>
         ),

@@ -48,18 +48,18 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     };
 
     const styles = {
-      accent: "bg-main border border-secondary/40 text-white",
-      primary: "bg-accent hover:bg-main border border-secondary/40 text-white",
+      accent: "bg-vc-main border border-vc-secondary/40 text-white",
+      primary: "bg-vc-accent hover:bg-vc-main border border-vc-secondary/40 text-white",
       secondary:
-        "bg-container hover:bg-main/50 border border-secondary/40 text-secondary",
-      discret: "border border-secondary/70 hover:bg-main/10",
+        "bg-vc-container hover:bg-vc-main/50 border border-vc-secondary/40 text-vc-secondary",
+      discret: "border border-vc-secondary/70 hover:bg-vc-main/10",
       dangerous:
-        "bg-container border border-red-500/50 hover:border-red-500 hover:bg-red-500/10 text-secondary",
-      tertiary: "bg-container text-secondary",
+        "bg-vc-container border border-red-500/50 hover:border-red-500 hover:bg-red-500/10 text-vc-secondary",
+      tertiary: "bg-vc-container text-vc-secondary",
       // A deliberately light-on-both-themes chip — `overlay` (not `secondary`,
       // which flips to a dark foreground color in the light theme) stays a
       // pale neutral in dark and light alike, so `text-black` always reads.
-      lum: "bg-overlay text-black",
+      lum: "bg-vc-overlay text-black",
     };
 
     const btn = (
@@ -69,7 +69,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           {...props}
           disabled={loading || disabled}
           className={clsx(
-            "px-6 py-1.5 hover:scale-[1.02] active:scale-100 active:duration-100 cursor-pointer flex flex-row gap-2 justify-center items-center transition-all duration-200 ease-out disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-main/50 focus-visible:ring-offset-2 focus-visible:ring-offset-container",
+            "px-6 py-1.5 hover:scale-[1.02] active:scale-100 active:duration-100 cursor-pointer flex flex-row gap-2 justify-center items-center transition-all duration-200 ease-out disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vc-main/50 focus-visible:ring-offset-2 focus-visible:ring-offset-vc-container",
             styles[variant],
             className,
           )}

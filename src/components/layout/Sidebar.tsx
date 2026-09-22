@@ -83,7 +83,7 @@ function Header({ openFnc, open, title, subtitle }: any) {
           aria-label={open ? "Réduire le menu" : "Déplier le menu"}
           className={clsx(
             ICON_BOX,
-            "shrink-0 hidden sm:flex items-center justify-center text-secondary/70 hover:text-secondary hover:bg-veil active:scale-95 transition-all duration-200 cursor-pointer",
+            "shrink-0 hidden sm:flex items-center justify-center text-vc-secondary/70 hover:text-vc-secondary hover:bg-vc-veil active:scale-95 transition-all duration-200 cursor-pointer",
           )}
         >
           {open ? (
@@ -114,7 +114,7 @@ function Header({ openFnc, open, title, subtitle }: any) {
         <Title
           variant="brand"
           level="sm"
-          className="text-main! whitespace-nowrap overflow-hidden w-full"
+          className="text-vc-main! whitespace-nowrap overflow-hidden w-full"
         >
           {subtitle}
         </Title>
@@ -140,7 +140,7 @@ function UserCard({
         className={clsx(
           "group flex flex-row items-center gap-4 h-14 transition-[width,padding-left,background-color] duration-300 ease-in-out overflow-hidden",
           open
-            ? "w-full pl-3 bg-veil hover:bg-veil-strong"
+            ? "w-full pl-3 bg-vc-veil hover:bg-vc-veil-strong"
             : "w-10 pl-0 bg-transparent cursor-pointer",
           className,
         )}
@@ -154,10 +154,10 @@ function UserCard({
             <img
               src={avatarUrl}
               alt="Avatar"
-              className="h-9 w-9 rounded-full ring-1 ring-line bg-back object-cover"
+              className="h-9 w-9 rounded-full ring-1 ring-vc-line bg-vc-back object-cover"
             />
           ) : (
-            <div className="h-9 w-9 rounded-full ring-1 ring-line bg-main/20 flex items-center justify-center text-sm font-bold text-main">
+            <div className="h-9 w-9 rounded-full ring-1 ring-vc-line bg-vc-main/20 flex items-center justify-center text-sm font-bold text-vc-main">
               {initials}
             </div>
           )}
@@ -171,7 +171,7 @@ function UserCard({
           <h2 className="text-[14.5px] font-medium leading-tight truncate w-40">
             {name || "Name"}
           </h2>
-          <h3 className="text-secondary/50 truncate text-xs mt-0.5">
+          <h3 className="text-vc-secondary/50 truncate text-xs mt-0.5">
             {roleName}
           </h3>
         </div>
@@ -184,7 +184,7 @@ function UserCard({
             className="shrink-0 pr-2.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
           >
             <IconUserEdit
-              className="text-secondary/70 hover:text-main cursor-pointer w-[18px] h-[18px]"
+              className="text-vc-secondary/70 hover:text-vc-main cursor-pointer w-[18px] h-[18px]"
               stroke={1.75}
             />
           </div>
@@ -210,8 +210,8 @@ function NavButton({
     "flex items-center h-10 rounded-lg cursor-pointer overflow-hidden transition-[width,background-color] duration-300 hover:scale-100!",
     open ? "w-full" : ICON_BOX,
     active
-      ? "bg-main text-white"
-      : "bg-transparent text-secondary/85 hover:bg-veil hover:text-secondary font-normal",
+      ? "bg-vc-main text-white"
+      : "bg-transparent text-vc-secondary/85 hover:bg-vc-veil hover:text-vc-secondary font-normal",
   );
 
   const inner = (
@@ -235,7 +235,7 @@ function NavButton({
       </span>
       {alert && (
         <span className="mr-3 flex items-center justify-center w-2 h-2 shrink-0">
-          <span className="w-1.5 h-1.5 bg-main rounded-full ring-2 ring-main/30 animate-pulse" />
+          <span className="w-1.5 h-1.5 bg-vc-main rounded-full ring-2 ring-vc-main/30 animate-pulse" />
         </span>
       )}
     </>
@@ -330,7 +330,7 @@ function Nav({
             section.role === userRole && (
               <React.Fragment key={section.groupName}>
                 <Center>
-                  <div className="w-[85%] h-px my-3 bg-line"></div>
+                  <div className="w-[85%] h-px my-3 bg-vc-line"></div>
                 </Center>
                 {section.tabs.map((btn: any) => {
                   const isActive = isPageActive(btn);
@@ -404,7 +404,7 @@ export default function Sidebar({
   }, [activePath]);
 
   return (
-    <main className="flex h-screen font-main text-text bg-back overflow-hidden relative">
+    <main className="flex h-screen font-vc-main text-vc-text bg-vc-back overflow-hidden relative">
       {/* Mobile-only hamburger trigger — replaces the collapsed icon strip entirely below `sm` */}
       {!open && (
         <Squircle cornerRadius={10} cornerSmoothing={1} asChild>
@@ -412,7 +412,7 @@ export default function Sidebar({
             type="button"
             onClick={toggleOpen}
             aria-label="Ouvrir le menu"
-            className="sm:hidden fixed top-4 left-4 z-30 w-10 h-10 flex items-center justify-center bg-container text-secondary border border-line active:scale-95 transition-transform duration-150 cursor-pointer"
+            className="sm:hidden fixed top-4 left-4 z-30 w-10 h-10 flex items-center justify-center bg-vc-container text-vc-secondary border border-vc-line active:scale-95 transition-transform duration-150 cursor-pointer"
           >
             <IconMenu2 size={20} stroke={1.75} />
           </button>
@@ -433,8 +433,8 @@ export default function Sidebar({
           // Mobile: a plain slide (transform), the drawer is always full-width and
           // just moves on/off screen — no width animation involved there at all.
           // Desktop: unaffected, still the icon-strip <-> full-width expand/collapse.
-          "flex flex-col overflow-y-auto overflow-x-hidden shrink-0 w-full px-3 pt-5 py-3",
-          "fixed sm:static h-full z-20 bg-back border-r border-line",
+          "flex flex-col overflow-y-auto overflow-x-hidden vc-scroll-hover shrink-0 w-full px-3 pt-5 py-3",
+          "fixed sm:static h-full z-20 bg-vc-back border-r border-vc-line",
           "transition-transform sm:transition-[width] duration-300 ease-in-out",
           open
             ? "translate-x-0 sm:w-72"
@@ -449,7 +449,7 @@ export default function Sidebar({
                 type="button"
                 onClick={toggleOpen}
                 aria-label="Fermer le menu"
-                className="sm:hidden shrink-0 w-10 h-10 flex items-center justify-center text-secondary/70 hover:text-secondary hover:bg-veil rounded-lg transition-colors duration-200 cursor-pointer"
+                className="sm:hidden shrink-0 w-10 h-10 flex items-center justify-center text-vc-secondary/70 hover:text-vc-secondary hover:bg-vc-veil rounded-lg transition-colors duration-200 cursor-pointer"
               >
                 <IconX size={19} stroke={1.75} />
               </button>
@@ -470,7 +470,7 @@ export default function Sidebar({
 
           <div
             className={clsx(
-              "w-full h-px bg-line transition-opacity duration-300",
+              "w-full h-px bg-vc-line transition-opacity duration-300",
               open ? "opacity-100" : "opacity-0",
             )}
           />
@@ -489,7 +489,7 @@ export default function Sidebar({
             <div className="flex flex-col w-full">
               <div
                 className={clsx(
-                  "w-full h-px bg-line mb-3 transition-opacity duration-300",
+                  "w-full h-px bg-vc-line mb-3 transition-opacity duration-300",
                   open ? "opacity-100" : "opacity-0",
                 )}
               />

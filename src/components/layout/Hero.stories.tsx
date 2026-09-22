@@ -22,7 +22,7 @@ export const Default: Story = {
     darkened: 60,
     children: (
       <div className="text-center text-white flex flex-col items-center gap-6">
-        <Title className="text-5xl md:text-7xl font-title text-main">Volcanium UI</Title>
+        <Title className="text-5xl md:text-7xl font-vc-title text-vc-main">Volcanium UI</Title>
         <p className="text-xl md:text-2xl max-w-2xl opacity-90">
           The ultimate component library to build blazing fast interfaces.
         </p>

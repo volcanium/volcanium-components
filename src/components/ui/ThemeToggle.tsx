@@ -18,7 +18,7 @@ export default function ThemeToggle({ className }: ThemeToggleProps) {
         onClick={toggleTheme}
         aria-label={isLight ? "Passer en thème sombre" : "Passer en thème clair"}
         aria-pressed={isLight}
-        className={`flex h-9 w-9 items-center justify-center border border-line bg-container text-secondary/70 transition-colors duration-200 hover:bg-veil hover:text-secondary cursor-pointer ${className || ""}`}
+        className={`flex h-9 w-9 items-center justify-center border border-vc-line bg-vc-container text-vc-secondary/70 transition-colors duration-200 hover:bg-vc-veil hover:text-vc-secondary cursor-pointer ${className || ""}`}
       >
         {isLight ? <IconMoon size={17} stroke={1.75} /> : <IconSun size={17} stroke={1.75} />}
       </button>

@@ -87,18 +87,18 @@ export default function Select<T = unknown>({
       aria-expanded={open}
       aria-controls={listboxId}
       onClick={() => setOpen(!open)}
-      className={`w-fit min-w-52 max-w-full px-3.5! justify-between! bg-container border border-secondary/20 text-start text-secondary transition-colors duration-200 hover:border-main/40 focus-visible:border-main/60 relative ${open ? "border-main/60!" : ""} ${className}`}
+      className={`w-fit min-w-52 max-w-full px-3.5! justify-between! bg-vc-container border border-vc-secondary/20 text-start text-vc-secondary transition-colors duration-200 hover:border-vc-main/40 focus-visible:border-vc-main/60 relative ${open ? "border-vc-main/60!" : ""} ${className}`}
     >
-      <span className={`min-w-0 truncate pr-5 ${selected ? "" : "text-secondary/40"}`}>
+      <span className={`min-w-0 truncate pr-5 ${selected ? "" : "text-vc-secondary/40"}`}>
         {selected ? selected.label : actualPlaceholder}
       </span>
       <span
-        className={`absolute right-3 text-secondary/50 transition-transform duration-200 ease-out ${open ? "scale-0" : "scale-100"}`}
+        className={`absolute right-3 text-vc-secondary/50 transition-transform duration-200 ease-out ${open ? "scale-0" : "scale-100"}`}
       >
         <IconSelector size={16} />
       </span>
       <span
-        className={`absolute right-3 text-main transition-transform duration-200 ease-out ${open ? "scale-100" : "scale-0"}`}
+        className={`absolute right-3 text-vc-main transition-transform duration-200 ease-out ${open ? "scale-100" : "scale-0"}`}
       >
         <IconX size={16} />
       </span>
@@ -106,7 +106,7 @@ export default function Select<T = unknown>({
   );
 
   const SelectWrapper = (
-    <div className="relative inline-block font-main text-text">
+    <div className="relative inline-block font-vc-main text-vc-text">
       {TriggerElement}
       <OptionsMenu
         triggerRef={triggerRef}
@@ -131,7 +131,7 @@ export default function Select<T = unknown>({
   return label ? (
     <div className="flex flex-col gap-1">
       {SelectWrapper}
-      <label className="-mt-1 mb-1 text-start text-sm text-text/50" htmlFor={selectId}>
+      <label className="-mt-1 mb-1 text-start text-sm text-vc-text/50" htmlFor={selectId}>
         {label}
       </label>
     </div>

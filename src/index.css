@@ -1,29 +1,29 @@
 ﻿@import "tailwindcss";
 
 @theme {
-  --color-main: #ff714d;
-  --color-accent: #884534;
-  --color-back: #121212;
-  --color-container: #332c29;
-  --color-secondary: #ffe9d3;
-  --color-text: white;
-  --color-overlay: #d9d9d9;
+  --color-vc-main: #ff714d;
+  --color-vc-accent: #884534;
+  --color-vc-back: #121212;
+  --color-vc-container: #332c29;
+  --color-vc-secondary: #ffe9d3;
+  --color-vc-text: white;
+  --color-vc-overlay: #d9d9d9;
 
   /* Neutral, theme-reactive border/hover tints — used instead of hardcoded
      `white/[x]` utilities anywhere a surface needs to look right in both
      the dark (default) and light theme. */
-  --color-line: rgba(255, 255, 255, 0.08);
-  --color-line-strong: rgba(255, 255, 255, 0.16);
-  --color-veil: rgba(255, 255, 255, 0.06);
-  --color-veil-strong: rgba(255, 255, 255, 0.1);
+  --color-vc-line: rgba(255, 255, 255, 0.08);
+  --color-vc-line-strong: rgba(255, 255, 255, 0.16);
+  --color-vc-veil: rgba(255, 255, 255, 0.06);
+  --color-vc-veil-strong: rgba(255, 255, 255, 0.1);
   /* Dark theme's exact current hover intensity on `InformationButton`,
      preserved unchanged — see the `[data-theme="light"]` override below for
      why this needs its own token instead of a literal `black/50`. */
-  --color-info-hover: rgba(0, 0, 0, 0.5);
+  --color-vc-info-hover: rgba(0, 0, 0, 0.5);
 
-  --font-main: "DM Sans", system-ui, sans-serif;
-  --font-title: "Rammetto One", sans-serif;
-  --font-secondary: "Arimo", sans-serif;
+  --font-vc-main: "DM Sans", system-ui, sans-serif;
+  --font-vc-title: "Rammetto One", sans-serif;
+  --font-vc-secondary: "Arimo", sans-serif;
 }
 
 /*
@@ -39,21 +39,21 @@
  * sparingly as the accent it is, rather than tinting every surface with it.
  */
 [data-theme="light"] {
-  --color-main: #ff714d;
-  --color-accent: #e35b34;
-  --color-back: #f6f5f3;
-  --color-container: #ffffff;
-  --color-secondary: #201f1e;
-  --color-text: #201f1e;
-  --color-overlay: #ece9e4;
+  --color-vc-main: #ff714d;
+  --color-vc-accent: #e35b34;
+  --color-vc-back: #f6f5f3;
+  --color-vc-container: #ffffff;
+  --color-vc-secondary: #201f1e;
+  --color-vc-text: #201f1e;
+  --color-vc-overlay: #ece9e4;
 
-  --color-line: rgba(28, 27, 26, 0.1);
-  --color-line-strong: rgba(28, 27, 26, 0.18);
-  --color-veil: rgba(28, 27, 26, 0.05);
-  --color-veil-strong: rgba(28, 27, 26, 0.09);
+  --color-vc-line: rgba(28, 27, 26, 0.1);
+  --color-vc-line-strong: rgba(28, 27, 26, 0.18);
+  --color-vc-veil: rgba(28, 27, 26, 0.05);
+  --color-vc-veil-strong: rgba(28, 27, 26, 0.09);
   /* A literal `black/50` (dark theme's value) would wash the whole row out
      on a white card — a soft neutral tint reads as "hover" instead. */
-  --color-info-hover: rgba(28, 27, 26, 0.06);
+  --color-vc-info-hover: rgba(28, 27, 26, 0.06);
 }
 
 
@@ -69,12 +69,12 @@
 
 
 small {
-  @apply text-text/40;
+  @apply text-vc-text/40;
 }
 
 body,
 html {
-  @apply bg-back text-text  font-main;
+  @apply bg-vc-back text-vc-text  font-vc-main;
 }
 
 .backdropFilter {
@@ -87,12 +87,12 @@ html {
 
 /*
  * Scrollbar, themed to match the app instead of the browser's default —
- * reads the same `--color-line-strong`/`--color-main` variables as
+ * reads the same `--color-vc-line-strong`/`--color-vc-main` variables as
  * everything else, so it reskins automatically with the light/dark theme.
  */
 * {
   scrollbar-width: thin;
-  scrollbar-color: var(--color-line-strong) transparent;
+  scrollbar-color: var(--color-vc-line-strong) transparent;
 }
 
 ::-webkit-scrollbar {
@@ -105,17 +105,49 @@ html {
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: var(--color-line-strong);
+  background-color: var(--color-vc-line-strong);
   border-radius: 999px;
   border: 2px solid transparent;
   background-clip: padding-box;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background-color: var(--color-main);
+  background-color: var(--color-vc-main);
 }
 
 ::-webkit-scrollbar-corner {
   background: transparent;
+}
+
+/*
+ * Sidebar-only variant: invisible at rest, a thin thumb fades in only while
+ * the pointer is over the nav strip - used on `Sidebar`'s own scrollable
+ * column, which is narrow enough that a permanently-visible 10px scrollbar
+ * (the global default above) crowds the nav labels.
+ */
+.vc-scroll-hover {
+  /* `thin` at all times, on both rest and hover - only the thumb's color
+     changes below. Toggling the width itself (e.g. `none` -> `thin`) would
+     change the content box's available width the instant the pointer
+     enters/leaves, shifting the nav labels sideways by that same amount. */
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+}
+
+.vc-scroll-hover:hover {
+  scrollbar-color: var(--color-vc-line-strong) transparent;
+}
+
+.vc-scroll-hover::-webkit-scrollbar {
+  width: 4px;
+}
+
+.vc-scroll-hover::-webkit-scrollbar-thumb {
+  background-color: transparent;
+  border-radius: 999px;
+}
+
+.vc-scroll-hover:hover::-webkit-scrollbar-thumb {
+  background-color: var(--color-vc-line-strong);
 }
 

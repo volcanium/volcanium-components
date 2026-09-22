@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useRef, useState, ReactNode } from "react";
+import { useEffect, useLayoutEffect, useMemo, useRef, useState, ReactNode } from "react";
+import { createPortal } from "react-dom";
 import { Squircle } from "@squircle-js/react";
 import clsx from "clsx";
 import {
   IconFilter,
-  IconFilterOff,
   IconTrash,
   IconRefresh,
   IconPlus,
@@ -11,12 +11,13 @@ import {
   IconArrowForwardUp,
   IconChevronUp,
   IconChevronDown,
+  IconChevronLeft,
+  IconChevronRight,
   IconSelector,
   IconExternalLink,
 } from "@tabler/icons-react";
 import Title from "./Title";
 import Input from "./Input";
-import Select from "./Select";
 import Loader from "./Loader";
 import TooltipButton from "./TooltipButton";
 import TableCell, { TableColumnDef } from "./TableCell";
@@ -24,12 +25,31 @@ import TableNewRowModal, { NewRowConfig } from "./TableNewRowModal";
 import TableDeleteRowModal from "./TableDeleteRowModal";
 import { notify } from "./notify";
 import { useLanguage } from "../../utils/useLanguage";
+import { useClickOutside } from "../../utils/useDropdown";
 
 export type { TableColumnDef, TableCellType, TableCellValueParams } from "./TableCell";
 
 interface TableFetchResult<Row> {
   data: Row[];
   total?: number;
+}
+
+export interface TableSort {
+  field: string;
+  dir: 1 | -1;
+}
+
+/**
+ * Passed to `fetchMethod` only when `serverSide` is set - a plain
+ * client-side table (the default) always calls `fetchMethod()` with no
+ * argument, exactly like before.
+ */
+export interface TableFetchParams {
+  search: string;
+  page: number;
+  pageSize: number;
+  sort: TableSort | null;
+  filters: Record<string, any>;
 }
 
 export interface CellValueChangedEvent<Row> {
@@ -60,7 +80,15 @@ export interface TableProps<Row extends Record<string, any>> {
   loading?: boolean;
   /** Recharge les donnees quand cette valeur change. */
   reloadKey?: string | number;
-  fetchMethod: () => Promise<Row[] | TableFetchResult<Row>>;
+  /**
+   * En mode client (par defaut), appele sans argument : doit retourner
+   * l'integralite des lignes, recherche/filtres/tri/pagination sont geres
+   * ici meme, cote client. En mode `serverSide`, recoit `TableFetchParams`
+   * et doit retourner `{ data, total }` - `data` = uniquement la page
+   * courante deja filtree/triee par le serveur, `total` = nombre total de
+   * lignes toutes pages confondues (pour la pagination et le "X-Y sur Z").
+   */
+  fetchMethod: (params?: TableFetchParams) => Promise<Row[] | TableFetchResult<Row>>;
   /** Active la colonne de cases a cocher + les actions de selection. Desactive par defaut. */
   selectable?: boolean;
   onSelect?: (selectedRows: Row[]) => void;
@@ -71,6 +99,16 @@ export interface TableProps<Row extends Record<string, any>> {
   newRow?: NewRowConfig;
   searchPlaceholder?: string;
   className?: string;
+  /**
+   * Passe la recherche, les filtres, le tri et la pagination a `fetchMethod`
+   * au lieu de les appliquer cote client sur un tableau deja charge en
+   * entier - pour les gros volumes de donnees ou charger toutes les lignes
+   * d'un coup n'est pas raisonnable. Desactive par defaut (comportement
+   * inchange).
+   */
+  serverSide?: boolean;
+  /** Nombre de lignes par page en mode `serverSide`. Par defaut 25. */
+  pageSize?: number;
 }
 
 function getDisplayText<Row>(col: TableColumnDef<Row>, row: Row): string {
@@ -98,15 +136,28 @@ export default function Table<Row extends Record<string, any>>({
   newRow,
   searchPlaceholder,
   className,
+  serverSide = false,
+  pageSize = 25,
 }: TableProps<Row>) {
   const { t } = useLanguage();
   const [data, setData] = useState<Row[]>([]);
+  const [total, setTotal] = useState<number | null>(null);
   const [loadingData, setLoadingData] = useState(true);
   const [reloadSpinning, setReloadSpinning] = useState(true);
   const [search, setSearch] = useState("");
-  const [showFilters, setShowFilters] = useState(false);
-  const [filters, setFilters] = useState<Record<string, any>>({});
-  const [sort, setSort] = useState<{ field: string; dir: 1 | -1 } | null>(null);
+  // Chaque valeur est un tableau (case a cocher multiple, combinees en OU) -
+  // meme principe que le systeme de filtres colonne de Train Company
+  // (front/src/components/ui/Table.tsx), replique ici plutot qu'une seule
+  // valeur par colonne comme avant.
+  const [filters, setFilters] = useState<Record<string, string[]>>({});
+  const [sort, setSort] = useState<TableSort | null>(null);
+  const [page, setPage] = useState(0);
+  // En mode serverSide, la recherche/les filtres ne partent au serveur
+  // qu'apres un court debounce - sans quoi chaque frappe declencherait sa
+  // propre requete. `page` est reinitialise en meme temps (meme lot de
+  // mise a jour d'etat) pour ne provoquer qu'un seul rechargement, pas deux.
+  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [debouncedFilters, setDebouncedFilters] = useState<Record<string, string[]>>({});
   const [selectedKeys, setSelectedKeys] = useState<Set<any>>(new Set());
   const [editingCell, setEditingCell] = useState<{ rowKey: any; field: string } | null>(null);
   const [showAddModal, setShowAddModal] = useState(false);
@@ -117,6 +168,49 @@ export default function Table<Row extends Record<string, any>>({
   const containerRef = useRef<HTMLDivElement>(null);
   const hoveringRef = useRef(false);
 
+  // `table-layout: auto` (the browser default, used below until this locks
+  // in) recomputes every column's width from whatever rows are actually
+  // visible - so filtering/searching down to a narrower or wider set of
+  // values visibly resized every column on each keystroke. Measured once,
+  // right after the first real rows render, as a percentage of the header
+  // row's own width (not raw px) so it still adapts to the table's
+  // container being resized later, just not to which rows happen to be
+  // showing.
+  const headerRowRef = useRef<HTMLTableRowElement>(null);
+  const [lockedWidths, setLockedWidths] = useState<string[] | null>(null);
+  useLayoutEffect(() => {
+    if (lockedWidths || loadingData || data.length === 0) return;
+    const row = headerRowRef.current;
+    if (!row) return;
+    const cells = Array.from(row.children) as HTMLElement[];
+    // The checkbox column keeps its own fixed pixel width instead of a
+    // share of the percentage split below - a `%` share of a table that's
+    // later rendered much narrower (e.g. a smaller viewport than whatever
+    // width it happened to be measured at) could shrink it well under the
+    // checkbox's own fixed 18px box, squashing it into a flattened oval
+    // instead of clipping/wrapping like text would.
+    const isCheckboxCol = (i: number) => selectable && i === 0;
+    const total = cells.reduce(
+      (sum, el, i) => (isCheckboxCol(i) ? sum : sum + el.getBoundingClientRect().width),
+      0,
+    );
+    if (total === 0) return;
+    setLockedWidths(
+      cells.map((el, i) => {
+        const w = el.getBoundingClientRect().width;
+        return isCheckboxCol(i) ? `${w}px` : `${(w / total) * 100}%`;
+      }),
+    );
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loadingData, data.length, lockedWidths]);
+  // Re-measures from scratch only if the actual shape of the table changes
+  // (a different set of columns, or the selectable checkbox column
+  // appearing/disappearing) - never on a plain data reload, which is
+  // exactly what should stay locked.
+  useEffect(() => {
+    setLockedWidths(null);
+  }, [colsDefs.length, selectable]);
+
   const loading = loadingData;
   const getRowKey = (row: Row) => (row as any)[rowKey];
 
@@ -125,9 +219,13 @@ export default function Table<Row extends Record<string, any>>({
     setReloadSpinning(false);
     setTimeout(() => setReloadSpinning(true), 50);
     try {
-      const res = await fetchMethod();
+      const params: TableFetchParams | undefined = serverSide
+        ? { search: debouncedSearch, page, pageSize, sort, filters: debouncedFilters }
+        : undefined;
+      const res = await fetchMethod(params);
       const rows = Array.isArray(res) ? res : res.data;
       setData(rows);
+      if (serverSide) setTotal(Array.isArray(res) ? rows.length : (res.total ?? rows.length));
       setPast([]);
       setFuture([]);
       setSelectedKeys(new Set());
@@ -142,6 +240,32 @@ export default function Table<Row extends Record<string, any>>({
     loadData();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [reloadKey]);
+
+  // Reagit aux changements de page/tri/recherche/filtres - uniquement en
+  // mode serverSide (en mode client, ces memes changements sont geres plus
+  // bas par `visibleRows`, sans nouvel appel a `fetchMethod`). Le premier
+  // rendu est ignore : l'effet ci-dessus (sur `reloadKey`) a deja fait le
+  // chargement initial, un second ici ferait doublon.
+  const skippedFirstServerLoad = useRef(false);
+  useEffect(() => {
+    if (!serverSide) return;
+    if (!skippedFirstServerLoad.current) {
+      skippedFirstServerLoad.current = true;
+      return;
+    }
+    loadData();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [serverSide, page, sort, debouncedSearch, debouncedFilters]);
+
+  useEffect(() => {
+    if (!serverSide) return;
+    const timer = setTimeout(() => {
+      setDebouncedSearch(search);
+      setDebouncedFilters(filters);
+      setPage(0);
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [search, filters, serverSide]);
 
   // --- Edition + historique annulable (Ctrl+Z / Ctrl+Shift+Z) ---
 
@@ -233,8 +357,6 @@ export default function Table<Row extends Record<string, any>>({
 
   // --- Filtrage + recherche + tri ---
 
-  const filterableCols = colsDefs.filter((c) => c.filterable !== false && c.type !== "img");
-
   // Une colonne dont au moins une ligne chargee porte un booleen est traitee
   // comme une colonne "checkbox" pour le filtre (menu Oui/Non), meme sans
   // `type: "checkbox"` explicite.
@@ -251,6 +373,12 @@ export default function Table<Row extends Record<string, any>>({
     col.type === "checkbox" || booleanFields.has(col.field);
 
   const visibleRows = useMemo(() => {
+    // Deja recherchees/filtrees/triees/paginees par `fetchMethod` cote
+    // serveur - `data` EST la page a afficher, un second passage cote
+    // client la re-filtrerait sur elle-meme (perte de lignes) au lieu de
+    // sur l'ensemble reel.
+    if (serverSide) return data;
+
     let rows = data;
 
     if (search.trim()) {
@@ -260,16 +388,9 @@ export default function Table<Row extends Record<string, any>>({
       );
     }
 
-    for (const [field, value] of Object.entries(filters)) {
-      if (value === "" || value === undefined || value === null) continue;
-      const col = colsDefs.find((c) => c.field === field);
-      if (!col) continue;
-      if (col.type === "select" || isCheckboxLike(col)) {
-        rows = rows.filter((row) => String((row as any)[field]) === String(value));
-      } else {
-        const q = String(value).toLowerCase();
-        rows = rows.filter((row) => getDisplayText(col, row).toLowerCase().includes(q));
-      }
+    for (const [field, values] of Object.entries(filters)) {
+      if (!values || values.length === 0) continue;
+      rows = rows.filter((row) => values.includes(String((row as any)[field])));
     }
 
     if (sort) {
@@ -285,7 +406,7 @@ export default function Table<Row extends Record<string, any>>({
     }
 
     return rows;
-  }, [data, search, filters, sort, colsDefs]);
+  }, [data, search, filters, sort, colsDefs, serverSide]);
 
   // --- Selection ---
 
@@ -331,9 +452,8 @@ export default function Table<Row extends Record<string, any>>({
       if (prev.dir === 1) return { field, dir: -1 };
       return null;
     });
+    if (serverSide) setPage(0);
   };
-
-  const hasActiveFilters = Object.values(filters).some((v) => v !== "" && v !== undefined && v !== null);
 
   return (
     <div
@@ -343,13 +463,13 @@ export default function Table<Row extends Record<string, any>>({
       className={clsx("flex flex-col gap-2 w-full", className)}
     >
       <Squircle cornerRadius={20} cornerSmoothing={1} asChild>
-        <div className="flex flex-col gap-4 p-5 text-left bg-container border border-line w-full">
+        <div className="flex flex-col gap-4 p-5 text-left bg-vc-container border border-vc-line w-full">
           <div className="flex items-center justify-between gap-3 flex-wrap">
             <Title>{title}</Title>
             <div className="flex items-center gap-1.5">
               {selectable && selectedRows.length > 0 && (
                 <>
-                  <span className="text-sm text-secondary/70 mr-1">
+                  <span className="text-sm text-vc-secondary/70 mr-1">
                     {selectedRows.length === 1
                       ? t("table_selected_one", { count: selectedRows.length })
                       : t("table_selected_many", { count: selectedRows.length })}
@@ -364,7 +484,7 @@ export default function Table<Row extends Record<string, any>>({
                       <IconTrash size={16} />
                     </TableIconButton>
                   )}
-                  <div className="h-5 w-px bg-line mx-1" />
+                  <div className="h-5 w-px bg-vc-line mx-1" />
                 </>
               )}
               <TableIconButton
@@ -381,15 +501,6 @@ export default function Table<Row extends Record<string, any>>({
               >
                 <IconArrowForwardUp size={16} />
               </TableIconButton>
-              {filterableCols.length > 0 && (
-                <TableIconButton
-                  tooltip={showFilters ? t("table_hide_filters") : t("table_show_filters")}
-                  active={showFilters || hasActiveFilters}
-                  onClick={() => setShowFilters((v) => !v)}
-                >
-                  {showFilters ? <IconFilterOff size={16} /> : <IconFilter size={16} />}
-                </TableIconButton>
-              )}
               <TableIconButton
                 tooltip={t("table_reload")}
                 className={reloadSpinning ? "duration-500" : "-rotate-180 duration-0"}
@@ -414,79 +525,99 @@ export default function Table<Row extends Record<string, any>>({
             {searchPlaceholder || t("table_search_placeholder")}
           </Input>
 
-          <div className="w-full overflow-x-auto">
-            <table className="w-full border-collapse text-sm">
+          <div className="relative w-full overflow-x-auto">
+            {/* Overlay, not a swap of the tbody's own content: a reload
+                triggered by sort/filter/page/search (or Ctrl+Z) used to
+                unmount every row the instant `loading` flipped true and
+                remount them once the response landed - a jarring
+                flash-to-empty-then-back even on a fast network. The
+                already-rendered rows now stay exactly where they are
+                underneath a dimmed spinner until the new data actually
+                replaces them. Only the very first load (no rows yet at all)
+                still shows the plain centered loader row further down. */}
+            {loading && data.length > 0 && (
+              <div className="absolute inset-0 z-10 flex items-start justify-center pt-10 bg-vc-container/60 backdrop-blur-[1px]">
+                <Loader />
+              </div>
+            )}
+            <table
+              className="w-full border-collapse text-sm"
+              style={lockedWidths ? { tableLayout: "fixed" } : undefined}
+            >
+              {lockedWidths && (
+                <colgroup>
+                  {lockedWidths.map((w, i) => (
+                    <col key={i} style={{ width: w }} />
+                  ))}
+                </colgroup>
+              )}
               <thead>
-                <tr className="border-b border-line">
+                <tr ref={headerRowRef} className="border-b border-vc-line">
                   {selectable && (
-                    <th className="w-10 py-2 pr-2">
+                    <th className="w-10 py-2 pl-2 pr-2">
                       <Checkbox checked={allVisibleSelected} onChange={toggleAll} />
                     </th>
                   )}
-                  {colsDefs.map((col) => (
-                    <th
-                      key={col.field}
-                      className={clsx(
-                        "py-2 px-2 text-left font-medium text-secondary/70 select-none whitespace-nowrap",
-                        col.sortable !== false && "cursor-pointer hover:text-secondary",
-                      )}
-                      onClick={() => col.sortable !== false && toggleSort(col.field)}
-                    >
-                      <span className="inline-flex items-center gap-1">
-                        {col.headerName}
-                        {col.sortable !== false &&
-                          (sort?.field === col.field ? (
-                            sort.dir === 1 ? (
-                              <IconChevronUp size={13} />
-                            ) : (
-                              <IconChevronDown size={13} />
-                            )
-                          ) : (
-                            <IconSelector size={13} className="opacity-30" />
-                          ))}
-                      </span>
-                    </th>
-                  ))}
-                </tr>
-                {showFilters && (
-                  <tr className="border-b border-line">
-                    {selectable && <th className="py-1.5 pr-2" />}
-                    {colsDefs.map((col) => (
-                      <th key={col.field} className="py-1.5 px-2 font-normal">
-                        {col.filterable === false || col.type === "img" ? null : col.type ===
-                            "select" || isCheckboxLike(col) ? (
-                          <Select
-                            className="w-full! min-w-28!"
-                            placeholder={t("table_filter_all")}
-                            value={filters[col.field] ?? ""}
-                            onChange={(v) => setFilters((f) => ({ ...f, [col.field]: v }))}
-                            options={[
-                              { label: t("table_filter_all"), value: "" },
-                              ...(isCheckboxLike(col)
-                                ? [
-                                    { label: t("table_filter_yes"), value: "true" },
-                                    { label: t("table_filter_no"), value: "false" },
-                                  ]
-                                : col.options || []),
-                            ]}
-                          />
-                        ) : (
-                          <Input
-                            variant="secondary"
-                            className="w-full! min-w-24! py-1!"
-                            value={filters[col.field] ?? ""}
-                            onChange={(e) => setFilters((f) => ({ ...f, [col.field]: e.target.value }))}
-                          >
-                            {t("table_filter_placeholder")}
-                          </Input>
+                  {colsDefs.map((col) => {
+                    // Suit le systeme de filtres de Train Company
+                    // (front/src/components/ui/Table.tsx) : uniquement les
+                    // colonnes a valeurs discretes (select / case a cocher)
+                    // recoivent une icone de filtre - une colonne texte libre
+                    // reste couverte par la recherche globale au-dessus.
+                    const isFilterable =
+                      col.filterable !== false &&
+                      (col.type === "select" ? !!col.options?.length : isCheckboxLike(col));
+                    const filterOptions = isFilterable
+                      ? col.type === "select"
+                        ? col.options!
+                        : [
+                            { label: t("table_filter_yes"), value: "true" },
+                            { label: t("table_filter_no"), value: "false" },
+                          ]
+                      : [];
+                    return (
+                      <th
+                        key={col.field}
+                        className={clsx(
+                          "group/header relative py-2 px-2 text-left font-medium text-vc-secondary/70 select-none whitespace-nowrap overflow-hidden",
+                          col.sortable !== false && "cursor-pointer hover:text-vc-secondary",
                         )}
+                        onClick={() => col.sortable !== false && toggleSort(col.field)}
+                      >
+                        <span className="inline-flex items-center gap-1 max-w-full min-w-0">
+                          <span className="truncate min-w-0">{col.headerName}</span>
+                          <span className="inline-flex items-center gap-1 shrink-0">
+                            {col.sortable !== false &&
+                              (sort?.field === col.field ? (
+                                sort.dir === 1 ? (
+                                  <IconChevronUp size={13} />
+                                ) : (
+                                  <IconChevronDown size={13} />
+                                )
+                              ) : (
+                                <IconSelector size={13} className="opacity-30" />
+                              ))}
+                            {isFilterable && (
+                              <ColumnFilterButton
+                                label={col.headerName}
+                                options={filterOptions}
+                                selected={filters[col.field] ?? []}
+                                onChange={(values) => setFilters((f) => ({ ...f, [col.field]: values }))}
+                                t={t}
+                              />
+                            )}
+                          </span>
+                        </span>
                       </th>
-                    ))}
-                  </tr>
-                )}
+                    );
+                  })}
+                </tr>
               </thead>
               <tbody>
-                {loading && (
+                {/* First load only (nothing to show underneath yet) - a
+                    reload once rows already exist uses the overlay above
+                    instead, see its comment. */}
+                {loading && data.length === 0 && (
                   <tr>
                     <td colSpan={colsDefs.length + (selectable ? 1 : 0)} className="py-10">
                       <div className="flex justify-center">
@@ -499,13 +630,13 @@ export default function Table<Row extends Record<string, any>>({
                   <tr>
                     <td
                       colSpan={colsDefs.length + (selectable ? 1 : 0)}
-                      className="py-10 text-center text-secondary/50"
+                      className="py-10 text-center text-vc-secondary/50"
                     >
                       {t("table_no_results")}
                     </td>
                   </tr>
                 )}
-                {!loading &&
+                {visibleRows.length > 0 &&
                   visibleRows.map((row) => {
                     const key = getRowKey(row);
                     return (
@@ -513,12 +644,12 @@ export default function Table<Row extends Record<string, any>>({
                         key={key}
                         onDoubleClick={() => openRequest?.([row])}
                         className={clsx(
-                          "border-b border-line/60 last:border-b-0 transition-colors",
-                          selectedKeys.has(key) ? "bg-main/10" : "hover:bg-veil",
+                          "border-b border-vc-line/60 last:border-b-0 transition-colors",
+                          selectedKeys.has(key) ? "bg-vc-main/10" : "hover:bg-vc-veil",
                         )}
                       >
                         {selectable && (
-                          <td className="py-1.5 pr-2 align-middle">
+                          <td className="py-1.5 pl-2 pr-2 align-middle">
                             <div className="h-9 flex items-center">
                               <Checkbox checked={selectedKeys.has(key)} onChange={() => toggleRow(row)} />
                             </div>
@@ -543,6 +674,37 @@ export default function Table<Row extends Record<string, any>>({
               </tbody>
             </table>
           </div>
+
+          {serverSide && (
+            <div className="flex items-center justify-between gap-3 flex-wrap">
+              <span className="text-xs text-vc-secondary/60">
+                {total === 0
+                  ? t("table_no_results")
+                  : t("table_results", {
+                      count: total ?? visibleRows.length,
+                      plural: total === 1 ? "" : "s",
+                      page: page + 1,
+                      totalPages: total !== null ? Math.max(1, Math.ceil(total / pageSize)) : "…",
+                    })}
+              </span>
+              <div className="flex items-center gap-1.5">
+                <TableIconButton
+                  tooltip={t("table_previous_page")}
+                  disabled={page === 0}
+                  onClick={() => setPage((p) => Math.max(0, p - 1))}
+                >
+                  <IconChevronLeft size={16} />
+                </TableIconButton>
+                <TableIconButton
+                  tooltip={t("table_next_page")}
+                  disabled={total !== null ? (page + 1) * pageSize >= total : visibleRows.length < pageSize}
+                  onClick={() => setPage((p) => p + 1)}
+                >
+                  <IconChevronRight size={16} />
+                </TableIconButton>
+              </div>
+            </div>
+          )}
         </div>
       </Squircle>
 
@@ -578,8 +740,8 @@ function Checkbox({ checked, onChange }: { checked: boolean; onChange: () => voi
         onChange();
       }}
       className={clsx(
-        "flex h-4.5 w-4.5 items-center justify-center rounded-md border transition-colors cursor-pointer",
-        checked ? "bg-main border-main" : "bg-container border-secondary/30 hover:border-main/50",
+        "flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-md border transition-colors cursor-pointer",
+        checked ? "bg-vc-main border-vc-main" : "bg-vc-container border-vc-secondary/30 hover:border-vc-main/50",
       )}
     >
       {checked && (
@@ -588,6 +750,114 @@ function Checkbox({ checked, onChange }: { checked: boolean; onChange: () => voi
         </svg>
       )}
     </button>
+  );
+}
+
+/**
+ * Per-column filter icon + checkbox popover, styled after Train Company's
+ * own table filters (front/src/components/ui/Table.tsx): hidden until the
+ * header is hovered (or the filter is active), a click opens a portaled
+ * checkbox list (several options at once, combined as OR) with a reset
+ * action at the bottom.
+ */
+function ColumnFilterButton({
+  label,
+  options,
+  selected,
+  onChange,
+  t,
+}: {
+  label: ReactNode;
+  options: { label: ReactNode; value: any }[];
+  selected: string[];
+  onChange: (values: string[]) => void;
+  t: ReturnType<typeof useLanguage>["t"];
+}) {
+  const [open, setOpen] = useState(false);
+  const [position, setPosition] = useState<{ left: number; top: number } | null>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const panelRef = useRef<HTMLDivElement>(null);
+  const active = selected.length > 0;
+
+  useClickOutside(triggerRef, panelRef, () => setOpen(false));
+
+  useLayoutEffect(() => {
+    if (!open) return;
+    const updatePosition = () => {
+      const rect = triggerRef.current?.getBoundingClientRect();
+      if (!rect) return;
+      setPosition({ left: rect.left, top: rect.bottom + 6 });
+    };
+    updatePosition();
+    window.addEventListener("resize", updatePosition);
+    window.addEventListener("scroll", updatePosition, true);
+    return () => {
+      window.removeEventListener("resize", updatePosition);
+      window.removeEventListener("scroll", updatePosition, true);
+    };
+  }, [open]);
+
+  const toggleValue = (value: string) => {
+    onChange(selected.includes(value) ? selected.filter((v) => v !== value) : [...selected, value]);
+  };
+
+  return (
+    <>
+      <button
+        ref={triggerRef}
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          setOpen((v) => !v);
+        }}
+        title={`${t("table_filter")} : ${typeof label === "string" ? label : ""}`}
+        className={clsx(
+          "inline-flex items-center gap-0.5 rounded normal-case font-normal transition-opacity outline-none",
+          active
+            ? "text-vc-main opacity-100"
+            : "opacity-0 group-hover/header:opacity-60 hover:opacity-100!",
+        )}
+      >
+        <IconFilter size={13} />
+        {active && <span className="text-[10px] font-bold leading-none">{selected.length}</span>}
+      </button>
+      {open &&
+        position &&
+        createPortal(
+          <div
+            ref={panelRef}
+            onClick={(e) => e.stopPropagation()}
+            style={{ position: "fixed", left: position.left, top: position.top }}
+            className="z-999 min-w-40 rounded-md bg-vc-container border border-vc-line shadow-[0_16px_40px_-16px_rgba(0,0,0,0.55)] text-sm normal-case font-normal py-1"
+          >
+            <div className="max-h-64 overflow-y-auto py-1">
+              {options.map((opt) => {
+                const value = String(opt.value);
+                const checked = selected.includes(value);
+                return (
+                  <label
+                    key={value}
+                    className="flex items-center gap-2 px-3 py-1.5 hover:bg-vc-veil cursor-pointer"
+                  >
+                    <Checkbox checked={checked} onChange={() => toggleValue(value)} />
+                    <span className={checked ? "text-vc-main font-medium" : "text-vc-secondary"}>{opt.label}</span>
+                  </label>
+                );
+              })}
+            </div>
+            {active && (
+              <button
+                type="button"
+                onClick={() => onChange([])}
+                className="w-full text-left px-3 py-2 text-xs text-vc-secondary/70 hover:text-vc-main border-t border-vc-line"
+              >
+                {t("table_filter_reset")}
+              </button>
+            )}
+          </div>,
+          document.body,
+        )}
+    </>
   );
 }
 
@@ -614,7 +884,7 @@ function TableIconButton({
         onClick={onClick}
         className={clsx(
           "flex h-7 w-7 items-center justify-center rounded-2xl transition-colors",
-          active ? "bg-main text-white" : "bg-back-2 text-secondary hover:text-text",
+          active ? "bg-vc-main text-white" : "bg-vc-back text-vc-secondary hover:text-vc-text",
           disabled && "opacity-30 pointer-events-none",
           className,
         )}

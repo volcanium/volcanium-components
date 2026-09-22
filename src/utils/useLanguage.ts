@@ -37,6 +37,8 @@ export type TranslationKey =
   | "table_internal_error"
   | "table_show_filters"
   | "table_hide_filters"
+  | "table_filter"
+  | "table_filter_reset"
   | "table_filter_all"
   | "table_filter_yes"
   | "table_filter_no"
@@ -86,6 +88,8 @@ const dictionaries: Record<"fr" | "en", Dictionary> = {
     table_internal_error: "Erreur interne",
     table_show_filters: "Afficher les filtres",
     table_hide_filters: "Masquer les filtres",
+    table_filter: "Filtrer",
+    table_filter_reset: "Réinitialiser",
     table_filter_all: "Tous",
     table_filter_yes: "Oui",
     table_filter_no: "Non",
@@ -132,6 +136,8 @@ const dictionaries: Record<"fr" | "en", Dictionary> = {
     table_internal_error: "Internal error",
     table_show_filters: "Show filters",
     table_hide_filters: "Hide filters",
+    table_filter: "Filter",
+    table_filter_reset: "Reset",
     table_filter_all: "All",
     table_filter_yes: "Yes",
     table_filter_no: "No",

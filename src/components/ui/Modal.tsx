@@ -183,7 +183,7 @@ export default function Modal(props: ModalProps) {
               onClose();
             }
           }}
-          className="fixed inset-0 z-50 flex items-center justify-center bg-back/70 backdrop-blur-sm p-3 sm:p-6"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-vc-back/70 backdrop-blur-sm p-3 sm:p-6"
         >
           <Squircle cornerRadius={22} cornerSmoothing={1} asChild>
             <motion.div
@@ -197,9 +197,15 @@ export default function Modal(props: ModalProps) {
               exit="exit"
               onClick={(e: React.MouseEvent) => e.stopPropagation()}
               onKeyDown={handleTrapFocus}
-              className="sm:w-11/12 sm:min-w-125 max-w-2xl sm:h-auto h-full w-full sm:justify-start justify-between flex flex-col bg-container border border-line shadow-[0_24px_60px_-20px_rgba(0,0,0,0.55)] p-5 sm:p-7"
+              className="sm:w-11/12 sm:min-w-125 max-w-2xl sm:h-auto h-full max-h-[90vh] w-full sm:justify-start justify-between flex flex-col bg-vc-container border border-vc-line shadow-[0_24px_60px_-20px_rgba(0,0,0,0.55)] p-5 sm:p-7"
             >
-              <div>
+              {/* `min-h-0` is required for a flex child to actually shrink
+                  below its content's natural height and let overflow-y-auto
+                  engage - without it this div just keeps growing past the
+                  modal's own max-h-[90vh] cap instead of scrolling
+                  internally, pushing the confirm/close buttons off-screen on
+                  a tall form. */}
+              <div className="flex-1 min-h-0 overflow-y-auto">
                 {title && (
                   <div className="mb-4 flex items-center justify-between gap-10">
                     <Title level="lg">{title}</Title>
@@ -209,7 +215,7 @@ export default function Modal(props: ModalProps) {
                         onClose();
                       }}
                       aria-label={t("close")}
-                      className="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-full border border-transparent text-secondary/60 transition-colors duration-200 hover:border-line hover:bg-veil hover:text-secondary"
+                      className="flex h-8 w-8 shrink-0 cursor-pointer items-center justify-center rounded-full border border-transparent text-vc-secondary/60 transition-colors duration-200 hover:border-vc-line hover:bg-vc-veil hover:text-vc-secondary"
                     >
                       <IconX className="w-4 h-4" />
                     </button>
@@ -217,11 +223,11 @@ export default function Modal(props: ModalProps) {
                 )}
 
                 <div
-                  className={`h-px bg-line mb-5 transition-opacity duration-200 ${title ? "opacity-100" : "opacity-0"}`}
+                  className={`h-px bg-vc-line mb-5 transition-opacity duration-200 ${title ? "opacity-100" : "opacity-0"}`}
                 />
 
                 <div
-                  className={`flex flex-col gap-2 leading-relaxed text-text ${className || ""}`}
+                  className={`flex flex-col gap-2 leading-relaxed text-vc-text ${className || ""}`}
                 >
                   {content}
                 </div>

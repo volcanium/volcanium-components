@@ -112,9 +112,9 @@ export const Default: Story = {
           onToggle={setIsOpen}
           activePath={currentPath}
         >
-          <div className="p-10 w-full h-full bg-back text-text flex items-center justify-center">
-            <div className="bg-container p-8 rounded-2xl w-full max-w-4xl border border-white/5 shadow-2xl">
-              <h1 className="text-4xl font-title text-secondary mb-4">
+          <div className="p-10 w-full h-full bg-vc-back text-vc-text flex items-center justify-center">
+            <div className="bg-vc-container p-8 rounded-2xl w-full max-w-4xl border border-white/5 shadow-2xl">
+              <h1 className="text-4xl font-vc-title text-vc-secondary mb-4">
                 Main Content
               </h1>
               <p className="text-white/70 text-lg">
@@ -124,10 +124,10 @@ export const Default: Story = {
                 identical to the original application.
               </p>
               <div className="mt-8 grid grid-cols-2 gap-4">
-                <div className="h-32 bg-main/20 rounded-xl border border-main/30 flex items-center justify-center text-main font-semibold">
+                <div className="h-32 bg-vc-main/20 rounded-xl border border-vc-main/30 flex items-center justify-center text-vc-main font-semibold">
                   Widget 1
                 </div>
-                <div className="h-32 bg-secondary/10 rounded-xl border border-secondary/20 flex items-center justify-center text-secondary font-semibold">
+                <div className="h-32 bg-vc-secondary/10 rounded-xl border border-vc-secondary/20 flex items-center justify-center text-vc-secondary font-semibold">
                   Widget 2
                 </div>
               </div>
