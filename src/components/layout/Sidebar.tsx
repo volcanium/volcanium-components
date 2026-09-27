@@ -1,6 +1,7 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { createPortal } from "react-dom";
 import clsx from "clsx";
-import { motion } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { Link, useInRouterContext } from "react-router-dom";
 import { Squircle } from "@squircle-js/react";
 import LinkV from "../ui/Link";
@@ -9,7 +10,10 @@ import {
   IconLayoutSidebarLeftExpand,
   IconMenu2,
   IconX,
-  IconUserEdit,
+  IconArrowsRightLeft,
+  IconUserPlus,
+  IconLogout,
+  IconCheck,
 } from "@tabler/icons-react";
 import Title from "../ui/Title";
 import Center from "./Center";
@@ -32,6 +36,38 @@ export interface SpecificTabsDef {
   groupName: string;
   role: string;
   tabs: TabDef[];
+}
+
+export interface AccountSwitcherAccount {
+  id: string;
+  name: string;
+  email?: string;
+  avatarUrl?: string;
+  initials?: string;
+  /** Whether this is the currently active account */
+  active?: boolean;
+}
+
+export interface AccountSwitcherProps {
+  /** Accounts to list (usually: every account signed in on this device) */
+  accounts: AccountSwitcherAccount[];
+  /** Shows a loader in place of the list while accounts are being fetched */
+  loading?: boolean;
+  /** Called when the user picks an account to switch to */
+  onSwitch: (id: string) => void;
+  /** Called when the user removes an account from the list (e.g. sign it out) */
+  onRemove?: (id: string) => void;
+  /** Called when the user wants to add another account */
+  onAdd?: () => void;
+  /** Account id currently being switched to, shows a spinner on that row */
+  switchingId?: string | null;
+  /** Account id currently being removed, disables that row's remove button */
+  removingId?: string | null;
+  labels?: {
+    title?: string;
+    active?: string;
+    add?: string;
+  };
 }
 
 export interface SidebarProps {
@@ -59,8 +95,14 @@ export interface SidebarProps {
     avatarUrl?: string;
     initials?: string;
   };
-  /** Callback when the user edit button is clicked */
-  onUserModif?: () => void;
+  /** Enables the account switcher: shows a "switch" button on the user card that
+   *  opens a compact side panel listing accounts. Omit to hide the button entirely.
+   *  Ignored if `onSwitchAccountClick` is also provided. */
+  accountSwitcher?: AccountSwitcherProps;
+  /** Shows the same "switch" button on the user card, but calls this instead of
+   *  opening the built-in panel - for apps that just need a simple link out
+   *  (e.g. to another service's own account switcher) without the full panel. */
+  onSwitchAccountClick?: () => void;
   /** Whether to show the "Panel powered by volcanium studio" branding at the bottom of the sidebar. Defaults to true. */
   showBranding?: boolean;
   /** Content to display next to the sidebar (via children) */
@@ -128,7 +170,8 @@ function UserCard({
   roleName,
   avatarUrl,
   initials = "U",
-  onModif,
+  onToggleSwitcher,
+  switcherActive,
   className,
   open = true,
   ...props
@@ -175,19 +218,23 @@ function UserCard({
             {roleName}
           </h3>
         </div>
-        {onModif && open && (
-          <div
+        {onToggleSwitcher && open && (
+          <button
+            type="button"
+            aria-label="Changer de compte"
             onClick={(e) => {
               e.stopPropagation();
-              onModif();
+              onToggleSwitcher();
             }}
-            className="shrink-0 pr-2.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+            className={clsx(
+              "shrink-0 mr-2.5 w-7 h-7 flex items-center justify-center rounded-lg transition-all duration-200",
+              switcherActive
+                ? "bg-vc-main/15 text-vc-main opacity-100"
+                : "text-vc-secondary/70 hover:text-vc-main hover:bg-vc-veil-strong opacity-0 group-hover:opacity-100",
+            )}
           >
-            <IconUserEdit
-              className="text-vc-secondary/70 hover:text-vc-main cursor-pointer w-[18px] h-[18px]"
-              stroke={1.75}
-            />
-          </div>
+            <IconArrowsRightLeft size={16} stroke={1.75} />
+          </button>
         )}
       </div>
     </Squircle>
@@ -358,6 +405,175 @@ function Nav({
 }
 
 // ---------------------------------------------
+// Account switcher — compact side panel anchored to the user card, not a
+// full-screen modal: it lists every account signed in on this device and
+// lets the user pick one, add another, or remove one, without leaving the
+// current page.
+// ---------------------------------------------
+function AccountSwitcherPanel({
+  anchorRef,
+  accounts,
+  loading,
+  onSwitch,
+  onRemove,
+  onAdd,
+  switchingId,
+  removingId,
+  labels,
+  onClose,
+}: AccountSwitcherProps & { anchorRef: React.RefObject<HTMLElement | null>; onClose: () => void }) {
+  const panelRef = useRef<HTMLDivElement>(null);
+  const [coords, setCoords] = useState<{ top: number; left: number } | null>(null);
+
+  // The sidebar itself clips overflow-x (needed for the collapse animation),
+  // so this panel can't just be an absolutely-positioned child of it — it
+  // would be cut off. Instead it's portaled to <body> and manually pinned to
+  // the user card's live position, recomputed on scroll/resize so it tracks
+  // the card even if the sidebar scrolls or the viewport changes.
+  useLayoutEffect(() => {
+    const PANEL_WIDTH = 288; // matches w-72
+    const updatePosition = () => {
+      const rect = anchorRef.current?.getBoundingClientRect();
+      if (!rect) return;
+      // Detached from the sidebar (extra gap) and aligned with the top of the
+      // card, not its bottom — reads as "floating next to" rather than
+      // "hanging off" the card.
+      const left = Math.min(rect.right + 16, window.innerWidth - PANEL_WIDTH - 12);
+      const top = Math.min(rect.top - 4, window.innerHeight - 12);
+      setCoords({ top, left: Math.max(12, left) });
+    };
+    updatePosition();
+    window.addEventListener("resize", updatePosition);
+    window.addEventListener("scroll", updatePosition, true);
+    return () => {
+      window.removeEventListener("resize", updatePosition);
+      window.removeEventListener("scroll", updatePosition, true);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    const handlePointerDown = (e: MouseEvent) => {
+      if (
+        panelRef.current &&
+        !panelRef.current.contains(e.target as Node) &&
+        !anchorRef.current?.contains(e.target as Node)
+      ) {
+        onClose();
+      }
+    };
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  if (!coords) return null;
+
+  return createPortal(
+    <motion.div
+      ref={panelRef}
+      initial={{ opacity: 0, y: -6, scale: 0.98 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: -6, scale: 0.98 }}
+      transition={{ duration: 0.16, ease: [0.16, 1, 0.3, 1] }}
+      style={{ position: "fixed", top: coords.top, left: coords.left }}
+      className="z-[999] w-72 max-w-[85vw] rounded-2xl border border-vc-line bg-vc-container shadow-xl p-2 flex flex-col gap-1"
+    >
+      <p className="px-2 pt-1.5 pb-2 text-[11px] font-semibold uppercase tracking-wide text-vc-secondary/50">
+        {labels?.title ?? "Comptes"}
+      </p>
+
+      {loading && (
+        <div className="flex items-center justify-center py-6">
+          <div className="w-5 h-5 border-2 border-vc-main border-t-transparent rounded-full animate-spin" />
+        </div>
+      )}
+
+      {!loading && (
+        <div className="flex flex-col gap-0.5 max-h-64 overflow-y-auto vc-scroll-hover">
+          {accounts.map((account) => {
+            const isSwitching = switchingId === account.id;
+            const isRemoving = removingId === account.id;
+            return (
+              <div
+                key={account.id}
+                onClick={() => !account.active && onSwitch(account.id)}
+                className={clsx(
+                  "group/row flex items-center gap-2.5 rounded-xl p-2 transition-colors",
+                  account.active
+                    ? "bg-vc-main/10"
+                    : "cursor-pointer hover:bg-vc-veil",
+                )}
+              >
+                <div className="w-8 h-8 rounded-full shrink-0 overflow-hidden ring-1 ring-vc-line bg-vc-back flex items-center justify-center">
+                  {account.avatarUrl ? (
+                    <img src={account.avatarUrl} alt={account.name} className="w-full h-full object-cover" />
+                  ) : (
+                    <span className="text-xs font-bold text-vc-main">
+                      {account.initials ?? account.name?.charAt(0)?.toUpperCase() ?? "U"}
+                    </span>
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-[13px] font-medium truncate">{account.name}</p>
+                  {account.email && (
+                    <p className="text-[11px] text-vc-secondary/50 truncate">{account.email}</p>
+                  )}
+                </div>
+                {isSwitching ? (
+                  <div className="w-4 h-4 border-2 border-vc-main border-t-transparent rounded-full animate-spin shrink-0" />
+                ) : account.active ? (
+                  <IconCheck size={16} className="text-vc-main shrink-0" />
+                ) : (
+                  onRemove && (
+                    <button
+                      type="button"
+                      disabled={isRemoving}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        onRemove(account.id);
+                      }}
+                      aria-label="Retirer ce compte"
+                      className="shrink-0 w-6 h-6 flex items-center justify-center rounded-lg text-vc-secondary/40 opacity-0 group-hover/row:opacity-100 hover:text-vc-main hover:bg-vc-veil-strong transition-all"
+                    >
+                      <IconLogout size={14} />
+                    </button>
+                  )
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {onAdd && (
+        <>
+          <div className="h-px bg-vc-line my-1" />
+          <button
+            type="button"
+            onClick={onAdd}
+            className="flex items-center gap-2.5 rounded-xl p-2 text-left text-[13px] text-vc-secondary/85 hover:bg-vc-veil hover:text-vc-secondary transition-colors"
+          >
+            <div className="w-8 h-8 rounded-full shrink-0 flex items-center justify-center border border-dashed border-vc-line">
+              <IconUserPlus size={16} className="text-vc-secondary/60" />
+            </div>
+            {labels?.add ?? "Ajouter un compte"}
+          </button>
+        </>
+      )}
+    </motion.div>,
+    document.body,
+  );
+}
+
+// ---------------------------------------------
 // Sidebar Main Component
 // ---------------------------------------------
 
@@ -371,12 +587,15 @@ export default function Sidebar({
   bottomTabs = [],
   activePath = "/",
   user,
-  onUserModif,
+  accountSwitcher,
+  onSwitchAccountClick,
   showBranding = true,
   children,
 }: SidebarProps) {
   const [internalOpen, setInternalOpen] = useState(isOpen);
   const open = onToggle ? isOpen : internalOpen;
+  const [switcherOpen, setSwitcherOpen] = useState(false);
+  const userCardRef = useRef<HTMLDivElement>(null);
 
   const toggleOpen = () => {
     const nextOpen = !open;
@@ -457,15 +676,33 @@ export default function Sidebar({
           </div>
 
           {user && (
-            <UserCard
-              onClick={open ? undefined : toggleOpen}
-              open={open}
-              onModif={onUserModif}
-              name={user.name}
-              roleName={user.roleName}
-              avatarUrl={user.avatarUrl}
-              initials={user.initials}
-            />
+            <div className="relative" ref={userCardRef}>
+              <UserCard
+                onClick={open ? undefined : toggleOpen}
+                open={open}
+                onToggleSwitcher={
+                  onSwitchAccountClick
+                    ? onSwitchAccountClick
+                    : accountSwitcher
+                      ? () => setSwitcherOpen((v) => !v)
+                      : undefined
+                }
+                switcherActive={switcherOpen}
+                name={user.name}
+                roleName={user.roleName}
+                avatarUrl={user.avatarUrl}
+                initials={user.initials}
+              />
+              <AnimatePresence>
+                {switcherOpen && accountSwitcher && (
+                  <AccountSwitcherPanel
+                    {...accountSwitcher}
+                    anchorRef={userCardRef}
+                    onClose={() => setSwitcherOpen(false)}
+                  />
+                )}
+              </AnimatePresence>
+            </div>
           )}
 
           <div
