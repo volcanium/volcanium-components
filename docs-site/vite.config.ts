@@ -10,4 +10,9 @@ export default defineConfig({
       "@lib": path.resolve(__dirname, "../src"),
     },
   },
+  server: {
+    host: true,
+    port: 5180,
+    strictPort: true,
+  },
 });

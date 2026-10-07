@@ -14,6 +14,8 @@ import {
   IconUserPlus,
   IconLogout,
   IconCheck,
+  IconUserCog,
+  IconDotsVertical,
 } from "@tabler/icons-react";
 import Title from "../ui/Title";
 import Center from "./Center";
@@ -70,6 +72,20 @@ export interface AccountSwitcherProps {
   };
 }
 
+export interface UserMenuProps {
+  /** Called when the user picks "Changer de compte". Omit to hide that row. */
+  onSwitchAccount?: () => void;
+  /** Called when the user picks "Se déconnecter". Omit to hide that row. */
+  onLogout?: () => void;
+  /** Called when the user picks "Gérer mon compte" (usually a redirect to Volcanium Compte). Omit to hide that row. */
+  onManageAccount?: () => void;
+  labels?: {
+    switchAccount?: string;
+    logout?: string;
+    manageAccount?: string;
+  };
+}
+
 export interface SidebarProps {
   /** If true, sidebar is expanded. If false, collapsed. */
   isOpen?: boolean;
@@ -103,6 +119,12 @@ export interface SidebarProps {
    *  opening the built-in panel - for apps that just need a simple link out
    *  (e.g. to another service's own account switcher) without the full panel. */
   onSwitchAccountClick?: () => void;
+  /** Turns the whole user card into a menu trigger: clicking it (instead of only the small
+   *  switch-account icon) opens a small popover with "Changer de compte" / "Se déconnecter" /
+   *  "Gérer mon compte" rows - for apps whose own logout button shouldn't sit in the main nav
+   *  (everything except Volcanium Compte itself, which keeps its own bottomTabs logout button).
+   *  Takes precedence over `accountSwitcher` / `onSwitchAccountClick` when provided. */
+  userMenu?: UserMenuProps;
   /** Whether to show the "Panel powered by volcanium studio" branding at the bottom of the sidebar. Defaults to true. */
   showBranding?: boolean;
   /** Content to display next to the sidebar (via children) */
@@ -172,18 +194,21 @@ function UserCard({
   initials = "U",
   onToggleSwitcher,
   switcherActive,
+  menuMode = false,
   className,
   open = true,
+  onClick,
   ...props
 }: any) {
   return (
     <Squircle cornerRadius={12} cornerSmoothing={1} asChild>
       <div
         {...props}
+        onClick={onClick}
         className={clsx(
           "group flex flex-row items-center gap-4 h-14 transition-[width,padding-left,background-color] duration-300 ease-in-out overflow-hidden",
           open
-            ? "w-full pl-3 bg-vc-veil hover:bg-vc-veil-strong"
+            ? clsx("w-full pl-3 bg-vc-veil hover:bg-vc-veil-strong", onClick && "cursor-pointer")
             : "w-10 pl-0 bg-transparent cursor-pointer",
           className,
         )}
@@ -221,7 +246,7 @@ function UserCard({
         {onToggleSwitcher && open && (
           <button
             type="button"
-            aria-label="Changer de compte"
+            aria-label={menuMode ? "Ouvrir le menu du compte" : "Changer de compte"}
             onClick={(e) => {
               e.stopPropagation();
               onToggleSwitcher();
@@ -230,10 +255,21 @@ function UserCard({
               "shrink-0 mr-2.5 w-7 h-7 flex items-center justify-center rounded-lg transition-all duration-200",
               switcherActive
                 ? "bg-vc-main/15 text-vc-main opacity-100"
-                : "text-vc-secondary/70 hover:text-vc-main hover:bg-vc-veil-strong opacity-0 group-hover:opacity-100",
+                : clsx(
+                    "text-vc-secondary/70 hover:text-vc-main hover:bg-vc-veil-strong",
+                    // Le trigger du menu (3 points) reste visible en permanence -
+                    // c'est le seul indice que la carte entiere est cliquable,
+                    // contrairement a l'icone switch (au clic dedie, deja
+                    // affordant via le curseur de la carte).
+                    menuMode ? "opacity-100" : "opacity-0 group-hover:opacity-100",
+                  ),
             )}
           >
-            <IconArrowsRightLeft size={16} stroke={1.75} />
+            {menuMode ? (
+              <IconDotsVertical size={16} stroke={1.75} />
+            ) : (
+              <IconArrowsRightLeft size={16} stroke={1.75} />
+            )}
           </button>
         )}
       </div>
@@ -574,6 +610,119 @@ function AccountSwitcherPanel({
 }
 
 // ---------------------------------------------
+// User menu — small popover opened by clicking the user card itself, for
+// apps that shouldn't carry their own logout button in the main nav (see
+// `userMenu` on SidebarProps). Same anchored-portal mechanics as
+// AccountSwitcherPanel above, kept separate since the two are mutually
+// exclusive (a card is either a switcher trigger or a menu trigger).
+// ---------------------------------------------
+function UserMenuPanel({
+  anchorRef,
+  onSwitchAccount,
+  onLogout,
+  onManageAccount,
+  labels,
+  onClose,
+}: UserMenuProps & { anchorRef: React.RefObject<HTMLElement | null>; onClose: () => void }) {
+  const panelRef = useRef<HTMLDivElement>(null);
+  const [coords, setCoords] = useState<{ top: number; left: number } | null>(null);
+
+  useLayoutEffect(() => {
+    const PANEL_WIDTH = 240; // matches w-60
+    const updatePosition = () => {
+      const rect = anchorRef.current?.getBoundingClientRect();
+      if (!rect) return;
+      const left = Math.min(rect.right + 16, window.innerWidth - PANEL_WIDTH - 12);
+      const top = Math.min(rect.top - 4, window.innerHeight - 12);
+      setCoords({ top, left: Math.max(12, left) });
+    };
+    updatePosition();
+    window.addEventListener("resize", updatePosition);
+    window.addEventListener("scroll", updatePosition, true);
+    return () => {
+      window.removeEventListener("resize", updatePosition);
+      window.removeEventListener("scroll", updatePosition, true);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    const handlePointerDown = (e: MouseEvent) => {
+      if (
+        panelRef.current &&
+        !panelRef.current.contains(e.target as Node) &&
+        !anchorRef.current?.contains(e.target as Node)
+      ) {
+        onClose();
+      }
+    };
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  if (!coords) return null;
+
+  const rows = [
+    onSwitchAccount && {
+      key: "switch",
+      label: labels?.switchAccount ?? "Changer de compte",
+      icon: IconArrowsRightLeft,
+      onClick: onSwitchAccount,
+    },
+    onManageAccount && {
+      key: "manage",
+      label: labels?.manageAccount ?? "Gérer mon compte",
+      icon: IconUserCog,
+      onClick: onManageAccount,
+    },
+    onLogout && {
+      key: "logout",
+      label: labels?.logout ?? "Se déconnecter",
+      icon: IconLogout,
+      onClick: onLogout,
+    },
+  ].filter(Boolean) as { key: string; label: string; icon: React.ElementType; onClick: () => void }[];
+
+  return createPortal(
+    <motion.div
+      ref={panelRef}
+      initial={{ opacity: 0, y: -6, scale: 0.98 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: -6, scale: 0.98 }}
+      transition={{ duration: 0.16, ease: [0.16, 1, 0.3, 1] }}
+      style={{ position: "fixed", top: coords.top, left: coords.left }}
+      className="z-[999] w-60 max-w-[85vw] rounded-2xl border border-vc-line bg-vc-container shadow-xl p-1.5 flex flex-col gap-0.5"
+    >
+      {rows.map(({ key, label, icon: Icon, onClick }) => (
+        <button
+          key={key}
+          type="button"
+          onClick={() => {
+            onClose();
+            onClick();
+          }}
+          className="flex items-center gap-2.5 rounded-xl p-2 text-left text-[13px] text-vc-secondary/85 hover:bg-vc-veil hover:text-vc-secondary transition-colors"
+        >
+          <div className="w-7 h-7 rounded-lg shrink-0 flex items-center justify-center bg-vc-veil">
+            <Icon size={15} stroke={1.75} />
+          </div>
+          {label}
+        </button>
+      ))}
+    </motion.div>,
+    document.body,
+  );
+}
+
+// ---------------------------------------------
 // Sidebar Main Component
 // ---------------------------------------------
 
@@ -589,12 +738,14 @@ export default function Sidebar({
   user,
   accountSwitcher,
   onSwitchAccountClick,
+  userMenu,
   showBranding = true,
   children,
 }: SidebarProps) {
   const [internalOpen, setInternalOpen] = useState(isOpen);
   const open = onToggle ? isOpen : internalOpen;
   const [switcherOpen, setSwitcherOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
   const userCardRef = useRef<HTMLDivElement>(null);
 
   const toggleOpen = () => {
@@ -678,16 +829,25 @@ export default function Sidebar({
           {user && (
             <div className="relative" ref={userCardRef}>
               <UserCard
-                onClick={open ? undefined : toggleOpen}
+                onClick={
+                  open
+                    ? userMenu
+                      ? () => setUserMenuOpen((v) => !v)
+                      : undefined
+                    : toggleOpen
+                }
                 open={open}
                 onToggleSwitcher={
-                  onSwitchAccountClick
-                    ? onSwitchAccountClick
-                    : accountSwitcher
-                      ? () => setSwitcherOpen((v) => !v)
-                      : undefined
+                  userMenu
+                    ? () => setUserMenuOpen((v) => !v)
+                    : onSwitchAccountClick
+                      ? onSwitchAccountClick
+                      : accountSwitcher
+                        ? () => setSwitcherOpen((v) => !v)
+                        : undefined
                 }
-                switcherActive={switcherOpen}
+                switcherActive={userMenu ? userMenuOpen : switcherOpen}
+                menuMode={Boolean(userMenu)}
                 name={user.name}
                 roleName={user.roleName}
                 avatarUrl={user.avatarUrl}
@@ -699,6 +859,13 @@ export default function Sidebar({
                     {...accountSwitcher}
                     anchorRef={userCardRef}
                     onClose={() => setSwitcherOpen(false)}
+                  />
+                )}
+                {userMenuOpen && userMenu && (
+                  <UserMenuPanel
+                    {...userMenu}
+                    anchorRef={userCardRef}
+                    onClose={() => setUserMenuOpen(false)}
                   />
                 )}
               </AnimatePresence>
