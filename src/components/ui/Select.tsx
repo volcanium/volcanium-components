@@ -82,6 +82,8 @@ export default function Select<T = unknown>({
     <Button
       ref={triggerRef}
       id={selectId}
+      // Sans `type="button"`, un Select dans un <form> (ex. `Form`) soumettait le formulaire a l'ouverture.
+      type="button"
       variant="tertiary"
       aria-haspopup="listbox"
       aria-expanded={open}
