@@ -127,6 +127,8 @@ export interface SidebarProps {
   userMenu?: UserMenuProps;
   /** Whether to show the "Panel powered by volcanium studio" branding at the bottom of the sidebar. Defaults to true. */
   showBranding?: boolean;
+  /** Replaces the branding line ("Panel powered by volcanium studio") by a custom label, e.g. "Volcanium". */
+  brandingLabel?: React.ReactNode;
   /** Content to display next to the sidebar (via children) */
   children?: React.ReactNode;
 }
@@ -740,6 +742,7 @@ export default function Sidebar({
   onSwitchAccountClick,
   userMenu,
   showBranding = true,
+  brandingLabel,
   children,
 }: SidebarProps) {
   const [internalOpen, setInternalOpen] = useState(isOpen);
@@ -907,10 +910,16 @@ export default function Sidebar({
                 open ? "opacity-100 delay-150" : "opacity-0",
               )}
             >
-              Panel powered by{" "}
-              <LinkV onClick={() => window.open("https://volcanium-studio.com/")}>
-                volcanium studio
-              </LinkV>
+              {brandingLabel ? (
+                <LinkV onClick={() => window.open("https://volcanium-studio.com/")}>{brandingLabel}</LinkV>
+              ) : (
+                <>
+                  Panel powered by{" "}
+                  <LinkV onClick={() => window.open("https://volcanium-studio.com/")}>
+                    volcanium studio
+                  </LinkV>
+                </>
+              )}
             </small>
           )}
         </div>

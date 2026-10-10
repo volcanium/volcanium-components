@@ -95,6 +95,8 @@ export interface TableProps<Row extends Record<string, any>> {
   deleteRow?: boolean;
   deleteRequest?: (selectedRows: Row[]) => Promise<void>;
   openRequest?: (selectedRows: Row[]) => void;
+  /** Clic sur une ligne (hors boutons, liens et champs qu'elle contient) : ouvre par exemple la page de détail. */
+  onRowClick?: (row: Row) => void;
   modifMethod?: (params: CellValueChangedEvent<Row>) => void;
   newRow?: NewRowConfig;
   searchPlaceholder?: string;
@@ -138,6 +140,7 @@ export default function Table<Row extends Record<string, any>>({
   className,
   serverSide = false,
   pageSize = 25,
+  onRowClick,
 }: TableProps<Row>) {
   const { t } = useLanguage();
   const [data, setData] = useState<Row[]>([]);
@@ -643,8 +646,16 @@ export default function Table<Row extends Record<string, any>>({
                       <tr
                         key={key}
                         onDoubleClick={() => openRequest?.([row])}
+                        onClick={
+                          onRowClick
+                            ? (e) => {
+                                if (!(e.target as HTMLElement).closest("button, a, input, select, textarea, label, [role=button]")) onRowClick(row);
+                              }
+                            : undefined
+                        }
                         className={clsx(
                           "border-b border-vc-line/60 last:border-b-0 transition-colors",
+                          onRowClick && "cursor-pointer",
                           selectedKeys.has(key) ? "bg-vc-main/10" : "hover:bg-vc-veil",
                         )}
                       >
