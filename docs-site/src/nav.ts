@@ -11,7 +11,10 @@ export interface NavGroup {
 export const navGroups: NavGroup[] = [
   {
     group: "Config",
-    items: [{ path: "/config/volcanium-provider", label: "VolcaniumProvider" }],
+    items: [
+      { path: "/config/volcanium-provider", label: "VolcaniumProvider" },
+      { path: "/ui/theme-toggle", label: "ThemeToggle" },
+    ],
   },
   {
     group: "Actions",
@@ -28,6 +31,7 @@ export const navGroups: NavGroup[] = [
       { path: "/ui/textarea", label: "Textarea" },
       { path: "/ui/select", label: "Select" },
       { path: "/ui/toggle", label: "Toggle" },
+      { path: "/ui/date-picker", label: "DatePicker" },
       { path: "/ui/form", label: "Form" },
     ],
   },
@@ -35,8 +39,10 @@ export const navGroups: NavGroup[] = [
     group: "Feedback & Overlays",
     items: [
       { path: "/ui/modal", label: "Modal" },
+      { path: "/ui/confirm-modal", label: "ConfirmModal / PromptModal" },
       { path: "/ui/toast", label: "ToastProvider / notify" },
       { path: "/ui/loader", label: "Loader" },
+      { path: "/ui/full-page-loader", label: "FullPageLoader" },
       { path: "/ui/information-button", label: "InformationButton" },
       { path: "/ui/in-dev", label: "InDev" },
     ],
@@ -47,6 +53,8 @@ export const navGroups: NavGroup[] = [
       { path: "/ui/table", label: "Table" },
       { path: "/ui/check-list-item", label: "CheckListItem" },
       { path: "/ui/stepper", label: "Stepper" },
+      { path: "/ui/tabs", label: "Tabs" },
+      { path: "/ui/info-card", label: "InfoCard / InfoGrid" },
     ],
   },
   {

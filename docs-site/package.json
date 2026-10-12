@@ -10,8 +10,6 @@
   },
   "dependencies": {
     "@tabler/icons-react": "^3.12.0",
-    "ag-grid-community": "^32.1.0",
-    "ag-grid-react": "^32.1.0",
     "clsx": "^2.1.1",
     "date-fns": "^3.6.0",
     "framer-motion": "^11.3.30",

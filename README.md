@@ -1,5 +1,40 @@
 # Volcanium UI Components
 
-**FR** : Bibliothèque de composants d'interface utilisateur React/TypeScript de Volcanium. Ce module fournit des composants génériques prêts à l'emploi (boutons, modales, tableaux, etc.) stylisés avec Tailwind CSS. Explorez la documentation via Storybook (`npm run storybook`).
+Bibliothèque de composants React/TypeScript de Volcanium (Tailwind CSS 4). / React/TypeScript UI component library by Volcanium.
 
-**EN** : React/TypeScript UI component library by Volcanium. This module provides ready-to-use, generic components (buttons, modals, tables, etc.) styled with Tailwind CSS. Explore the documentation via Storybook (`npm run storybook`).
+## Installation
+
+Le paquet est publié sur GitHub Packages. Dans le projet qui le consomme, `.npmrc` :
+
+```
+@volcanium:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}
+```
+
+`NODE_AUTH_TOKEN` : jeton GitHub avec le droit `read:packages`. Puis :
+
+```
+npm install @volcanium/volcanium-components
+```
+
+Pairs requis : `react`, `react-dom`, `react-router-dom`.
+
+## Utilisation
+
+```tsx
+import "@volcanium/volcanium-components/src/index.css"; // après `@import "tailwindcss"`
+import { VolcaniumProvider, Button } from "@volcanium/volcanium-components";
+
+<VolcaniumProvider config={{ lang: "fr" }}>
+  <Button>Valider</Button>
+</VolcaniumProvider>
+```
+
+- `config.lang` / `config.theme` : la langue (et le thème) de l'app, suivis si elle change. Sans `config.theme`, le thème mémorisé est repris (`localStorage`, clé `volcanium-theme`, désactivable avec `themeStorageKey={false}`).
+- Tous les composants lisent leurs couleurs dans des variables CSS `vc-*` : voir `CONTRIBUTING.md`.
+
+## Développement
+
+- `npm run storybook` : Storybook (bascule clair/sombre via `data-theme`)
+- `npm run docs:dev` : site de documentation (`docs-site/`)
+- `npm run build` : build `tsup` (`dist/`)

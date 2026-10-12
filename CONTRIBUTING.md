@@ -3,10 +3,14 @@
 Ce document définit les règles strictes d'architecture et de conception pour maintenir la cohérence de la librairie de composants. Toute modification ou création de composant doit respecter ces conventions.
 
 ## 1. Design System & Typographie (Tailwind CSS)
-- **Couleurs sémantiques** : N'utilisez **jamais** de couleurs Tailwind par défaut (ex: `bg-red-500`, `text-blue-300`) ou de codes hexadécimaux codés en dur. Vous devez obligatoirement utiliser le thème défini dans `src/index.css` :
-  - `bg-main`, `text-main`
-  - `bg-back` (fond principal), `bg-contaner` (fonds de cartes/modales)
-  - `text-secondary`, `text-text`
+- **Couleurs sémantiques** : N'utilisez **jamais** de couleurs Tailwind par défaut (ex: `bg-red-500`, `text-white`, `bg-black/60`), de `rgb()` ou de codes hexadécimaux codés en dur : ils sont faux dans l'un des deux thèmes. Utilisez les tokens de `src/index.css` (tous préfixés `vc-`, redéfinis par `[data-theme="light"]`) :
+  - Marque : `bg-vc-main`, `text-vc-main`, `bg-vc-accent`, `text-vc-on-main` (texte posé sur une surface de marque)
+  - Surfaces : `bg-vc-back` (fond de page), `bg-vc-container` (cartes/modales), `bg-vc-scrim` (voile derrière une modale)
+  - Texte : `text-vc-text`, `text-vc-secondary` (et opacités : `text-vc-text/60`)
+  - Filets et survols : `border-vc-line`, `border-vc-line-strong`, `bg-vc-veil`, `bg-vc-veil-strong`
+  - Statuts : `text-vc-danger`, `text-vc-success`, `text-vc-warning` (et `border-vc-danger/50`, `bg-vc-danger/10`…)
+- **Textes** : aucun texte en dur dans un composant. Ajoutez une clé (fr + en) dans `src/utils/useLanguage.ts` et lisez-la avec `useLanguage().t`.
+- **Thème** : géré par `VolcaniumProvider` (attribut `data-theme` sur `<html>`, mémorisé dans `localStorage` sous `volcanium-theme`).
 - **Polices** : Utilisez les classes `font-main`, `font-title` et `font-secondary`.
 - **Comportements globaux** : L'utilisation de classes arbitraires doit rester exceptionnelle.
 

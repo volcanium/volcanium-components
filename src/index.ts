@@ -35,11 +35,18 @@ export type {
 } from "./components/ui/Table";
 export { default as TooltipButton } from "./components/ui/TooltipButton";
 export { default as Form } from "./components/ui/Form";
+export type { FormField, FormProps } from "./components/ui/Form";
 export { default as Link } from "./components/ui/Link";
 export { default as Textarea } from "./components/ui/Textarea";
 export { default as Loader } from "./components/ui/Loader";
 export { default as FullPageLoader } from "./components/ui/FullPageLoader";
 export { default as Toggle } from "./components/ui/Toggle";
+export { default as InfoCard, InfoGrid } from "./components/ui/InfoCard";
+export type { InfoCardProps } from "./components/ui/InfoCard";
+export { default as ConfirmModal, PromptModal } from "./components/ui/ConfirmModal";
+export type { ConfirmModalProps, PromptModalProps } from "./components/ui/ConfirmModal";
+export { default as Tabs } from "./components/ui/Tabs";
+export type { TabsProps, TabItem } from "./components/ui/Tabs";
 export { default as Stepper } from "./components/ui/Stepper";
 export type { StepperProps, StepperItem } from "./components/ui/Stepper";
 

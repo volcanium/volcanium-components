@@ -22,6 +22,12 @@ import TextareaDoc from "./pages/ui/TextareaDoc";
 import LoaderDoc from "./pages/ui/LoaderDoc";
 import ToggleDoc from "./pages/ui/ToggleDoc";
 import StepperDoc from "./pages/ui/StepperDoc";
+import TabsDoc from "./pages/ui/TabsDoc";
+import InfoCardDoc from "./pages/ui/InfoCardDoc";
+import ConfirmModalDoc from "./pages/ui/ConfirmModalDoc";
+import FullPageLoaderDoc from "./pages/ui/FullPageLoaderDoc";
+import DatePickerDoc from "./pages/ui/DatePickerDoc";
+import ThemeToggleDoc from "./pages/ui/ThemeToggleDoc";
 
 import CenterDoc from "./pages/layout/CenterDoc";
 import GridDoc from "./pages/layout/GridDoc";
@@ -94,6 +100,12 @@ export default function App() {
           <Route path="/ui/loader" element={<LoaderDoc />} />
           <Route path="/ui/toggle" element={<ToggleDoc />} />
           <Route path="/ui/stepper" element={<StepperDoc />} />
+          <Route path="/ui/tabs" element={<TabsDoc />} />
+          <Route path="/ui/info-card" element={<InfoCardDoc />} />
+          <Route path="/ui/confirm-modal" element={<ConfirmModalDoc />} />
+          <Route path="/ui/full-page-loader" element={<FullPageLoaderDoc />} />
+          <Route path="/ui/date-picker" element={<DatePickerDoc />} />
+          <Route path="/ui/theme-toggle" element={<ThemeToggleDoc />} />
 
           <Route path="/layout/center" element={<CenterDoc />} />
           <Route path="/layout/grid" element={<GridDoc />} />

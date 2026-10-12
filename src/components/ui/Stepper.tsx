@@ -68,7 +68,7 @@ function StepCard({ children, title, count, className = "", done = false }: Step
         <div className="flex flex-row justify-between items-center">
           <Title>{title}</Title>
         </div>
-        <div className="mt-2 text-white/80">{children}</div>
+        <div className="mt-2 text-vc-text/80">{children}</div>
       </motion.div>
     </div>
   );
@@ -208,7 +208,7 @@ export default function Stepper({ stages = [], layout = "linear", className = ""
 
   if (!stages || stages.length === 0) {
     return (
-      <div className={`text-center text-white/50 p-8 ${className}`}>
+      <div className={`text-center text-vc-text/50 p-8 ${className}`}>
         {layout === "zigzag" ? t("stepper_empty_roadmap") : t("stepper_empty_cursus")}
       </div>
     );

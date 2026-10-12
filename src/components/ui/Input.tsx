@@ -2,6 +2,7 @@ import { useId, useState, ReactNode, InputHTMLAttributes } from "react";
 import clsx from "clsx";
 import { IconEye, IconEyeOff, IconRefresh } from "@tabler/icons-react";
 import { Squircle } from "@squircle-js/react";
+import { useLanguage } from "../../utils/useLanguage";
 
 export interface InputProps extends Omit<
   InputHTMLAttributes<HTMLInputElement>,
@@ -26,6 +27,7 @@ export default function Input({
   disabled,
   ...props
 }: InputProps) {
+  const { t } = useLanguage();
   const varaiants = {
     one: "bg-vc-container",
     secondary: "bg-vc-container",
@@ -67,7 +69,7 @@ export default function Input({
           tabIndex={-1}
           disabled={disabled}
           onClick={() => setVisible((v) => !v)}
-          aria-label={visible ? "Masquer le mot de passe" : "Afficher le mot de passe"}
+          aria-label={visible ? t("hide_password") : t("show_password")}
           className="absolute right-0 top-0 h-full px-3 flex items-center text-vc-main/70 transition-colors duration-150 hover:text-vc-main disabled:cursor-not-allowed cursor-pointer"
         >
           {visible ? <IconEyeOff size={17} /> : <IconEye size={17} />}

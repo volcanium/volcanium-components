@@ -82,7 +82,7 @@ export default function TooltipButton({ children, tooltip }: TooltipButtonProps)
               bottom: position.bottom,
               transform: "translateX(-50%)",
             }}
-            className={`z-999 border border-vc-secondary/40 bg-vc-container text-white text-sm rounded-md px-3 py-1 text-center pointer-events-none
+            className={`z-999 border border-vc-secondary/40 bg-vc-container text-vc-text text-sm rounded-md px-3 py-1 text-center pointer-events-none
                         whitespace-nowrap max-w-max transition-opacity duration-150 ease-out ${
                           visible ? "opacity-100" : "opacity-0"
                         }`}

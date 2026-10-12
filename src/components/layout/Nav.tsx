@@ -172,7 +172,7 @@ export default function Nav({
                 WebkitBackdropFilter: "blur(24px)",
                 boxShadow: "0 1px 24px rgba(0,0,0,0.45)",
               }
-            : { backgroundColor: overlayMode ? "transparent" : "rgb(18,18,18)" }),
+            : { backgroundColor: overlayMode ? "transparent" : "var(--color-vc-back)" }),
         }}
       >
         <div className="flex justify-between items-center w-full">
@@ -276,7 +276,7 @@ export default function Nav({
                   className={`px-4 py-3 rounded-xl cursor-pointer active:text-vc-main text-sm font-medium transition-colors duration-200 block ${
                     (a.id && activeSection === a.id)
                       ? "text-vc-main bg-vc-container border-vc-main"
-                      : "text-white/70 hover:text-vc-secondary hover:bg-white/5"
+                      : "text-vc-text/70 hover:text-vc-secondary hover:bg-vc-veil"
                   }`}
                 >
                   {a.label}

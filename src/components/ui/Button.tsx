@@ -48,13 +48,13 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     };
 
     const styles = {
-      accent: "bg-vc-main border border-vc-secondary/40 text-white",
-      primary: "bg-vc-accent hover:bg-vc-main border border-vc-secondary/40 text-white",
+      accent: "bg-vc-main border border-vc-secondary/40 text-vc-on-main",
+      primary: "bg-vc-accent hover:bg-vc-main border border-vc-secondary/40 text-vc-on-main",
       secondary:
         "bg-vc-container hover:bg-vc-main/50 border border-vc-secondary/40 text-vc-secondary",
       discret: "border border-vc-secondary/70 hover:bg-vc-main/10",
       dangerous:
-        "bg-vc-container border border-red-500/50 hover:border-red-500 hover:bg-red-500/10 text-vc-secondary",
+        "bg-vc-container border border-vc-danger/50 hover:border-vc-danger hover:bg-vc-danger/10 text-vc-secondary",
       tertiary: "bg-vc-container text-vc-secondary",
       // A deliberately light-on-both-themes chip — `overlay` (not `secondary`,
       // which flips to a dark foreground color in the light theme) stays a

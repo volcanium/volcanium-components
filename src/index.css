@@ -21,6 +21,14 @@
      why this needs its own token instead of a literal `black/50`. */
   --color-vc-info-hover: rgba(0, 0, 0, 0.5);
 
+  /* Semantic status colors + text/overlay that sit on brand surfaces: never
+     hardcode red/green/yellow/white in a component, read these instead. */
+  --color-vc-danger: #f87171;
+  --color-vc-success: #4ade80;
+  --color-vc-warning: #facc15;
+  --color-vc-on-main: #ffffff;
+  --color-vc-scrim: rgba(0, 0, 0, 0.6);
+
   --font-vc-main: "DM Sans", system-ui, sans-serif;
   --font-vc-title: "Rammetto One", sans-serif;
   --font-vc-secondary: "Arimo", sans-serif;
@@ -54,6 +62,11 @@
   /* A literal `black/50` (dark theme's value) would wash the whole row out
      on a white card — a soft neutral tint reads as "hover" instead. */
   --color-vc-info-hover: rgba(28, 27, 26, 0.06);
+
+  /* Darker shades: the dark theme's pastel tones lack contrast on white. */
+  --color-vc-danger: #dc2626;
+  --color-vc-success: #16a34a;
+  --color-vc-warning: #a16207;
 }
 
 

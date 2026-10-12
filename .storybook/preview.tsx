@@ -2,7 +2,7 @@ import type { Preview } from "@storybook/react";
 import React, { useEffect } from "react";
 import { themes } from '@storybook/theming';
 import { BrowserRouter } from "react-router-dom";
-import { withThemeByClassName } from '@storybook/addon-themes';
+import { withThemeByDataAttribute } from '@storybook/addon-themes';
 import { I18nextProvider } from 'react-i18next';
 import i18n from '../src/i18n';
 import "../src/index.css";
@@ -66,12 +66,14 @@ const preview: Preview = {
       </BrowserRouter>
     ),
     i18nDecorator,
-    withThemeByClassName({
+    withThemeByDataAttribute({
       themes: {
         light: 'light',
         dark: 'dark',
       },
       defaultTheme: 'dark',
+      // The library reads `data-theme` (see VolcaniumProvider), not a class.
+      attributeName: 'data-theme',
     }),
   ],
 };

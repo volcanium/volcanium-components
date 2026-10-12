@@ -113,7 +113,7 @@ export default function DatePicker({
   maxDate,
   language,
 }: DatePickerProps) {
-  const { language: providerLanguage } = useLanguage();
+  const { language: providerLanguage, t } = useLanguage();
   const lang = language || resolveLanguage(providerLanguage);
   const locale = LOCALES[lang];
   const pattern = INPUT_PATTERNS[lang];
@@ -305,7 +305,7 @@ export default function DatePicker({
                   type="button"
                   onClick={() => setCursor((c) => subMonths(c, 1))}
                   className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-vc-secondary/60 transition-colors duration-150 hover:bg-vc-veil hover:text-vc-secondary cursor-pointer"
-                  aria-label="Previous month"
+                  aria-label={t("previous_month")}
                 >
                   <IconChevronLeft size={16} />
                 </button>
@@ -373,7 +373,7 @@ export default function DatePicker({
                   type="button"
                   onClick={() => setCursor((c) => addMonths(c, 1))}
                   className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-vc-secondary/60 transition-colors duration-150 hover:bg-vc-veil hover:text-vc-secondary cursor-pointer"
-                  aria-label="Next month"
+                  aria-label={t("next_month")}
                 >
                   <IconChevronRight size={16} />
                 </button>
@@ -402,7 +402,7 @@ export default function DatePicker({
                         aspect-square rounded-lg text-sm transition-colors duration-150
                         ${!inMonth ? "text-vc-secondary/25" : "text-vc-secondary/85"}
                         ${disabledDay ? "opacity-30 cursor-not-allowed" : "cursor-pointer hover:bg-vc-veil-strong"}
-                        ${isSelected ? "bg-vc-main text-white hover:bg-vc-main" : ""}
+                        ${isSelected ? "bg-vc-main text-vc-on-main hover:bg-vc-main" : ""}
                         ${!isSelected && isToday ? "border border-vc-main/50" : ""}
                       `}
                     >
@@ -440,7 +440,7 @@ export default function DatePicker({
             type="button"
             disabled={disabled}
             onClick={() => setOpen((v) => !v)}
-            aria-label="Open calendar"
+            aria-label={t("open_calendar")}
             aria-haspopup="dialog"
             aria-expanded={open}
             className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-vc-secondary/50 transition-colors duration-150 hover:bg-vc-veil-strong hover:text-vc-secondary cursor-pointer disabled:cursor-not-allowed"
