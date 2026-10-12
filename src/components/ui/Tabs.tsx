@@ -51,7 +51,7 @@ export default function Tabs({ tabs, value, onChange, className = "", contentCla
       <div
         role="tablist"
         onKeyDown={onKeyDown}
-        className={`flex gap-1 overflow-x-auto border-b border-vc-line vc-scroll-hover ${className}`}
+        className={`flex gap-1 overflow-x-auto overflow-y-hidden border-b border-vc-line vc-scroll-hover ${className}`}
       >
         {tabs.map((t) => {
           const selected = t.id === value;
@@ -69,7 +69,7 @@ export default function Tabs({ tabs, value, onChange, className = "", contentCla
               tabIndex={selected ? 0 : -1}
               disabled={t.disabled}
               onClick={() => onChange(t.id)}
-              className={`-mb-px flex shrink-0 cursor-pointer items-center gap-2 whitespace-nowrap border-b-2 px-4 py-2.5 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
+              className={`flex shrink-0 cursor-pointer items-center gap-2 whitespace-nowrap border-b-2 px-4 py-2.5 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
                 selected
                   ? "border-vc-main font-medium text-vc-text"
                   : "border-transparent text-vc-text/60 hover:border-vc-line-strong hover:text-vc-text"
