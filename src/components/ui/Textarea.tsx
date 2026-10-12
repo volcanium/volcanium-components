@@ -40,7 +40,7 @@ export default function Textarea({
       <textarea
         {...props}
         id={textareaId}
-        className={`px-3 py-1 ${variants[variant]} ${resizeMap[resize]} w-52 max-w-100 min-w-30 min-h-20 max-h-100 border border-vc-secondary/20 focus:border-vc-accent/50 outline-0 ${className || ""}`}
+        className={`px-3 py-1 ${variants[variant]} ${resizeMap[resize]} w-52 max-w-full min-w-30 min-h-20 max-h-100 border border-vc-secondary/20 focus:border-vc-accent/50 outline-0 ${className || ""}`}
       />
     </Squircle>
   );
@@ -49,7 +49,7 @@ export default function Textarea({
     <div className="flex flex-col gap-1">
       {TextareaEl}
       <label
-        className="w-full -mt-1 mb-1 text-start text-sm text-white/50"
+        className="w-full -mt-1 mb-1 text-start text-sm text-vc-text/50"
         htmlFor={textareaId}
       >
         {label}

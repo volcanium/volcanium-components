@@ -2,6 +2,7 @@ import { ReactNode, useEffect, useState } from "react";
 import Modal from "./Modal";
 import Button from "./Button";
 import Input from "./Input";
+import { useLanguage } from "../../utils/useLanguage";
 
 export interface ConfirmModalProps {
   isOpen: boolean;
@@ -22,7 +23,8 @@ export interface ConfirmModalProps {
 }
 
 /** Fenêtre de confirmation (remplace `window.confirm`). */
-export default function ConfirmModal({ isOpen, onClose, title, children, confirmLabel = "Confirmer", cancelLabel = "Annuler", danger, onConfirm, requireText, secondary }: ConfirmModalProps) {
+export default function ConfirmModal({ isOpen, onClose, title, children, confirmLabel, cancelLabel, danger, onConfirm, requireText, secondary }: ConfirmModalProps) {
+  const { t } = useLanguage();
   const [busy, setBusy] = useState(false);
   const [typed, setTyped] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -40,7 +42,7 @@ export default function ConfirmModal({ isOpen, onClose, title, children, confirm
       await fn();
       onClose();
     } catch (err) {
-      setError((err as Error).message || "Action impossible");
+      setError((err as Error).message || t("action_failed"));
     } finally {
       setBusy(false);
     }
@@ -51,10 +53,10 @@ export default function ConfirmModal({ isOpen, onClose, title, children, confirm
       <div className="flex flex-col gap-3 text-sm">
         {children && <div>{children}</div>}
         {requireText && <Input label={`Pour confirmer, recopie : ${requireText}`} value={typed} onChange={(e) => setTyped(e.target.value)} />}
-        {error && <p className="text-red-400">{error}</p>}
+        {error && <p className="text-vc-danger">{error}</p>}
         <div className="flex flex-wrap justify-end gap-3">
           <Button variant="secondary" onClick={onClose} disabled={busy}>
-            {cancelLabel}
+            {cancelLabel ?? t("cancel")}
           </Button>
           {secondary && (
             <Button variant="secondary" disabled={busy} onClick={() => void run(secondary.onClick)}>
@@ -62,7 +64,7 @@ export default function ConfirmModal({ isOpen, onClose, title, children, confirm
             </Button>
           )}
           <Button variant={danger ? "dangerous" : "primary"} loading={busy} disabled={busy || (!!requireText && typed !== requireText)} onClick={() => void run(onConfirm)}>
-            {confirmLabel}
+            {confirmLabel ?? t("confirm")}
           </Button>
         </div>
       </div>
@@ -82,7 +84,8 @@ export interface PromptModalProps {
 }
 
 /** Fenêtre de saisie d'une valeur (remplace `window.prompt`). Entrée valide. */
-export function PromptModal({ isOpen, onClose, title, label, initialValue = "", placeholder, confirmLabel = "Valider", onSubmit }: PromptModalProps) {
+export function PromptModal({ isOpen, onClose, title, label, initialValue = "", placeholder, confirmLabel, onSubmit }: PromptModalProps) {
+  const { t } = useLanguage();
   const [value, setValue] = useState(initialValue);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -100,7 +103,7 @@ export function PromptModal({ isOpen, onClose, title, label, initialValue = "", 
       await onSubmit(value.trim());
       onClose();
     } catch (err) {
-      setError((err as Error).message || "Action impossible");
+      setError((err as Error).message || t("action_failed"));
     } finally {
       setBusy(false);
     }
@@ -116,13 +119,13 @@ export function PromptModal({ isOpen, onClose, title, label, initialValue = "", 
         }}
       >
         <Input label={label} value={value} placeholder={placeholder} onChange={(e) => setValue(e.target.value)} autoFocus />
-        {error && <p className="text-red-400">{error}</p>}
+        {error && <p className="text-vc-danger">{error}</p>}
         <div className="flex justify-end gap-3">
           <Button type="button" variant="secondary" onClick={onClose} disabled={busy}>
             Annuler
           </Button>
           <Button type="submit" loading={busy} disabled={busy || !value.trim()}>
-            {confirmLabel}
+            {confirmLabel ?? t("validate")}
           </Button>
         </div>
       </form>

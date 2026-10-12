@@ -35,6 +35,7 @@ export type {
 } from "./components/ui/Table";
 export { default as TooltipButton } from "./components/ui/TooltipButton";
 export { default as Form } from "./components/ui/Form";
+export type { FormField, FormProps } from "./components/ui/Form";
 export { default as Link } from "./components/ui/Link";
 export { default as Textarea } from "./components/ui/Textarea";
 export { default as Loader } from "./components/ui/Loader";

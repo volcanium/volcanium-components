@@ -19,6 +19,7 @@ import {
 } from "@tabler/icons-react";
 import Title from "../ui/Title";
 import Center from "./Center";
+import { useLanguage } from "../../utils/useLanguage";
 
 // ---------------------------------------------
 // Types
@@ -140,13 +141,14 @@ const ICON_BOX = "w-10 h-10";
 // ---------------------------------------------
 
 function Header({ openFnc, open, title, subtitle }: any) {
+  const { t } = useLanguage();
   return (
     <header className="flex flex-row items-center gap-3 flex-1 min-w-0 h-10">
       <Squircle cornerRadius={9} cornerSmoothing={1} asChild>
         <button
           type="button"
           onClick={openFnc}
-          aria-label={open ? "Réduire le menu" : "Déplier le menu"}
+          aria-label={open ? t("collapse_menu") : t("expand_menu")}
           className={clsx(
             ICON_BOX,
             "shrink-0 hidden sm:flex items-center justify-center text-vc-secondary/70 hover:text-vc-secondary hover:bg-vc-veil active:scale-95 transition-all duration-200 cursor-pointer",
@@ -202,6 +204,7 @@ function UserCard({
   onClick,
   ...props
 }: any) {
+  const { t } = useLanguage();
   return (
     <Squircle cornerRadius={12} cornerSmoothing={1} asChild>
       <div
@@ -248,7 +251,7 @@ function UserCard({
         {onToggleSwitcher && open && (
           <button
             type="button"
-            aria-label={menuMode ? "Ouvrir le menu du compte" : "Changer de compte"}
+            aria-label={menuMode ? t("open_account_menu") : t("switch_account")}
             onClick={(e) => {
               e.stopPropagation();
               onToggleSwitcher();
@@ -295,7 +298,7 @@ function NavButton({
     "flex items-center h-10 rounded-lg cursor-pointer overflow-hidden transition-[width,background-color] duration-300 hover:scale-100!",
     open ? "w-full" : ICON_BOX,
     active
-      ? "bg-vc-main text-white"
+      ? "bg-vc-main text-vc-on-main"
       : "bg-transparent text-vc-secondary/85 hover:bg-vc-veil hover:text-vc-secondary font-normal",
   );
 
@@ -460,6 +463,7 @@ function AccountSwitcherPanel({
   labels,
   onClose,
 }: AccountSwitcherProps & { anchorRef: React.RefObject<HTMLElement | null>; onClose: () => void }) {
+  const { t } = useLanguage();
   const panelRef = useRef<HTMLDivElement>(null);
   const [coords, setCoords] = useState<{ top: number; left: number } | null>(null);
 
@@ -525,7 +529,7 @@ function AccountSwitcherPanel({
       className="z-[999] w-72 max-w-[85vw] rounded-2xl border border-vc-line bg-vc-container shadow-xl p-2 flex flex-col gap-1"
     >
       <p className="px-2 pt-1.5 pb-2 text-[11px] font-semibold uppercase tracking-wide text-vc-secondary/50">
-        {labels?.title ?? "Comptes"}
+        {labels?.title ?? t("accounts")}
       </p>
 
       {loading && (
@@ -578,7 +582,7 @@ function AccountSwitcherPanel({
                         e.stopPropagation();
                         onRemove(account.id);
                       }}
-                      aria-label="Retirer ce compte"
+                      aria-label={t("remove_account")}
                       className="shrink-0 w-6 h-6 flex items-center justify-center rounded-lg text-vc-secondary/40 opacity-0 group-hover/row:opacity-100 hover:text-vc-main hover:bg-vc-veil-strong transition-all"
                     >
                       <IconLogout size={14} />
@@ -602,7 +606,7 @@ function AccountSwitcherPanel({
             <div className="w-8 h-8 rounded-full shrink-0 flex items-center justify-center border border-dashed border-vc-line">
               <IconUserPlus size={16} className="text-vc-secondary/60" />
             </div>
-            {labels?.add ?? "Ajouter un compte"}
+            {labels?.add ?? t("add_account")}
           </button>
         </>
       )}
@@ -626,6 +630,7 @@ function UserMenuPanel({
   labels,
   onClose,
 }: UserMenuProps & { anchorRef: React.RefObject<HTMLElement | null>; onClose: () => void }) {
+  const { t } = useLanguage();
   const panelRef = useRef<HTMLDivElement>(null);
   const [coords, setCoords] = useState<{ top: number; left: number } | null>(null);
 
@@ -675,19 +680,19 @@ function UserMenuPanel({
   const rows = [
     onSwitchAccount && {
       key: "switch",
-      label: labels?.switchAccount ?? "Changer de compte",
+      label: labels?.switchAccount ?? t("switch_account"),
       icon: IconArrowsRightLeft,
       onClick: onSwitchAccount,
     },
     onManageAccount && {
       key: "manage",
-      label: labels?.manageAccount ?? "Gérer mon compte",
+      label: labels?.manageAccount ?? t("manage_account"),
       icon: IconUserCog,
       onClick: onManageAccount,
     },
     onLogout && {
       key: "logout",
-      label: labels?.logout ?? "Se déconnecter",
+      label: labels?.logout ?? t("logout"),
       icon: IconLogout,
       onClick: onLogout,
     },
@@ -745,6 +750,7 @@ export default function Sidebar({
   brandingLabel,
   children,
 }: SidebarProps) {
+  const { t } = useLanguage();
   const [internalOpen, setInternalOpen] = useState(isOpen);
   const open = onToggle ? isOpen : internalOpen;
   const [switcherOpen, setSwitcherOpen] = useState(false);
@@ -784,7 +790,7 @@ export default function Sidebar({
           <button
             type="button"
             onClick={toggleOpen}
-            aria-label="Ouvrir le menu"
+            aria-label={t("open_menu")}
             className="sm:hidden fixed top-4 left-4 z-30 w-10 h-10 flex items-center justify-center bg-vc-container text-vc-secondary border border-vc-line active:scale-95 transition-transform duration-150 cursor-pointer"
           >
             <IconMenu2 size={20} stroke={1.75} />
@@ -797,7 +803,7 @@ export default function Sidebar({
         <div
           onClick={toggleOpen}
           aria-hidden="true"
-          className="sm:hidden fixed inset-0 bg-black/60 z-10"
+          className="sm:hidden fixed inset-0 bg-vc-scrim z-10"
         />
       )}
 

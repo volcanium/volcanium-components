@@ -4,6 +4,7 @@ import { IconCheck, IconPencil, IconX } from "@tabler/icons-react";
 import Input from "./Input";
 import Textarea from "./Textarea";
 import Select, { SelectOption } from "./Select";
+import { useLanguage } from "../../utils/useLanguage";
 
 export interface InfoCardProps {
   /** Petit titre de la case (ex. « Port »). */
@@ -52,6 +53,7 @@ export default function InfoCard({
   actions,
   className,
 }: InfoCardProps) {
+  const { t } = useLanguage();
   const [editing, setEditing] = useState(false);
   const [draft, setDraft] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -85,7 +87,7 @@ export default function InfoCard({
       setEditing(false);
       setError(null);
     } catch (err) {
-      setError((err as Error).message || "Enregistrement impossible");
+      setError((err as Error).message || t("save_failed"));
     } finally {
       setSaving(false);
     }
@@ -131,15 +133,15 @@ export default function InfoCard({
           ) : (
             <Input type={editType} value={draft} placeholder={placeholder} onChange={(e) => setDraft(e.target.value)} loading={saving} />
           )}
-          {error && <span className="text-xs text-red-400">{error}</span>}
+          {error && <span className="text-xs text-vc-danger">{error}</span>}
           <div className="flex items-center gap-2 text-xs text-vc-text/50">
-            <button type="button" onClick={() => void commit()} disabled={saving} aria-label="Valider" className="cursor-pointer rounded-md bg-vc-main/90 p-1 text-white hover:bg-vc-main disabled:opacity-50">
+            <button type="button" onClick={() => void commit()} disabled={saving} aria-label={t("validate")} className="cursor-pointer rounded-md bg-vc-main/90 p-1 text-vc-on-main hover:bg-vc-main disabled:opacity-50">
               <IconCheck size={14} />
             </button>
             <button type="button" onClick={cancel} aria-label="Annuler" className="cursor-pointer rounded-md bg-vc-veil-strong p-1 hover:bg-vc-line-strong">
               <IconX size={14} />
             </button>
-            <span>{editType === "textarea" ? "Ctrl+Entrée pour valider" : "Entrée pour valider"} · Échap pour annuler</span>
+            <span>{editType === "textarea" ? t("hint_ctrl_enter_validate") : t("hint_enter_validate")} · {t("hint_escape_cancel")}</span>
           </div>
         </div>
       ) : (
@@ -148,7 +150,7 @@ export default function InfoCard({
           onKeyDown={(e) => (e.key === "Enter" || e.key === " ") && (e.preventDefault(), open())}
           role={canEdit ? "button" : undefined}
           tabIndex={canEdit ? 0 : undefined}
-          title={canEdit ? "Cliquer pour modifier" : undefined}
+          title={canEdit ? t("click_to_edit") : undefined}
           className={clsx(
             "flex min-w-0 items-start justify-between gap-2 break-words text-sm",
             mono && "font-mono text-[13px]",

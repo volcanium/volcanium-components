@@ -23,7 +23,7 @@ export default function Toggle({
   return (
     <div className="flex items-center justify-between gap-3 mt-1">
       {(label || loading) && (
-        <span className="text-white/50 text-sm flex items-center gap-2">
+        <span className="text-vc-text/50 text-sm flex items-center gap-2">
           {label}
           {loading && <IconRefresh size={14} className="animate-spin text-vc-main" />}
         </span>

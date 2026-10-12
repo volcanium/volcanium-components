@@ -756,7 +756,7 @@ function Checkbox({ checked, onChange }: { checked: boolean; onChange: () => voi
       )}
     >
       {checked && (
-        <svg viewBox="0 0 16 16" className="h-3 w-3 text-white" fill="none">
+        <svg viewBox="0 0 16 16" className="h-3 w-3 text-vc-on-main" fill="none">
           <path d="M3 8.5l3 3 7-7" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       )}
@@ -895,7 +895,7 @@ function TableIconButton({
         onClick={onClick}
         className={clsx(
           "flex h-7 w-7 items-center justify-center rounded-2xl transition-colors",
-          active ? "bg-vc-main text-white" : "bg-vc-back text-vc-secondary hover:text-vc-text",
+          active ? "bg-vc-main text-vc-on-main" : "bg-vc-back text-vc-secondary hover:text-vc-text",
           disabled && "opacity-30 pointer-events-none",
           className,
         )}

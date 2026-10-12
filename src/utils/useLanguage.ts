@@ -46,7 +46,31 @@ export type TranslationKey =
   | "table_add"
   | "stepper_empty_cursus"
   | "stepper_empty_roadmap"
-  | "stepper_done";
+  | "stepper_done"
+  | "action_failed"
+  | "save_failed"
+  | "validate"
+  | "click_to_edit"
+  | "hint_enter_validate"
+  | "hint_ctrl_enter_validate"
+  | "hint_escape_cancel"
+  | "switch_to_dark"
+  | "switch_to_light"
+  | "hide_password"
+  | "show_password"
+  | "collapse_menu"
+  | "expand_menu"
+  | "open_menu"
+  | "open_account_menu"
+  | "switch_account"
+  | "manage_account"
+  | "logout"
+  | "accounts"
+  | "add_account"
+  | "remove_account"
+  | "previous_month"
+  | "next_month"
+  | "open_calendar";
 
 type Dictionary = Record<TranslationKey, string>;
 
@@ -98,6 +122,30 @@ const dictionaries: Record<"fr" | "en", Dictionary> = {
     stepper_empty_cursus: "Aucune étape n'a été ajoutée au cursus.",
     stepper_empty_roadmap: "Aucune étape n'a été ajoutée à la roadmap.",
     stepper_done: "Fait",
+    action_failed: "Action impossible",
+    save_failed: "Enregistrement impossible",
+    validate: "Valider",
+    click_to_edit: "Cliquer pour modifier",
+    hint_enter_validate: "Entrée pour valider",
+    hint_ctrl_enter_validate: "Ctrl+Entrée pour valider",
+    hint_escape_cancel: "Échap pour annuler",
+    switch_to_dark: "Passer en thème sombre",
+    switch_to_light: "Passer en thème clair",
+    hide_password: "Masquer le mot de passe",
+    show_password: "Afficher le mot de passe",
+    collapse_menu: "Réduire le menu",
+    expand_menu: "Déplier le menu",
+    open_menu: "Ouvrir le menu",
+    open_account_menu: "Ouvrir le menu du compte",
+    switch_account: "Changer de compte",
+    manage_account: "Gérer mon compte",
+    logout: "Se déconnecter",
+    accounts: "Comptes",
+    add_account: "Ajouter un compte",
+    remove_account: "Retirer ce compte",
+    previous_month: "Mois précédent",
+    next_month: "Mois suivant",
+    open_calendar: "Ouvrir le calendrier",
   },
   en: {
     not_provided: "Not provided",
@@ -146,6 +194,30 @@ const dictionaries: Record<"fr" | "en", Dictionary> = {
     stepper_empty_cursus: "No step has been added to the cursus yet.",
     stepper_empty_roadmap: "No step has been added to the roadmap yet.",
     stepper_done: "Done",
+    action_failed: "Action failed",
+    save_failed: "Could not save",
+    validate: "Validate",
+    click_to_edit: "Click to edit",
+    hint_enter_validate: "Enter to validate",
+    hint_ctrl_enter_validate: "Ctrl+Enter to validate",
+    hint_escape_cancel: "Esc to cancel",
+    switch_to_dark: "Switch to dark theme",
+    switch_to_light: "Switch to light theme",
+    hide_password: "Hide password",
+    show_password: "Show password",
+    collapse_menu: "Collapse menu",
+    expand_menu: "Expand menu",
+    open_menu: "Open menu",
+    open_account_menu: "Open account menu",
+    switch_account: "Switch account",
+    manage_account: "Manage my account",
+    logout: "Log out",
+    accounts: "Accounts",
+    add_account: "Add an account",
+    remove_account: "Remove this account",
+    previous_month: "Previous month",
+    next_month: "Next month",
+    open_calendar: "Open calendar",
   },
 };
 

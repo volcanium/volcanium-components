@@ -95,7 +95,7 @@ export default function TableCell<Row>({
               : "cursor-default",
           )}
         >
-          {value && <IconCheck size={13} strokeWidth={3} className="text-white" />}
+          {value && <IconCheck size={13} strokeWidth={3} className="text-vc-on-main" />}
         </button>
       </div>
     );
