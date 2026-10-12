@@ -55,7 +55,7 @@ export default function Input({
             isPassword && "pr-10",
             varaiants[variant],
           )}
-          placeholder={children}
+          placeholder={props.placeholder ?? children}
         />
       </Squircle>
       {isPassword && (

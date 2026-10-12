@@ -70,7 +70,8 @@ export type TranslationKey =
   | "remove_account"
   | "previous_month"
   | "next_month"
-  | "open_calendar";
+  | "open_calendar"
+  | "confirm_retype";
 
 type Dictionary = Record<TranslationKey, string>;
 
@@ -146,6 +147,7 @@ const dictionaries: Record<"fr" | "en", Dictionary> = {
     previous_month: "Mois précédent",
     next_month: "Mois suivant",
     open_calendar: "Ouvrir le calendrier",
+    confirm_retype: "Pour confirmer, recopiez : {text}",
   },
   en: {
     not_provided: "Not provided",
@@ -218,6 +220,7 @@ const dictionaries: Record<"fr" | "en", Dictionary> = {
     previous_month: "Previous month",
     next_month: "Next month",
     open_calendar: "Open calendar",
+    confirm_retype: "To confirm, type: {text}",
   },
 };
 
