@@ -69,7 +69,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
           {...props}
           disabled={loading || disabled}
           className={clsx(
-            "px-6 py-1.5 hover:scale-[1.02] active:scale-100 active:duration-100 cursor-pointer flex flex-row gap-2 justify-center items-center transition-all duration-200 ease-out disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vc-main/50 focus-visible:ring-offset-2 focus-visible:ring-offset-vc-container",
+            "px-6 py-2 hover:scale-[1.02] active:scale-100 active:duration-100 cursor-pointer flex flex-row gap-2 justify-center items-center transition-all duration-200 ease-out disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vc-main/50 focus-visible:ring-offset-2 focus-visible:ring-offset-vc-container",
             styles[variant],
             className,
           )}
