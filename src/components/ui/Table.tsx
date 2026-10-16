@@ -465,7 +465,7 @@ export default function Table<Row extends Record<string, any>>({
       onMouseLeave={() => (hoveringRef.current = false)}
       className={clsx("flex flex-col gap-2 w-full", className)}
     >
-      <Squircle cornerRadius={20} cornerSmoothing={1} asChild>
+      <Squircle cornerRadius={11} cornerSmoothing={1} asChild>
         <div className="flex flex-col gap-4 p-5 text-left bg-vc-container border border-vc-line w-full">
           <div className="flex items-center justify-between gap-3 flex-wrap">
             <Title>{title}</Title>
@@ -656,7 +656,7 @@ export default function Table<Row extends Record<string, any>>({
                         className={clsx(
                           "border-b border-vc-line/60 last:border-b-0 transition-colors",
                           onRowClick && "cursor-pointer",
-                          selectedKeys.has(key) ? "bg-vc-main/10" : "hover:bg-vc-veil",
+                          selectedKeys.has(key) ? "bg-vc-veil-strong" : "hover:bg-vc-veil",
                         )}
                       >
                         {selectable && (
@@ -752,7 +752,7 @@ function Checkbox({ checked, onChange }: { checked: boolean; onChange: () => voi
       }}
       className={clsx(
         "flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-md border transition-colors cursor-pointer",
-        checked ? "bg-vc-main border-vc-main" : "bg-vc-container border-vc-secondary/30 hover:border-vc-main/50",
+        checked ? "bg-vc-main border-vc-main" : "bg-vc-container border-vc-line-strong hover:border-vc-text/30",
       )}
     >
       {checked && (

@@ -44,14 +44,14 @@ export default function Input({
 
   const InputEl = (
     <div className={clsx("relative w-full", disabled && "opacity-50", className)}>
-      <Squircle asChild cornerRadius={10} cornerSmoothing={1}>
+      <Squircle asChild cornerRadius={7} cornerSmoothing={1}>
         <input
           {...props}
           type={resolvedType}
           id={inputId}
           disabled={disabled}
           className={clsx(
-            "w-full px-3.5 py-2 border border-vc-secondary/20 outline-none transition-colors duration-200 focus:border-vc-main/60 disabled:cursor-not-allowed placeholder:text-vc-secondary/40",
+            "w-full px-3.5 py-2 border border-vc-line-strong outline-none transition-colors duration-200 focus:border-vc-main/60 disabled:cursor-not-allowed placeholder:text-vc-secondary/40",
             isPassword && "pr-10",
             varaiants[variant],
           )}

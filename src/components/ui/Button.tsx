@@ -47,15 +47,16 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       else if (onClick) onClick(e);
     };
 
+    // Refonte graphique : boutons sobres. Surfaces neutres + filet fin ; l'orange de la marque
+    // n'est gardé que pour la variante `accent` (un seul appel à l'action par écran).
     const styles = {
-      accent: "bg-vc-main border border-vc-secondary/40 text-vc-on-main",
-      primary: "bg-vc-accent hover:bg-vc-main border border-vc-secondary/40 text-vc-on-main",
-      secondary:
-        "bg-vc-container hover:bg-vc-main/50 border border-vc-secondary/40 text-vc-secondary",
-      discret: "border border-vc-secondary/70 hover:bg-vc-main/10",
+      accent: "bg-vc-main border border-vc-main text-vc-on-main hover:brightness-110",
+      primary: "bg-vc-veil-strong hover:bg-vc-line-strong border border-vc-line-strong text-vc-text",
+      secondary: "bg-transparent hover:bg-vc-veil border border-vc-line-strong text-vc-secondary",
+      discret: "border border-transparent hover:bg-vc-veil-strong text-vc-secondary",
       dangerous:
-        "bg-vc-container border border-vc-danger/50 hover:border-vc-danger hover:bg-vc-danger/10 text-vc-secondary",
-      tertiary: "bg-vc-container text-vc-secondary",
+        "bg-transparent border border-vc-danger/40 hover:border-vc-danger hover:bg-vc-danger/10 text-vc-danger",
+      tertiary: "bg-vc-veil text-vc-secondary hover:bg-vc-veil-strong",
       // A deliberately light-on-both-themes chip — `overlay` (not `secondary`,
       // which flips to a dark foreground color in the light theme) stays a
       // pale neutral in dark and light alike, so `text-black` always reads.
@@ -63,13 +64,13 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
     };
 
     const btn = (
-      <Squircle asChild cornerRadius={10} cornerSmoothing={1}>
+      <Squircle asChild cornerRadius={7} cornerSmoothing={1}>
         <button
           ref={ref}
           {...props}
           disabled={loading || disabled}
           className={clsx(
-            "px-6 py-2 hover:scale-[1.02] active:scale-100 active:duration-100 cursor-pointer flex flex-row gap-2 justify-center items-center transition-all duration-200 ease-out disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vc-main/50 focus-visible:ring-offset-2 focus-visible:ring-offset-vc-container",
+            "px-6 py-2 cursor-pointer flex flex-row gap-2 justify-center items-center transition-colors duration-150 disabled:opacity-50 disabled:cursor-not-allowed focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vc-main/50 focus-visible:ring-offset-2 focus-visible:ring-offset-vc-container",
             styles[variant],
             className,
           )}

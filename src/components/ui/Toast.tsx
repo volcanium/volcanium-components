@@ -56,7 +56,7 @@ import { IconInfoCircle, IconCheck, IconAlertTriangle, IconX } from "@tabler/ico
 
 function Toast({ message, type, onClose }: ToastProps) {
   const styles = {
-    info: "bg-vc-container border border-vc-secondary/20 text-vc-text",
+    info: "bg-vc-container border border-vc-line-strong text-vc-text",
     success: "bg-vc-container border border-vc-success/50 text-vc-success",
     warn: "bg-vc-container border border-vc-warning/50 text-vc-warning",
     error: "bg-vc-container border border-vc-danger/50 text-vc-danger",

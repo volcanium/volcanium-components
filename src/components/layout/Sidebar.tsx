@@ -144,7 +144,7 @@ function Header({ openFnc, open, title, subtitle }: any) {
   const { t } = useLanguage();
   return (
     <header className="flex flex-row items-center gap-3 flex-1 min-w-0 h-10">
-      <Squircle cornerRadius={9} cornerSmoothing={1} asChild>
+      <Squircle cornerRadius={7} cornerSmoothing={1} asChild>
         <button
           type="button"
           onClick={openFnc}
@@ -206,7 +206,7 @@ function UserCard({
 }: any) {
   const { t } = useLanguage();
   return (
-    <Squircle cornerRadius={12} cornerSmoothing={1} asChild>
+    <Squircle cornerRadius={9} cornerSmoothing={1} asChild>
       <div
         {...props}
         onClick={onClick}
@@ -230,7 +230,7 @@ function UserCard({
               className="h-9 w-9 rounded-full ring-1 ring-vc-line bg-vc-back object-cover"
             />
           ) : (
-            <div className="h-9 w-9 rounded-full ring-1 ring-vc-line bg-vc-main/20 flex items-center justify-center text-sm font-bold text-vc-main">
+            <div className="h-9 w-9 rounded-full ring-1 ring-vc-line bg-vc-veil-strong flex items-center justify-center text-sm font-bold text-vc-main">
               {initials}
             </div>
           )}
@@ -259,7 +259,7 @@ function UserCard({
             className={clsx(
               "shrink-0 mr-2.5 w-7 h-7 flex items-center justify-center rounded-lg transition-all duration-200",
               switcherActive
-                ? "bg-vc-main/15 text-vc-main opacity-100"
+                ? "bg-vc-veil-strong text-vc-main opacity-100"
                 : clsx(
                     "text-vc-secondary/70 hover:text-vc-main hover:bg-vc-veil-strong",
                     // Le trigger du menu (3 points) reste visible en permanence -
@@ -330,7 +330,7 @@ function NavButton({
   );
 
   const content = (
-    <Squircle cornerRadius={10} cornerSmoothing={1} asChild>
+    <Squircle cornerRadius={7} cornerSmoothing={1} asChild>
       {page ? (
         inRouterContext ? (
           <Link to={page} className={className} onClick={onClick} {...props}>
@@ -550,7 +550,7 @@ function AccountSwitcherPanel({
                 className={clsx(
                   "group/row flex items-center gap-2.5 rounded-xl p-2 transition-colors",
                   account.active
-                    ? "bg-vc-main/10"
+                    ? "bg-vc-veil-strong"
                     : "cursor-pointer hover:bg-vc-veil",
                 )}
               >
@@ -786,7 +786,7 @@ export default function Sidebar({
     <main className="flex h-screen font-vc-main text-vc-text bg-vc-back overflow-hidden relative">
       {/* Mobile-only hamburger trigger — replaces the collapsed icon strip entirely below `sm` */}
       {!open && (
-        <Squircle cornerRadius={10} cornerSmoothing={1} asChild>
+        <Squircle cornerRadius={7} cornerSmoothing={1} asChild>
           <button
             type="button"
             onClick={toggleOpen}

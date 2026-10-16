@@ -197,7 +197,7 @@ export default function OptionsMenu<T = unknown>({
                       className={`
                         px-3 py-2 rounded-lg text-left text-sm transition-colors duration-150 truncate shrink-0
                         hover:bg-vc-veil hover:text-vc-secondary
-                        ${value === opt.value ? "bg-vc-main/20 text-vc-secondary" : "bg-transparent text-vc-secondary/80"}
+                        ${value === opt.value ? "bg-vc-veil-strong text-vc-secondary" : "bg-transparent text-vc-secondary/80"}
                       `}
                     >
                       {opt.label}

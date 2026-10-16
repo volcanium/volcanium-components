@@ -36,11 +36,11 @@ export default function Textarea({
   const textareaId = id || generatedId;
 
   const TextareaEl = (
-    <Squircle asChild cornerRadius={10} cornerSmoothing={1}>
+    <Squircle asChild cornerRadius={7} cornerSmoothing={1}>
       <textarea
         {...props}
         id={textareaId}
-        className={`px-3 py-1 ${variants[variant]} ${resizeMap[resize]} w-52 max-w-full min-w-30 min-h-20 max-h-100 border border-vc-secondary/20 focus:border-vc-accent/50 outline-0 ${className || ""}`}
+        className={`px-3 py-1 ${variants[variant]} ${resizeMap[resize]} w-52 max-w-full min-w-30 min-h-20 max-h-100 border border-vc-line-strong focus:border-vc-accent/50 outline-0 ${className || ""}`}
       />
     </Squircle>
   );

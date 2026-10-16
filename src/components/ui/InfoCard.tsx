@@ -108,7 +108,7 @@ export default function InfoCard({
       ref={box}
       className={clsx(
         "group relative flex min-w-0 flex-col gap-1 rounded-xl border bg-vc-container px-4 py-3 transition-colors",
-        editing ? "border-vc-main" : "border-vc-line hover:border-vc-main/40 hover:bg-vc-veil",
+        editing ? "border-vc-main" : "border-vc-line hover:border-vc-text/30 hover:bg-vc-veil",
         className,
       )}
     >
