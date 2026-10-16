@@ -20,6 +20,7 @@ import {
 import Title from "../ui/Title";
 import Center from "./Center";
 import { useLanguage } from "../../utils/useLanguage";
+import { formatUserTitle, getInitials } from "../../utils/userIdentity";
 
 // ---------------------------------------------
 // Types
@@ -107,10 +108,17 @@ export interface SidebarProps {
   /** User information to display in the card */
   user?: {
     name: string;
+    /** Free text under the name (e.g. an email, an account type). Ignored when `title` or `organization` is set. */
     roleName?: string;
     role?: string;
+    /** Absolute URL of the profile picture. Falls back to the initials when missing or when it fails to load. */
     avatarUrl?: string;
+    /** Overrides the initials computed from `name` (two letters: first + last word). */
     initials?: string;
+    /** Job title. With `organization` it is shown as "Title - Organization", cut with "…" when too long. */
+    title?: string;
+    /** Organization name of a business account. */
+    organization?: string;
   };
   /** Enables the account switcher: shows a "switch" button on the user card that
    *  opens a compact side panel listing accounts. Omit to hide the button entirely.
@@ -191,11 +199,27 @@ function Header({ openFnc, open, title, subtitle }: any) {
   );
 }
 
+function SwitcherAvatar({ account }: { account: AccountSwitcherAccount }) {
+  const [failedUrl, setFailedUrl] = useState<string | null>(null);
+  if (account.avatarUrl && failedUrl !== account.avatarUrl) {
+    return (
+      <img
+        src={account.avatarUrl}
+        alt={account.name}
+        referrerPolicy="no-referrer"
+        onError={() => setFailedUrl(account.avatarUrl ?? null)}
+        className="w-full h-full object-cover"
+      />
+    );
+  }
+  return <span className="text-xs font-bold text-vc-main">{account.initials || getInitials(account.name)}</span>;
+}
+
 function UserCard({
   name,
   roleName,
   avatarUrl,
-  initials = "U",
+  initials,
   onToggleSwitcher,
   switcherActive,
   menuMode = false,
@@ -205,6 +229,9 @@ function UserCard({
   ...props
 }: any) {
   const { t } = useLanguage();
+  // A picture that fails to load (blocked, deleted, unreachable) must not leave a broken image: show the initials instead.
+  const [failedUrl, setFailedUrl] = useState<string | null>(null);
+  const showImage = Boolean(avatarUrl) && failedUrl !== avatarUrl;
   return (
     <Squircle cornerRadius={9} cornerSmoothing={1} asChild>
       <div
@@ -223,15 +250,17 @@ function UserCard({
             make room when opening and slides back to dead-center when collapsed,
             instead of jumping. */}
         <div className={clsx(ICON_BOX, "flex items-center justify-center shrink-0")}>
-          {avatarUrl ? (
+          {showImage ? (
             <img
               src={avatarUrl}
               alt="Avatar"
+              referrerPolicy="no-referrer"
+              onError={() => setFailedUrl(avatarUrl)}
               className="h-9 w-9 rounded-full ring-1 ring-vc-line bg-vc-back object-cover"
             />
           ) : (
             <div className="h-9 w-9 rounded-full ring-1 ring-vc-line bg-vc-veil-strong flex items-center justify-center text-sm font-bold text-vc-main">
-              {initials}
+              {initials || getInitials(name)}
             </div>
           )}
         </div>
@@ -555,13 +584,7 @@ function AccountSwitcherPanel({
                 )}
               >
                 <div className="w-8 h-8 rounded-full shrink-0 overflow-hidden ring-1 ring-vc-line bg-vc-back flex items-center justify-center">
-                  {account.avatarUrl ? (
-                    <img src={account.avatarUrl} alt={account.name} className="w-full h-full object-cover" />
-                  ) : (
-                    <span className="text-xs font-bold text-vc-main">
-                      {account.initials ?? account.name?.charAt(0)?.toUpperCase() ?? "U"}
-                    </span>
-                  )}
+                  <SwitcherAvatar account={account} />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-[13px] font-medium truncate">{account.name}</p>
@@ -858,7 +881,11 @@ export default function Sidebar({
                 switcherActive={userMenu ? userMenuOpen : switcherOpen}
                 menuMode={Boolean(userMenu)}
                 name={user.name}
-                roleName={user.roleName}
+                roleName={
+                  user.title || user.organization
+                    ? formatUserTitle({ title: user.title, organization: user.organization })
+                    : user.roleName
+                }
                 avatarUrl={user.avatarUrl}
                 initials={user.initials}
               />

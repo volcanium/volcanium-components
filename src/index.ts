@@ -1,6 +1,7 @@
 // --- config ---
 export * from "./components/config/VolcaniumProvider";
 export { useTheme } from "./utils/useTheme";
+export { getInitials, formatUserTitle, truncateWithEllipsis, USER_SUBTITLE_MAX_LENGTH } from "./utils/userIdentity";
 export { default as ThemeToggle } from "./components/ui/ThemeToggle";
 
 // --- ui ---

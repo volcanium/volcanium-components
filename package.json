@@ -1,6 +1,6 @@
 {
   "name": "@volcanium/volcanium-components",
-  "version": "2.4.0-refonte.0",
+  "version": "2.4.0-refonte.1",
   "description": "UI Components Library for Volcanium",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
