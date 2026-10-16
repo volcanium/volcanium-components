@@ -1,8 +1,8 @@
-import { ReactNode } from "react";
+import { HTMLAttributes, ReactNode } from "react";
 import clsx from "clsx";
 import Title from "./Title";
 
-export interface CardProps {
+export interface CardProps extends Omit<HTMLAttributes<HTMLElement>, "title"> {
   /** Titre de la carte. */
   title?: string;
   /** Phrase d'explication sous le titre. */
@@ -18,9 +18,9 @@ export interface CardProps {
 }
 
 /** Carte de regroupement : une seule recette de bordure / fond pour toute l'application. */
-export default function Card({ title, description, actions, compact, as: Tag = "section", children, className }: CardProps) {
+export default function Card({ title, description, actions, compact, as: Tag = "section", children, className, ...rest }: CardProps) {
   return (
-    <Tag className={clsx("rounded-lg border border-vc-line bg-vc-veil space-y-3", compact ? "p-4" : "p-5", className)}>
+    <Tag className={clsx("rounded-lg border border-vc-line bg-vc-veil space-y-3", compact ? "p-4" : "p-5", className)} {...rest}>
       {(title || actions) && (
         <div className="flex items-center justify-between gap-3">
           {title && <Title level="sm">{title}</Title>}

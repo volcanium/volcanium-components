@@ -81,6 +81,14 @@ export { default as Disclosure } from "./components/ui/Disclosure";
 export type { DisclosureProps } from "./components/ui/Disclosure";
 export { default as DescriptionList } from "./components/ui/DescriptionList";
 export type { DescriptionListProps, DescriptionItem } from "./components/ui/DescriptionList";
+export { default as Checkbox } from "./components/ui/Checkbox";
+export type { CheckboxProps } from "./components/ui/Checkbox";
+export { default as RouterLink } from "./components/ui/RouterLink";
+export type { RouterLinkProps } from "./components/ui/RouterLink";
+export { default as Chip } from "./components/ui/Chip";
+export type { ChipProps } from "./components/ui/Chip";
+export { default as Tile } from "./components/ui/Tile";
+export type { TileProps } from "./components/ui/Tile";
 
 // --- layout ---
 export { default as Center } from "./components/layout/Center";

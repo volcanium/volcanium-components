@@ -20,6 +20,8 @@ type ButtonProps = {
   loading?: boolean;
   variant?: Variant;
   linkClassName?: string;
+  /** Avec `link` : ouvre dans un nouvel onglet (lien externe). @default false */
+  external?: boolean;
   icon?: ReactNode;
   onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
 } & ButtonHTMLAttributes<HTMLButtonElement>;
@@ -35,6 +37,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
       disabled,
       variant = "primary",
       linkClassName,
+      external = false,
       icon,
       ...props
     }: ButtonProps,
@@ -91,7 +94,7 @@ const Button = forwardRef<HTMLButtonElement, ButtonProps>(
         );
       }
       return (
-        <a className={linkClassName || undefined} href={link}>
+        <a className={linkClassName || undefined} href={link} {...(external ? { target: "_blank", rel: "noopener noreferrer" } : {})}>
           {btn}
         </a>
       );
