@@ -1,6 +1,7 @@
 ﻿import { useEffect, useState, useCallback, ReactNode } from "react"
 import { motion, AnimatePresence } from "framer-motion";
 import { registerNotify } from "./notify"
+import { uuid } from "../../utils/uuid"
 
 export interface ToastProviderProps {
   children: ReactNode;
@@ -20,7 +21,7 @@ export default function ToastProvider({ children }: ToastProviderProps) {
   }, [])
 
   const show = useCallback((message: string, type = "info", duration = 3000) => {
-    const id = crypto.randomUUID()
+    const id = uuid()
 
     setToasts(t => [...t, { id, message, type }])
 
