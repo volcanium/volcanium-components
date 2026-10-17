@@ -89,7 +89,7 @@ export default function TableCell<Row>({
           role="checkbox"
           className={clsx(
             "flex h-5 w-5 items-center justify-center rounded-md border transition-all duration-150",
-            value ? "bg-vc-main border-vc-main" : "bg-vc-container border-vc-secondary/25",
+            value ? "bg-vc-main border-vc-main" : "bg-vc-container border-vc-line-strong",
             column.editable
               ? "cursor-pointer hover:border-vc-main/60 active:scale-90"
               : "cursor-default",

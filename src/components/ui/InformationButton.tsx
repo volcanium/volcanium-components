@@ -193,7 +193,7 @@ export function InformationButton({
 
   if (!isInteractive) {
     return (
-      <Squircle cornerRadius={14} cornerSmoothing={1} asChild>
+      <Squircle cornerRadius={9} cornerSmoothing={1} asChild>
         <div className={clsx(baseClassName, disabled && "opacity-60")}>{content}</div>
       </Squircle>
     );
@@ -213,7 +213,7 @@ export function InformationButton({
   // open, so this stays a `div[role=button]` throughout.
   if (isSelectMode) {
     return (
-      <Squircle cornerRadius={14} cornerSmoothing={1} asChild>
+      <Squircle cornerRadius={9} cornerSmoothing={1} asChild>
         <div
           ref={triggerRef}
           role="button"
@@ -260,7 +260,7 @@ export function InformationButton({
   // it becomes a `<div>` containing a focusable `<input>` once editing.
   if (isTextEditMode) {
     return (
-      <Squircle cornerRadius={14} cornerSmoothing={1} asChild>
+      <Squircle cornerRadius={9} cornerSmoothing={1} asChild>
         <div
           role="button"
           tabIndex={disabled ? -1 : 0}
@@ -283,7 +283,7 @@ export function InformationButton({
   }
 
   return (
-    <Squircle cornerRadius={14} cornerSmoothing={1} asChild>
+    <Squircle cornerRadius={9} cornerSmoothing={1} asChild>
       <button
         type="button"
         onClick={onClick}

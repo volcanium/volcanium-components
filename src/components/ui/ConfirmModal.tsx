@@ -52,7 +52,7 @@ export default function ConfirmModal({ isOpen, onClose, title, children, confirm
     <Modal isOpen={isOpen} onClose={onClose} title={title} buttons={false}>
       <div className="flex flex-col gap-3 text-sm">
         {children && <div>{children}</div>}
-        {requireText && <Input label={`Pour confirmer, recopie : ${requireText}`} value={typed} onChange={(e) => setTyped(e.target.value)} />}
+        {requireText && <Input label={t("confirm_retype", { text: requireText })} value={typed} onChange={(e) => setTyped(e.target.value)} />}
         {error && <p className="text-vc-danger">{error}</p>}
         <div className="flex flex-wrap justify-end gap-3">
           <Button variant="secondary" onClick={onClose} disabled={busy}>

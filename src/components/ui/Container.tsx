@@ -27,14 +27,14 @@ export function Container({ title, fix, children, link }: ContainerProps) {
   const [hover, setHover] = useState(false);
 
   const card = (
-    <Squircle cornerRadius={20} cornerSmoothing={1} asChild>
+    <Squircle cornerRadius={11} cornerSmoothing={1} asChild>
       <div
         onMouseEnter={() => setHover(true)}
         onMouseLeave={() => setHover(false)}
         className={clsx(
           "flex flex-col gap-4 p-5 sm:p-8 text-start bg-vc-container border border-vc-line transition-all duration-300",
           link &&
-            "cursor-pointer hover:border-vc-line-strong hover:-translate-y-0.5 hover:shadow-[0_16px_36px_-20px_rgba(0,0,0,0.6)]",
+            "cursor-pointer hover:border-vc-line-strong",
           fix ? "w-full sm:w-200" : "w-full",
         )}
       >

@@ -14,7 +14,7 @@ export default function ThemeToggle({ className }: ThemeToggleProps) {
   const isLight = theme === "light";
 
   return (
-    <Squircle cornerRadius={10} cornerSmoothing={1} asChild>
+    <Squircle cornerRadius={7} cornerSmoothing={1} asChild>
       <button
         type="button"
         onClick={toggleTheme}

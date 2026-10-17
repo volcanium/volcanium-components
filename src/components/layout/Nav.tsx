@@ -199,7 +199,7 @@ export default function Nav({
                 whileTap={{ scale: 0.88 }}
                 style={{
                   backgroundColor: isMenuOpen
-                    ? "rgba(255,113,77,0.18)"
+                    ? "rgba(255,255,255,0.10)"
                     : "rgba(255,255,255,0.04)",
                 }}
               >
@@ -245,7 +245,7 @@ export default function Nav({
                   left: 0,
                   right: 0,
                   top: "100%",
-                  backgroundColor: "rgba(18,18,18,0.95)",
+                  backgroundColor: "rgba(15,15,16,0.95)",
                   backdropFilter: "blur(24px)",
                   WebkitBackdropFilter: "blur(24px)",
                   boxShadow: "0 12px 40px rgba(0,0,0,0.55)",
@@ -312,7 +312,7 @@ export default function Nav({
         style={
           isStickyStyle
             ? {
-                backgroundColor: "rgba(18,18,18,0.8)",
+                backgroundColor: "rgba(15,15,16,0.8)",
                 backdropFilter: "blur(50px)",
                 WebkitBackdropFilter: "blur(50px)",
               }

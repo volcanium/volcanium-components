@@ -20,6 +20,7 @@ import {
 import Title from "../ui/Title";
 import Center from "./Center";
 import { useLanguage } from "../../utils/useLanguage";
+import { formatUserTitle, getInitials } from "../../utils/userIdentity";
 
 // ---------------------------------------------
 // Types
@@ -33,6 +34,19 @@ export interface TabDef {
   notActive?: boolean;
   loading?: boolean;
   onClick?: (e?: React.MouseEvent) => void;
+  /** Counter shown at the right of the label (e.g. unread messages). Hidden when 0 or when the sidebar is collapsed. */
+  badge?: number;
+  /** Sub-menu shown under this entry while `expanded` is true (one level only). The parent keeps its own `page`/`onClick`
+   *  (typically a toggle); children are plain tabs. Hidden while the sidebar is collapsed to icons. */
+  children?: TabDef[];
+  /** Controlled state of the sub-menu: the app decides when it is open (e.g. on click of the parent). */
+  expanded?: boolean;
+  /** Makes the sub-menu entries re-orderable (drag and drop, or Alt+Up / Alt+Down on a focused entry). Called with the
+   *  indexes of the entry in `children` before and after the move; the app owns the order. An entry with
+   *  `reorderable: false` can neither be moved nor be dropped on. */
+  onReorderChildren?: (from: number, to: number) => void;
+  /** Child entries only: `false` pins the entry (e.g. a trailing "New folder" action). @default true */
+  reorderable?: boolean;
 }
 
 export interface SpecificTabsDef {
@@ -107,10 +121,17 @@ export interface SidebarProps {
   /** User information to display in the card */
   user?: {
     name: string;
+    /** Free text under the name (e.g. an email, an account type). Ignored when `title` or `organization` is set. */
     roleName?: string;
     role?: string;
+    /** Absolute URL of the profile picture. Falls back to the initials when missing or when it fails to load. */
     avatarUrl?: string;
+    /** Overrides the initials computed from `name` (two letters: first + last word). */
     initials?: string;
+    /** Job title. With `organization` it is shown as "Title - Organization", cut with "…" when too long. */
+    title?: string;
+    /** Organization name of a business account. */
+    organization?: string;
   };
   /** Enables the account switcher: shows a "switch" button on the user card that
    *  opens a compact side panel listing accounts. Omit to hide the button entirely.
@@ -144,7 +165,7 @@ function Header({ openFnc, open, title, subtitle }: any) {
   const { t } = useLanguage();
   return (
     <header className="flex flex-row items-center gap-3 flex-1 min-w-0 h-10">
-      <Squircle cornerRadius={9} cornerSmoothing={1} asChild>
+      <Squircle cornerRadius={7} cornerSmoothing={1} asChild>
         <button
           type="button"
           onClick={openFnc}
@@ -191,11 +212,27 @@ function Header({ openFnc, open, title, subtitle }: any) {
   );
 }
 
+function SwitcherAvatar({ account }: { account: AccountSwitcherAccount }) {
+  const [failedUrl, setFailedUrl] = useState<string | null>(null);
+  if (account.avatarUrl && failedUrl !== account.avatarUrl) {
+    return (
+      <img
+        src={account.avatarUrl}
+        alt={account.name}
+        referrerPolicy="no-referrer"
+        onError={() => setFailedUrl(account.avatarUrl ?? null)}
+        className="w-full h-full object-cover"
+      />
+    );
+  }
+  return <span className="text-xs font-bold text-vc-main">{account.initials || getInitials(account.name)}</span>;
+}
+
 function UserCard({
   name,
   roleName,
   avatarUrl,
-  initials = "U",
+  initials,
   onToggleSwitcher,
   switcherActive,
   menuMode = false,
@@ -205,8 +242,11 @@ function UserCard({
   ...props
 }: any) {
   const { t } = useLanguage();
+  // A picture that fails to load (blocked, deleted, unreachable) must not leave a broken image: show the initials instead.
+  const [failedUrl, setFailedUrl] = useState<string | null>(null);
+  const showImage = Boolean(avatarUrl) && failedUrl !== avatarUrl;
   return (
-    <Squircle cornerRadius={12} cornerSmoothing={1} asChild>
+    <Squircle cornerRadius={9} cornerSmoothing={1} asChild>
       <div
         {...props}
         onClick={onClick}
@@ -223,15 +263,17 @@ function UserCard({
             make room when opening and slides back to dead-center when collapsed,
             instead of jumping. */}
         <div className={clsx(ICON_BOX, "flex items-center justify-center shrink-0")}>
-          {avatarUrl ? (
+          {showImage ? (
             <img
               src={avatarUrl}
               alt="Avatar"
+              referrerPolicy="no-referrer"
+              onError={() => setFailedUrl(avatarUrl)}
               className="h-9 w-9 rounded-full ring-1 ring-vc-line bg-vc-back object-cover"
             />
           ) : (
-            <div className="h-9 w-9 rounded-full ring-1 ring-vc-line bg-vc-main/20 flex items-center justify-center text-sm font-bold text-vc-main">
-              {initials}
+            <div className="h-9 w-9 rounded-full ring-1 ring-vc-line bg-vc-veil-strong flex items-center justify-center text-sm font-bold text-vc-main">
+              {initials || getInitials(name)}
             </div>
           )}
         </div>
@@ -259,7 +301,7 @@ function UserCard({
             className={clsx(
               "shrink-0 mr-2.5 w-7 h-7 flex items-center justify-center rounded-lg transition-all duration-200",
               switcherActive
-                ? "bg-vc-main/15 text-vc-main opacity-100"
+                ? "bg-vc-veil-strong text-vc-main opacity-100"
                 : clsx(
                     "text-vc-secondary/70 hover:text-vc-main hover:bg-vc-veil-strong",
                     // Le trigger du menu (3 points) reste visible en permanence -
@@ -287,6 +329,7 @@ function NavButton({
   children,
   label,
   alert,
+  badge,
   active = false,
   loading,
   onClick,
@@ -321,6 +364,11 @@ function NavButton({
       >
         {label}
       </span>
+      {open && typeof badge === "number" && badge > 0 && (
+        <span className={clsx("mr-3 min-w-5 rounded-full px-1.5 text-center text-xs font-semibold", active ? "bg-vc-on-main/20" : "bg-vc-main/15 text-vc-main")}>
+          {badge > 99 ? "99+" : badge}
+        </span>
+      )}
       {alert && (
         <span className="mr-3 flex items-center justify-center w-2 h-2 shrink-0">
           <span className="w-1.5 h-1.5 bg-vc-main rounded-full ring-2 ring-vc-main/30 animate-pulse" />
@@ -330,7 +378,7 @@ function NavButton({
   );
 
   const content = (
-    <Squircle cornerRadius={10} cornerSmoothing={1} asChild>
+    <Squircle cornerRadius={7} cornerSmoothing={1} asChild>
       {page ? (
         inRouterContext ? (
           <Link to={page} className={className} onClick={onClick} {...props}>
@@ -364,6 +412,8 @@ function Nav({
   specificTabs = [],
   userRole,
 }: any) {
+  // Drag and drop of sub-menu entries (see `TabDef.onReorderChildren`): index being dragged and index hovered.
+  const [drag, setDrag] = useState<{ from: number; over: number | null } | null>(null);
   const isPageActive = (btn: any) => {
     if (btn.notActive) return false;
     const normalizedPath = (activePath || "/").replace(/\/+$/, "") || "/";
@@ -397,19 +447,63 @@ function Nav({
     <div className="flex flex-col gap-1">
       {tabs.map((btn: any) => {
         const isActive = isPageActive(btn);
+        const showChildren = open && btn.expanded && Array.isArray(btn.children) && btn.children.length > 0;
         return (
-          <NavButton
-            key={btn.page ?? btn.name}
-            onClick={btn.onClick}
-            loading={btn.loading}
-            open={open}
-            active={isActive}
-            page={btn.page}
-            label={btn.name}
-            alert={open && btn.alert}
-          >
-            {renderIcon(btn, isActive)}
-          </NavButton>
+          <React.Fragment key={btn.page ?? btn.name}>
+            <NavButton
+              onClick={btn.onClick}
+              loading={btn.loading}
+              open={open}
+              active={isActive}
+              page={btn.page}
+              label={btn.name}
+              alert={open && btn.alert}
+              badge={btn.badge}
+              aria-expanded={Array.isArray(btn.children) && btn.children.length > 0 ? Boolean(btn.expanded) : undefined}
+            >
+              {renderIcon(btn, isActive)}
+            </NavButton>
+            {showChildren && (
+              <div className="ml-5 flex flex-col gap-0.5 border-l border-vc-line pl-2" role="group" aria-label={btn.name}>
+                {btn.children.map((child: any, index: number) => {
+                  const childActive = isPageActive(child);
+                  const canMove = typeof btn.onReorderChildren === "function" && child.reorderable !== false;
+                  const dropTarget = drag !== null && drag.over === index && drag.from !== index && canMove;
+                  return (
+                    <div
+                      key={child.page ?? child.name}
+                      draggable={canMove}
+                      onDragStart={canMove ? (e) => { e.dataTransfer.effectAllowed = "move"; e.dataTransfer.setData("text/plain", String(index)); setDrag({ from: index, over: null }); } : undefined}
+                      onDragOver={canMove && drag ? (e) => { e.preventDefault(); e.dataTransfer.dropEffect = "move"; if (drag.over !== index) setDrag({ ...drag, over: index }); } : undefined}
+                      onDrop={canMove && drag ? (e) => { e.preventDefault(); if (drag.from !== index) btn.onReorderChildren(drag.from, index); setDrag(null); } : undefined}
+                      onDragEnd={canMove ? () => setDrag(null) : undefined}
+                      onKeyDown={canMove ? (e) => {
+                        if (!e.altKey || (e.key !== "ArrowUp" && e.key !== "ArrowDown")) return;
+                        const to = index + (e.key === "ArrowUp" ? -1 : 1);
+                        if (to < 0 || to >= btn.children.length || btn.children[to].reorderable === false) return;
+                        e.preventDefault();
+                        btn.onReorderChildren(index, to);
+                      } : undefined}
+                      className={clsx("rounded-lg", dropTarget && "ring-2 ring-vc-main/60", drag?.from === index && "opacity-50")}
+                    >
+                      <NavButton
+                        onClick={child.onClick}
+                        loading={child.loading}
+                        open={open}
+                        active={childActive}
+                        page={child.page}
+                        label={child.name}
+                        alert={open && child.alert}
+                        badge={child.badge}
+                      >
+                        {renderIcon(child, childActive)}
+                      </NavButton>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </React.Fragment>
         );
       })}
       {specificTabs?.length > 0 &&
@@ -550,18 +644,12 @@ function AccountSwitcherPanel({
                 className={clsx(
                   "group/row flex items-center gap-2.5 rounded-xl p-2 transition-colors",
                   account.active
-                    ? "bg-vc-main/10"
+                    ? "bg-vc-veil-strong"
                     : "cursor-pointer hover:bg-vc-veil",
                 )}
               >
                 <div className="w-8 h-8 rounded-full shrink-0 overflow-hidden ring-1 ring-vc-line bg-vc-back flex items-center justify-center">
-                  {account.avatarUrl ? (
-                    <img src={account.avatarUrl} alt={account.name} className="w-full h-full object-cover" />
-                  ) : (
-                    <span className="text-xs font-bold text-vc-main">
-                      {account.initials ?? account.name?.charAt(0)?.toUpperCase() ?? "U"}
-                    </span>
-                  )}
+                  <SwitcherAvatar account={account} />
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-[13px] font-medium truncate">{account.name}</p>
@@ -786,7 +874,7 @@ export default function Sidebar({
     <main className="flex h-screen font-vc-main text-vc-text bg-vc-back overflow-hidden relative">
       {/* Mobile-only hamburger trigger — replaces the collapsed icon strip entirely below `sm` */}
       {!open && (
-        <Squircle cornerRadius={10} cornerSmoothing={1} asChild>
+        <Squircle cornerRadius={7} cornerSmoothing={1} asChild>
           <button
             type="button"
             onClick={toggleOpen}
@@ -858,7 +946,11 @@ export default function Sidebar({
                 switcherActive={userMenu ? userMenuOpen : switcherOpen}
                 menuMode={Boolean(userMenu)}
                 name={user.name}
-                roleName={user.roleName}
+                roleName={
+                  user.title || user.organization
+                    ? formatUserTitle({ title: user.title, organization: user.organization })
+                    : user.roleName
+                }
                 avatarUrl={user.avatarUrl}
                 initials={user.initials}
               />

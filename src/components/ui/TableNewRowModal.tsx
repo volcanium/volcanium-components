@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { uuid } from "../../utils/uuid";
 import Modal from "./Modal";
 import Form, { FormField } from "./Form";
 import { notify } from "./notify";
@@ -27,7 +28,7 @@ export function TableNewRowModal({
   setShowModal,
   reloadTable,
 }: TableNewRowModalProps) {
-  const id = crypto.randomUUID();
+  const id = uuid();
   const [loaderBtn, setLoaderBtn] = useState(false);
   const { t } = useLanguage();
 

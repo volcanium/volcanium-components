@@ -1,21 +1,29 @@
 ﻿@import "tailwindcss";
 
 @theme {
+  /* Refonte graphique : surfaces neutres et sombres (plus de brun), l'orange de la marque ne sert plus que d'accent (focus, onglet actif, CTA). */
   --color-vc-main: #ff714d;
-  --color-vc-accent: #884534;
-  --color-vc-back: #121212;
-  --color-vc-container: #332c29;
-  --color-vc-secondary: #ffe9d3;
-  --color-vc-text: white;
+  --color-vc-accent: #2a2a2c;
+  --color-vc-back: #0f0f10;
+  --color-vc-container: #161617;
+  --color-vc-secondary: #e4e4e6;
+  --color-vc-text: #f4f4f5;
   --color-vc-overlay: #d9d9d9;
+
+  /* Rayons plus discrets (le thème Tailwind par défaut : 0.25 / 0.5 / 0.75 / 1 rem). */
+  --radius-sm: 0.1875rem;
+  --radius-md: 0.3125rem;
+  --radius-lg: 0.4375rem;
+  --radius-xl: 0.5625rem;
+  --radius-2xl: 0.75rem;
 
   /* Neutral, theme-reactive border/hover tints — used instead of hardcoded
      `white/[x]` utilities anywhere a surface needs to look right in both
      the dark (default) and light theme. */
   --color-vc-line: rgba(255, 255, 255, 0.08);
-  --color-vc-line-strong: rgba(255, 255, 255, 0.16);
-  --color-vc-veil: rgba(255, 255, 255, 0.06);
-  --color-vc-veil-strong: rgba(255, 255, 255, 0.1);
+  --color-vc-line-strong: rgba(255, 255, 255, 0.14);
+  --color-vc-veil: rgba(255, 255, 255, 0.04);
+  --color-vc-veil-strong: rgba(255, 255, 255, 0.08);
   /* Dark theme's exact current hover intensity on `InformationButton`,
      preserved unchanged — see the `[data-theme="light"]` override below for
      why this needs its own token instead of a literal `black/50`. */
@@ -48,12 +56,12 @@
  */
 [data-theme="light"] {
   --color-vc-main: #ff714d;
-  --color-vc-accent: #e35b34;
-  --color-vc-back: #f6f5f3;
+  --color-vc-accent: #ececee;
+  --color-vc-back: #f7f7f8;
   --color-vc-container: #ffffff;
-  --color-vc-secondary: #201f1e;
-  --color-vc-text: #201f1e;
-  --color-vc-overlay: #ece9e4;
+  --color-vc-secondary: #1f1f22;
+  --color-vc-text: #1f1f22;
+  --color-vc-overlay: #ececee;
 
   --color-vc-line: rgba(28, 27, 26, 0.1);
   --color-vc-line-strong: rgba(28, 27, 26, 0.18);

@@ -185,7 +185,7 @@ export default function Modal(props: ModalProps) {
           }}
           className="fixed inset-0 z-50 flex items-center justify-center bg-vc-back/70 backdrop-blur-sm p-3 sm:p-6"
         >
-          <Squircle cornerRadius={22} cornerSmoothing={1} asChild>
+          <Squircle cornerRadius={12} cornerSmoothing={1} asChild>
             <motion.div
               ref={modalRef}
               role="dialog"

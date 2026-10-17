@@ -1,6 +1,7 @@
 // --- config ---
 export * from "./components/config/VolcaniumProvider";
 export { useTheme } from "./utils/useTheme";
+export { getInitials, formatUserTitle, truncateWithEllipsis, USER_SUBTITLE_MAX_LENGTH } from "./utils/userIdentity";
 export { default as ThemeToggle } from "./components/ui/ThemeToggle";
 
 // --- ui ---
@@ -49,6 +50,46 @@ export { default as Tabs } from "./components/ui/Tabs";
 export type { TabsProps, TabItem } from "./components/ui/Tabs";
 export { default as Stepper } from "./components/ui/Stepper";
 export type { StepperProps, StepperItem } from "./components/ui/Stepper";
+export { default as Notice } from "./components/ui/Notice";
+export type { NoticeProps, NoticeTone } from "./components/ui/Notice";
+export { default as Card } from "./components/ui/Card";
+export type { CardProps } from "./components/ui/Card";
+export { default as CodeBlock } from "./components/ui/CodeBlock";
+export type { CodeBlockProps } from "./components/ui/CodeBlock";
+export { default as IconButton } from "./components/ui/IconButton";
+export type { IconButtonProps } from "./components/ui/IconButton";
+export { default as TextButton } from "./components/ui/TextButton";
+export type { TextButtonProps } from "./components/ui/TextButton";
+export { default as SegmentedControl } from "./components/ui/SegmentedControl";
+export type { SegmentedControlProps, SegmentedOption } from "./components/ui/SegmentedControl";
+export { default as ListRow } from "./components/ui/ListRow";
+export type { ListRowProps } from "./components/ui/ListRow";
+export { default as Badge } from "./components/ui/Badge";
+export type { BadgeProps, BadgeTone } from "./components/ui/Badge";
+export { default as FilePicker } from "./components/ui/FilePicker";
+export type { FilePickerProps } from "./components/ui/FilePicker";
+export { default as SimpleTable } from "./components/ui/SimpleTable";
+export type { SimpleTableProps, SimpleTableColumn } from "./components/ui/SimpleTable";
+export { default as ExternalLink } from "./components/ui/ExternalLink";
+export type { ExternalLinkProps } from "./components/ui/ExternalLink";
+export { default as LinkButton } from "./components/ui/LinkButton";
+export type { LinkButtonProps } from "./components/ui/LinkButton";
+export { default as BarStrip } from "./components/ui/BarStrip";
+export type { BarStripProps, BarStripItem } from "./components/ui/BarStrip";
+export { default as Tag } from "./components/ui/Tag";
+export type { TagProps } from "./components/ui/Tag";
+export { default as Disclosure } from "./components/ui/Disclosure";
+export type { DisclosureProps } from "./components/ui/Disclosure";
+export { default as DescriptionList } from "./components/ui/DescriptionList";
+export type { DescriptionListProps, DescriptionItem } from "./components/ui/DescriptionList";
+export { default as Checkbox } from "./components/ui/Checkbox";
+export type { CheckboxProps } from "./components/ui/Checkbox";
+export { default as RouterLink } from "./components/ui/RouterLink";
+export type { RouterLinkProps } from "./components/ui/RouterLink";
+export { default as Chip } from "./components/ui/Chip";
+export type { ChipProps } from "./components/ui/Chip";
+export { default as Tile } from "./components/ui/Tile";
+export type { TileProps } from "./components/ui/Tile";
 
 // --- layout ---
 export { default as Center } from "./components/layout/Center";

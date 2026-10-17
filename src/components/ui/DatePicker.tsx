@@ -298,7 +298,7 @@ export default function DatePicker({
           }}
           className="z-999 font-vc-main text-vc-text"
         >
-          <Squircle cornerRadius={16} cornerSmoothing={1} asChild>
+          <Squircle cornerRadius={10} cornerSmoothing={1} asChild>
             <div className="bg-vc-container shadow-[0_16px_40px_-16px_rgba(0,0,0,0.55)] border border-vc-line p-3 flex flex-col gap-3">
               <div className="flex items-center justify-between gap-2">
                 <button
@@ -338,7 +338,7 @@ export default function DatePicker({
                                 setMonthMenuOpen(false);
                               }}
                               className={`px-2 py-1.5 rounded-md text-xs capitalize truncate transition-colors duration-150 cursor-pointer hover:bg-vc-veil-strong ${
-                                i === cursor.getMonth() ? "bg-vc-main/20 text-vc-secondary" : "text-vc-secondary/75"
+                                i === cursor.getMonth() ? "bg-vc-veil-strong text-vc-secondary" : "text-vc-secondary/75"
                               }`}
                             >
                               {m}
@@ -421,9 +421,9 @@ export default function DatePicker({
 
   const Wrapper = (
     <div ref={wrapperRef} className="relative flex w-full font-vc-main text-vc-text">
-      <Squircle asChild cornerRadius={10} cornerSmoothing={1}>
+      <Squircle asChild cornerRadius={7} cornerSmoothing={1}>
         <div
-          className={`flex items-center w-full gap-2 pl-3.5 pr-2 border border-vc-secondary/20 bg-vc-container transition-colors duration-200 focus-within:border-vc-main/60 ${disabled ? "opacity-50" : ""} ${className}`}
+          className={`flex items-center w-full gap-2 pl-3.5 pr-2 border border-vc-line-strong bg-vc-container transition-colors duration-200 focus-within:border-vc-main/60 ${disabled ? "opacity-50" : ""} ${className}`}
         >
           <input
             id={pickerId}
