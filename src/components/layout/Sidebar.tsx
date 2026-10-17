@@ -34,6 +34,13 @@ export interface TabDef {
   notActive?: boolean;
   loading?: boolean;
   onClick?: (e?: React.MouseEvent) => void;
+  /** Counter shown at the right of the label (e.g. unread messages). Hidden when 0 or when the sidebar is collapsed. */
+  badge?: number;
+  /** Sub-menu shown under this entry while `expanded` is true (one level only). The parent keeps its own `page`/`onClick`
+   *  (typically a toggle); children are plain tabs. Hidden while the sidebar is collapsed to icons. */
+  children?: TabDef[];
+  /** Controlled state of the sub-menu: the app decides when it is open (e.g. on click of the parent). */
+  expanded?: boolean;
 }
 
 export interface SpecificTabsDef {
@@ -316,6 +323,7 @@ function NavButton({
   children,
   label,
   alert,
+  badge,
   active = false,
   loading,
   onClick,
@@ -350,6 +358,11 @@ function NavButton({
       >
         {label}
       </span>
+      {open && typeof badge === "number" && badge > 0 && (
+        <span className={clsx("mr-3 min-w-5 rounded-full px-1.5 text-center text-xs font-semibold", active ? "bg-vc-on-main/20" : "bg-vc-main/15 text-vc-main")}>
+          {badge > 99 ? "99+" : badge}
+        </span>
+      )}
       {alert && (
         <span className="mr-3 flex items-center justify-center w-2 h-2 shrink-0">
           <span className="w-1.5 h-1.5 bg-vc-main rounded-full ring-2 ring-vc-main/30 animate-pulse" />
@@ -426,19 +439,45 @@ function Nav({
     <div className="flex flex-col gap-1">
       {tabs.map((btn: any) => {
         const isActive = isPageActive(btn);
+        const showChildren = open && btn.expanded && Array.isArray(btn.children) && btn.children.length > 0;
         return (
-          <NavButton
-            key={btn.page ?? btn.name}
-            onClick={btn.onClick}
-            loading={btn.loading}
-            open={open}
-            active={isActive}
-            page={btn.page}
-            label={btn.name}
-            alert={open && btn.alert}
-          >
-            {renderIcon(btn, isActive)}
-          </NavButton>
+          <React.Fragment key={btn.page ?? btn.name}>
+            <NavButton
+              onClick={btn.onClick}
+              loading={btn.loading}
+              open={open}
+              active={isActive}
+              page={btn.page}
+              label={btn.name}
+              alert={open && btn.alert}
+              badge={btn.badge}
+              aria-expanded={Array.isArray(btn.children) && btn.children.length > 0 ? Boolean(btn.expanded) : undefined}
+            >
+              {renderIcon(btn, isActive)}
+            </NavButton>
+            {showChildren && (
+              <div className="ml-5 flex flex-col gap-0.5 border-l border-vc-line pl-2" role="group" aria-label={btn.name}>
+                {btn.children.map((child: any) => {
+                  const childActive = isPageActive(child);
+                  return (
+                    <NavButton
+                      key={child.page ?? child.name}
+                      onClick={child.onClick}
+                      loading={child.loading}
+                      open={open}
+                      active={childActive}
+                      page={child.page}
+                      label={child.name}
+                      alert={open && child.alert}
+                      badge={child.badge}
+                    >
+                      {renderIcon(child, childActive)}
+                    </NavButton>
+                  );
+                })}
+              </div>
+            )}
+          </React.Fragment>
         );
       })}
       {specificTabs?.length > 0 &&
