@@ -41,6 +41,12 @@ export interface TabDef {
   children?: TabDef[];
   /** Controlled state of the sub-menu: the app decides when it is open (e.g. on click of the parent). */
   expanded?: boolean;
+  /** Makes the sub-menu entries re-orderable (drag and drop, or Alt+Up / Alt+Down on a focused entry). Called with the
+   *  indexes of the entry in `children` before and after the move; the app owns the order. An entry with
+   *  `reorderable: false` can neither be moved nor be dropped on. */
+  onReorderChildren?: (from: number, to: number) => void;
+  /** Child entries only: `false` pins the entry (e.g. a trailing "New folder" action). @default true */
+  reorderable?: boolean;
 }
 
 export interface SpecificTabsDef {
@@ -406,6 +412,8 @@ function Nav({
   specificTabs = [],
   userRole,
 }: any) {
+  // Drag and drop of sub-menu entries (see `TabDef.onReorderChildren`): index being dragged and index hovered.
+  const [drag, setDrag] = useState<{ from: number; over: number | null } | null>(null);
   const isPageActive = (btn: any) => {
     if (btn.notActive) return false;
     const normalizedPath = (activePath || "/").replace(/\/+$/, "") || "/";
@@ -457,22 +465,40 @@ function Nav({
             </NavButton>
             {showChildren && (
               <div className="ml-5 flex flex-col gap-0.5 border-l border-vc-line pl-2" role="group" aria-label={btn.name}>
-                {btn.children.map((child: any) => {
+                {btn.children.map((child: any, index: number) => {
                   const childActive = isPageActive(child);
+                  const canMove = typeof btn.onReorderChildren === "function" && child.reorderable !== false;
+                  const dropTarget = drag !== null && drag.over === index && drag.from !== index && canMove;
                   return (
-                    <NavButton
+                    <div
                       key={child.page ?? child.name}
-                      onClick={child.onClick}
-                      loading={child.loading}
-                      open={open}
-                      active={childActive}
-                      page={child.page}
-                      label={child.name}
-                      alert={open && child.alert}
-                      badge={child.badge}
+                      draggable={canMove}
+                      onDragStart={canMove ? (e) => { e.dataTransfer.effectAllowed = "move"; e.dataTransfer.setData("text/plain", String(index)); setDrag({ from: index, over: null }); } : undefined}
+                      onDragOver={canMove && drag ? (e) => { e.preventDefault(); e.dataTransfer.dropEffect = "move"; if (drag.over !== index) setDrag({ ...drag, over: index }); } : undefined}
+                      onDrop={canMove && drag ? (e) => { e.preventDefault(); if (drag.from !== index) btn.onReorderChildren(drag.from, index); setDrag(null); } : undefined}
+                      onDragEnd={canMove ? () => setDrag(null) : undefined}
+                      onKeyDown={canMove ? (e) => {
+                        if (!e.altKey || (e.key !== "ArrowUp" && e.key !== "ArrowDown")) return;
+                        const to = index + (e.key === "ArrowUp" ? -1 : 1);
+                        if (to < 0 || to >= btn.children.length || btn.children[to].reorderable === false) return;
+                        e.preventDefault();
+                        btn.onReorderChildren(index, to);
+                      } : undefined}
+                      className={clsx("rounded-lg", dropTarget && "ring-2 ring-vc-main/60", drag?.from === index && "opacity-50")}
                     >
-                      {renderIcon(child, childActive)}
-                    </NavButton>
+                      <NavButton
+                        onClick={child.onClick}
+                        loading={child.loading}
+                        open={open}
+                        active={childActive}
+                        page={child.page}
+                        label={child.name}
+                        alert={open && child.alert}
+                        badge={child.badge}
+                      >
+                        {renderIcon(child, childActive)}
+                      </NavButton>
+                    </div>
                   );
                 })}
               </div>
