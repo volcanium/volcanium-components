@@ -90,6 +90,10 @@ export { default as Chip } from "./components/ui/Chip";
 export type { ChipProps } from "./components/ui/Chip";
 export { default as Tile } from "./components/ui/Tile";
 export type { TileProps } from "./components/ui/Tile";
+export { default as Avatar, initialsOf } from "./components/ui/Avatar";
+export type { AvatarProps } from "./components/ui/Avatar";
+export { default as ProfilePopover } from "./components/ui/ProfilePopover";
+export type { ProfilePopoverProps, ProfileTab } from "./components/ui/ProfilePopover";
 
 // --- layout ---
 export { default as Center } from "./components/layout/Center";
