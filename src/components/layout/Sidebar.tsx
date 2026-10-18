@@ -151,6 +151,8 @@ export interface SidebarProps {
   showBranding?: boolean;
   /** Replaces the branding line ("Panel powered by volcanium studio") by a custom label, e.g. "Volcanium". */
   brandingLabel?: React.ReactNode;
+  /** Content shown right under the user card, at the card's width (e.g. a mailbox selector). Hidden while the sidebar is collapsed to icons. */
+  belowUser?: React.ReactNode;
   /** Content to display next to the sidebar (via children) */
   children?: React.ReactNode;
 }
@@ -836,6 +838,7 @@ export default function Sidebar({
   userMenu,
   showBranding = true,
   brandingLabel,
+  belowUser,
   children,
 }: SidebarProps) {
   const { t } = useLanguage();
@@ -972,6 +975,8 @@ export default function Sidebar({
               </AnimatePresence>
             </div>
           )}
+
+          {user && belowUser && open && <div className="w-full">{belowUser}</div>}
 
           <div
             className={clsx(
