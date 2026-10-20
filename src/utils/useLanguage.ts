@@ -66,6 +66,8 @@ export type TranslationKey =
   | "manage_account"
   | "logout"
   | "accounts"
+  | "apps"
+  | "switch_app"
   | "add_account"
   | "remove_account"
   | "previous_month"
@@ -142,6 +144,8 @@ const dictionaries: Record<"fr" | "en", Dictionary> = {
     manage_account: "Gérer mon compte",
     logout: "Se déconnecter",
     accounts: "Comptes",
+    apps: "Applications",
+    switch_app: "Changer d'application",
     add_account: "Ajouter un compte",
     remove_account: "Retirer ce compte",
     previous_month: "Mois précédent",
@@ -215,6 +219,8 @@ const dictionaries: Record<"fr" | "en", Dictionary> = {
     manage_account: "Manage my account",
     logout: "Log out",
     accounts: "Accounts",
+    apps: "Applications",
+    switch_app: "Switch application",
     add_account: "Add an account",
     remove_account: "Remove this account",
     previous_month: "Previous month",

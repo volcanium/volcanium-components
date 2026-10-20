@@ -100,6 +100,6 @@ export { default as Center } from "./components/layout/Center";
 export { default as Grid } from "./components/layout/Grid";
 export { default as TopNav } from "./components/layout/TopNav";
 export { default as Sidebar } from "./components/layout/Sidebar";
-export type { SidebarProps, UserMenuProps, AccountSwitcherProps } from "./components/layout/Sidebar";
+export type { SidebarProps, UserMenuProps, AccountSwitcherProps, AppSwitcherProps, AppSwitcherApp } from "./components/layout/Sidebar";
 export { default as Hero } from "./components/layout/Hero";
 export { default as Nav } from "./components/layout/Nav";

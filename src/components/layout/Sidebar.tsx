@@ -16,6 +16,7 @@ import {
   IconCheck,
   IconUserCog,
   IconDotsVertical,
+  IconApps,
 } from "@tabler/icons-react";
 import Title from "../ui/Title";
 import Center from "./Center";
@@ -101,6 +102,26 @@ export interface UserMenuProps {
   };
 }
 
+export interface AppSwitcherApp {
+  id: string;
+  name: string;
+  /** Where the app lives; clicking the row goes there (unless `onSelect` is provided). */
+  url?: string;
+  /** Logo URL. Falls back to the initial of the app name when missing or when it fails to load. */
+  logoUrl?: string;
+  /** Marks the app currently open (highlighted, not clickable). */
+  active?: boolean;
+}
+
+export interface AppSwitcherProps {
+  /** Apps the user has access to. */
+  apps: AppSwitcherApp[];
+  /** Overrides the default navigation (`window.location.assign(app.url)`). */
+  onSelect?: (app: AppSwitcherApp) => void;
+  loading?: boolean;
+  labels?: { title?: string; button?: string };
+}
+
 export interface SidebarProps {
   /** If true, sidebar is expanded. If false, collapsed. */
   isOpen?: boolean;
@@ -147,6 +168,9 @@ export interface SidebarProps {
    *  (everything except Volcanium Compte itself, which keeps its own bottomTabs logout button).
    *  Takes precedence over `accountSwitcher` / `onSwitchAccountClick` when provided. */
   userMenu?: UserMenuProps;
+  /** Shows an app-switcher button next to the app name: opens a panel listing the apps the user can access
+   *  (logo + name), and clicking one navigates to it. Omit to hide the button entirely. */
+  appSwitcher?: AppSwitcherProps;
   /** Whether to show the "Panel powered by volcanium studio" branding at the bottom of the sidebar. Defaults to true. */
   showBranding?: boolean;
   /** Replaces the branding line ("Panel powered by volcanium studio") by a custom label, e.g. "Volcanium". */
@@ -211,6 +235,129 @@ function Header({ openFnc, open, title, subtitle }: any) {
         </Title>
       </div>
     </header>
+  );
+}
+
+function AppLogo({ app }: { app: AppSwitcherApp }) {
+  const [failedUrl, setFailedUrl] = useState<string | null>(null);
+  if (app.logoUrl && failedUrl !== app.logoUrl) {
+    return (
+      <img
+        src={app.logoUrl}
+        alt=""
+        referrerPolicy="no-referrer"
+        onError={() => setFailedUrl(app.logoUrl ?? null)}
+        className="w-full h-full object-contain"
+      />
+    );
+  }
+  return <span className="text-sm font-bold text-vc-main">{app.name.trim().charAt(0).toUpperCase()}</span>;
+}
+
+function AppSwitcherPanel({
+  anchorRef,
+  apps,
+  loading,
+  onSelect,
+  labels,
+  onClose,
+}: AppSwitcherProps & { anchorRef: React.RefObject<HTMLElement | null>; onClose: () => void }) {
+  const { t } = useLanguage();
+  const panelRef = useRef<HTMLDivElement>(null);
+  const [coords, setCoords] = useState<{ top: number; left: number } | null>(null);
+
+  // Same technique as AccountSwitcherPanel: the sidebar clips its overflow, so the panel is portaled to <body>
+  // and pinned next to the header row.
+  useLayoutEffect(() => {
+    const PANEL_WIDTH = 288;
+    const updatePosition = () => {
+      const rect = anchorRef.current?.getBoundingClientRect();
+      if (!rect) return;
+      const left = Math.min(rect.right + 16, window.innerWidth - PANEL_WIDTH - 12);
+      const top = Math.min(rect.top - 4, window.innerHeight - 12);
+      setCoords({ top, left: Math.max(12, left) });
+    };
+    updatePosition();
+    window.addEventListener("resize", updatePosition);
+    window.addEventListener("scroll", updatePosition, true);
+    return () => {
+      window.removeEventListener("resize", updatePosition);
+      window.removeEventListener("scroll", updatePosition, true);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    const handlePointerDown = (e: MouseEvent) => {
+      if (
+        panelRef.current &&
+        !panelRef.current.contains(e.target as Node) &&
+        !anchorRef.current?.contains(e.target as Node)
+      ) {
+        onClose();
+      }
+    };
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("mousedown", handlePointerDown);
+    document.addEventListener("keydown", handleKeyDown);
+    return () => {
+      document.removeEventListener("mousedown", handlePointerDown);
+      document.removeEventListener("keydown", handleKeyDown);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  if (!coords) return null;
+
+  const go = (app: AppSwitcherApp) => {
+    onClose();
+    if (onSelect) onSelect(app);
+    else if (app.url) window.location.assign(app.url);
+  };
+
+  return createPortal(
+    <motion.div
+      ref={panelRef}
+      initial={{ opacity: 0, y: -6, scale: 0.98 }}
+      animate={{ opacity: 1, y: 0, scale: 1 }}
+      exit={{ opacity: 0, y: -6, scale: 0.98 }}
+      transition={{ duration: 0.16, ease: [0.16, 1, 0.3, 1] }}
+      style={{ position: "fixed", top: coords.top, left: coords.left }}
+      className="z-[999] w-72 max-w-[85vw] rounded-2xl border border-vc-line bg-vc-container shadow-xl p-2 flex flex-col gap-1"
+    >
+      <p className="px-2 pt-1.5 pb-2 text-[11px] font-semibold uppercase tracking-wide text-vc-secondary/50">
+        {labels?.title ?? t("apps")}
+      </p>
+      {loading ? (
+        <div className="flex items-center justify-center py-6">
+          <div className="w-5 h-5 border-2 border-vc-main border-t-transparent rounded-full animate-spin" />
+        </div>
+      ) : (
+        <div className="flex flex-col gap-0.5 max-h-72 overflow-y-auto vc-scroll-hover">
+          {apps.map((app) => (
+            <button
+              key={app.id}
+              type="button"
+              disabled={app.active}
+              onClick={() => go(app)}
+              className={clsx(
+                "flex items-center gap-2.5 rounded-xl p-2 text-left transition-colors",
+                app.active ? "bg-vc-veil-strong" : "cursor-pointer hover:bg-vc-veil",
+              )}
+            >
+              <div className="w-8 h-8 rounded-lg shrink-0 overflow-hidden ring-1 ring-vc-line bg-vc-back flex items-center justify-center">
+                <AppLogo app={app} />
+              </div>
+              <p className="flex-1 min-w-0 text-[13px] font-medium truncate">{app.name}</p>
+              {app.active && <IconCheck size={16} className="shrink-0 text-vc-main" />}
+            </button>
+          ))}
+        </div>
+      )}
+    </motion.div>,
+    document.body,
   );
 }
 
@@ -836,6 +983,7 @@ export default function Sidebar({
   accountSwitcher,
   onSwitchAccountClick,
   userMenu,
+  appSwitcher,
   showBranding = true,
   brandingLabel,
   belowUser,
@@ -846,6 +994,8 @@ export default function Sidebar({
   const open = onToggle ? isOpen : internalOpen;
   const [switcherOpen, setSwitcherOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
+  const [appsOpen, setAppsOpen] = useState(false);
+  const headerRef = useRef<HTMLDivElement>(null);
   const userCardRef = useRef<HTMLDivElement>(null);
 
   const toggleOpen = () => {
@@ -912,8 +1062,31 @@ export default function Sidebar({
         )}
       >
         <div className="flex flex-col gap-5 w-full">
-          <div className="flex flex-row items-center gap-3 w-full h-10">
+          <div className="relative flex flex-row items-center gap-3 w-full h-10" ref={headerRef}>
             <Header openFnc={toggleOpen} open={open} title={title} subtitle={subtitle} />
+            {open && appSwitcher && (
+              <button
+                type="button"
+                onClick={() => setAppsOpen((v) => !v)}
+                aria-label={appSwitcher.labels?.button ?? t("switch_app")}
+                title={appSwitcher.labels?.button ?? t("switch_app")}
+                className={clsx(
+                  "shrink-0 w-8 h-8 flex items-center justify-center rounded-lg text-vc-secondary/70 hover:text-vc-secondary hover:bg-vc-veil active:scale-95 transition-all duration-200 cursor-pointer",
+                  appsOpen && "bg-vc-veil text-vc-secondary",
+                )}
+              >
+                <IconApps size={18} stroke={1.75} />
+              </button>
+            )}
+            <AnimatePresence>
+              {open && appsOpen && appSwitcher && (
+                <AppSwitcherPanel
+                  {...appSwitcher}
+                  anchorRef={headerRef}
+                  onClose={() => setAppsOpen(false)}
+                />
+              )}
+            </AnimatePresence>
             {open && (
               <button
                 type="button"
