@@ -1,6 +1,17 @@
 import { useVolcaniumConfig } from "../components/config/VolcaniumProvider";
 
 export type TranslationKey =
+  | "rte_toolbar"
+  | "rte_bold"
+  | "rte_italic"
+  | "rte_underline"
+  | "rte_bullet_list"
+  | "rte_ordered_list"
+  | "rte_link"
+  | "rte_link_label"
+  | "rte_link_placeholder"
+  | "rte_undo"
+  | "rte_redo"
   | "not_provided"
   | "account"
   | "cancel"
@@ -79,6 +90,17 @@ type Dictionary = Record<TranslationKey, string>;
 
 const dictionaries: Record<"fr" | "en", Dictionary> = {
   fr: {
+    rte_toolbar: "Mise en forme",
+    rte_bold: "Gras",
+    rte_italic: "Italique",
+    rte_underline: "Souligné",
+    rte_bullet_list: "Liste à puces",
+    rte_ordered_list: "Liste numérotée",
+    rte_link: "Lien",
+    rte_link_label: "Adresse du lien",
+    rte_link_placeholder: "https://…",
+    rte_undo: "Annuler la dernière modification",
+    rte_redo: "Rétablir",
     not_provided: "Non renseigné",
     account: "Compte",
     cancel: "Annuler",
@@ -154,6 +176,17 @@ const dictionaries: Record<"fr" | "en", Dictionary> = {
     confirm_retype: "Pour confirmer, recopiez : {text}",
   },
   en: {
+    rte_toolbar: "Formatting",
+    rte_bold: "Bold",
+    rte_italic: "Italic",
+    rte_underline: "Underline",
+    rte_bullet_list: "Bulleted list",
+    rte_ordered_list: "Numbered list",
+    rte_link: "Link",
+    rte_link_label: "Link address",
+    rte_link_placeholder: "https://…",
+    rte_undo: "Undo",
+    rte_redo: "Redo",
     not_provided: "Not provided",
     account: "Account",
     cancel: "Cancel",
