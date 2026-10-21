@@ -90,7 +90,14 @@ export type TranslationKey =
   | "presence_offline"
   | "presence_idle"
   | "presence_in_call"
-  | "presence_dnd";
+  | "presence_dnd"
+  | "notif_answer"
+  | "notif_decline"
+  | "notif_messages"
+  | "notif_open"
+  | "notif_dismiss"
+  | "notif_body_call_incoming"
+  | "notif_body_call_incoming_audio";
 
 type Dictionary = Record<TranslationKey, string>;
 
@@ -186,6 +193,13 @@ const dictionaries: Record<"fr" | "en", Dictionary> = {
     presence_idle: "Inactif",
     presence_in_call: "En appel",
     presence_dnd: "Ne pas déranger",
+    notif_answer: "Décrocher",
+    notif_decline: "Raccrocher",
+    notif_messages: "Messages",
+    notif_open: "Ouvrir",
+    notif_dismiss: "Ignorer",
+    notif_body_call_incoming: "Appel vidéo entrant…",
+    notif_body_call_incoming_audio: "Appel audio entrant…",
   },
   en: {
     rte_toolbar: "Formatting",
@@ -278,6 +292,13 @@ const dictionaries: Record<"fr" | "en", Dictionary> = {
     presence_idle: "Idle",
     presence_in_call: "In a call",
     presence_dnd: "Do not disturb",
+    notif_answer: "Answer",
+    notif_decline: "Decline",
+    notif_messages: "Messages",
+    notif_open: "Open",
+    notif_dismiss: "Dismiss",
+    notif_body_call_incoming: "Incoming video call…",
+    notif_body_call_incoming_audio: "Incoming audio call…",
   },
 };
 

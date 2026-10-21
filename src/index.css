@@ -172,3 +172,10 @@ html {
   background-color: var(--color-vc-line-strong);
 }
 
+
+/* Notifications entre apps : arrivee de la carte et halo qui pulse autour de la photo pendant que ca sonne. */
+@keyframes vc-notif-in { from { opacity: 0; transform: translateX(16px) scale(0.98); } to { opacity: 1; transform: none; } }
+.vc-notif-in { animation: vc-notif-in 0.22s ease-out both; }
+@keyframes vc-notif-ring { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-vc-main) 55%, transparent); } 70%, 100% { box-shadow: 0 0 0 12px transparent; } }
+.vc-notif-ring { animation: vc-notif-ring 1.6s ease-out infinite; }
+@media (prefers-reduced-motion: reduce) { .vc-notif-in, .vc-notif-ring { animation: none; } }

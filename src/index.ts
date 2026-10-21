@@ -94,6 +94,11 @@ export { default as PresenceDot, PRESENCE_STATUSES, presenceLabelKey } from "./p
 export type { PresenceStatus, ManualPresence, PresenceDotProps } from "./presence/PresenceDot";
 export { PresenceProvider, usePresence, usePresenceOf } from "./presence/PresenceProvider";
 export type { PresenceProviderProps, PresenceApi } from "./presence/PresenceProvider";
+export { NotificationProvider, useNotifications } from "./notifications/NotificationProvider";
+export type { NotificationProviderProps, NotificationsApi, NotificationItem, NotificationAction } from "./notifications/NotificationProvider";
+export { default as NotificationCard } from "./notifications/NotificationCard";
+export type { NotificationCardProps } from "./notifications/NotificationCard";
+export { startRingtone } from "./notifications/ringtone";
 export { default as Avatar, initialsOf } from "./components/ui/Avatar";
 export type { AvatarProps } from "./components/ui/Avatar";
 export { default as MessageItem } from "./components/ui/MessageItem";
