@@ -17,11 +17,14 @@ import {
   IconUserCog,
   IconDotsVertical,
   IconApps,
+  IconChevronDown,
 } from "@tabler/icons-react";
 import Title from "../ui/Title";
 import Center from "./Center";
 import { useLanguage } from "../../utils/useLanguage";
 import { formatUserTitle, getInitials } from "../../utils/userIdentity";
+import PresenceDot, { PRESENCE_STATUSES, presenceLabelKey, type ManualPresence, type PresenceStatus } from "../../presence/PresenceDot";
+import { usePresence, type PresenceApi } from "../../presence/PresenceProvider";
 
 // ---------------------------------------------
 // Types
@@ -385,6 +388,7 @@ function UserCard({
   onToggleSwitcher,
   switcherActive,
   menuMode = false,
+  status,
   className,
   open = true,
   onClick,
@@ -412,19 +416,22 @@ function UserCard({
             make room when opening and slides back to dead-center when collapsed,
             instead of jumping. */}
         <div className={clsx(ICON_BOX, "flex items-center justify-center shrink-0")}>
-          {showImage ? (
-            <img
-              src={avatarUrl}
-              alt="Avatar"
-              referrerPolicy="no-referrer"
-              onError={() => setFailedUrl(avatarUrl)}
-              className="h-9 w-9 rounded-full ring-1 ring-vc-line bg-vc-back object-cover"
-            />
-          ) : (
-            <div className="h-9 w-9 rounded-full ring-1 ring-vc-line bg-vc-veil-strong flex items-center justify-center text-sm font-bold text-vc-main">
-              {initials || getInitials(name)}
-            </div>
-          )}
+          <div className="relative h-9 w-9">
+            {showImage ? (
+              <img
+                src={avatarUrl}
+                alt="Avatar"
+                referrerPolicy="no-referrer"
+                onError={() => setFailedUrl(avatarUrl)}
+                className="h-9 w-9 rounded-full ring-1 ring-vc-line bg-vc-back object-cover"
+              />
+            ) : (
+              <div className="h-9 w-9 rounded-full ring-1 ring-vc-line bg-vc-veil-strong flex items-center justify-center text-sm font-bold text-vc-main">
+                {initials || getInitials(name)}
+              </div>
+            )}
+            {status && <PresenceDot status={status} size={12} corner />}
+          </div>
         </div>
         <div
           className={clsx(
@@ -704,11 +711,13 @@ function AccountSwitcherPanel({
   switchingId,
   removingId,
   labels,
+  presence,
   onClose,
-}: AccountSwitcherProps & { anchorRef: React.RefObject<HTMLElement | null>; onClose: () => void }) {
+}: AccountSwitcherProps & { anchorRef: React.RefObject<HTMLElement | null>; presence?: PresenceApi; onClose: () => void }) {
   const { t } = useLanguage();
   const panelRef = useRef<HTMLDivElement>(null);
   const [coords, setCoords] = useState<{ top: number; left: number } | null>(null);
+  const [statusOpen, setStatusOpen] = useState(false);
 
   // The sidebar itself clips overflow-x (needed for the collapse animation),
   // so this panel can't just be an absolutely-positioned child of it — it
@@ -847,8 +856,65 @@ function AccountSwitcherPanel({
           </button>
         </>
       )}
+
+      {presence && (
+        <>
+          <div className="h-px bg-vc-line my-1" />
+          <StatusMenu presence={presence} open={statusOpen} onToggle={() => setStatusOpen((v) => !v)} onClose={onClose} />
+        </>
+      )}
     </motion.div>,
     document.body,
+  );
+}
+
+// ---------------------------------------------
+// « Statut » row of the user menu: expands in place into the five statuses. "Online" is the automatic one
+// (green while active, yellow when idle); the others are chosen by hand and stay until changed.
+// ---------------------------------------------
+function StatusMenu({ presence, open, onToggle, onClose }: { presence: PresenceApi; open: boolean; onToggle: () => void; onClose: () => void }) {
+  const { t } = useLanguage();
+  const current: PresenceStatus = presence.manual ?? "online";
+  const shown: PresenceStatus = presence.self ?? current;
+  return (
+    <>
+      <button
+        type="button"
+        aria-expanded={open}
+        onClick={onToggle}
+        className="flex items-center gap-2.5 rounded-xl p-2 text-left text-[13px] text-vc-secondary/85 hover:bg-vc-veil hover:text-vc-secondary transition-colors"
+      >
+        <div className="w-7 h-7 rounded-lg shrink-0 flex items-center justify-center bg-vc-veil">
+          <PresenceDot status={shown} size={12} />
+        </div>
+        <span className="flex-1">{t("presence_label")}</span>
+        <span className="text-[11px] text-vc-secondary/50">{t(presenceLabelKey(shown))}</span>
+        <IconChevronDown size={14} className={clsx("shrink-0 text-vc-secondary/50 transition-transform", open && "rotate-180")} />
+      </button>
+      {open && (
+        <div role="listbox" aria-label={t("presence_label")} className="flex flex-col gap-0.5 pl-3">
+          {PRESENCE_STATUSES.map((status) => (
+            <button
+              key={status}
+              type="button"
+              role="option"
+              aria-selected={current === status}
+              onClick={() => {
+                onClose();
+                void presence.setStatus(status === "online" ? "auto" : (status as ManualPresence));
+              }}
+              className="flex items-center gap-2.5 rounded-xl p-2 text-left text-[13px] text-vc-secondary/85 hover:bg-vc-veil hover:text-vc-secondary transition-colors"
+            >
+              <div className="w-7 h-7 shrink-0 flex items-center justify-center">
+                <PresenceDot status={status} size={12} />
+              </div>
+              <span className="flex-1">{t(presenceLabelKey(status))}</span>
+              {current === status && <IconCheck size={15} className="shrink-0 text-vc-main" />}
+            </button>
+          ))}
+        </div>
+      )}
+    </>
   );
 }
 
@@ -865,11 +931,13 @@ function UserMenuPanel({
   onLogout,
   onManageAccount,
   labels,
+  presence,
   onClose,
-}: UserMenuProps & { anchorRef: React.RefObject<HTMLElement | null>; onClose: () => void }) {
+}: UserMenuProps & { anchorRef: React.RefObject<HTMLElement | null>; presence?: PresenceApi; onClose: () => void }) {
   const { t } = useLanguage();
   const panelRef = useRef<HTMLDivElement>(null);
   const [coords, setCoords] = useState<{ top: number; left: number } | null>(null);
+  const [statusOpen, setStatusOpen] = useState(false);
 
   useLayoutEffect(() => {
     const PANEL_WIDTH = 240; // matches w-60
@@ -961,6 +1029,7 @@ function UserMenuPanel({
           {label}
         </button>
       ))}
+      {presence && <StatusMenu presence={presence} open={statusOpen} onToggle={() => setStatusOpen((v) => !v)} onClose={onClose} />}
     </motion.div>,
     document.body,
   );
@@ -990,6 +1059,7 @@ export default function Sidebar({
   children,
 }: SidebarProps) {
   const { t } = useLanguage();
+  const presence = usePresence();
   const [internalOpen, setInternalOpen] = useState(isOpen);
   const open = onToggle ? isOpen : internalOpen;
   const [switcherOpen, setSwitcherOpen] = useState(false);
@@ -1106,7 +1176,10 @@ export default function Sidebar({
                   open
                     ? userMenu
                       ? () => setUserMenuOpen((v) => !v)
-                      : undefined
+                      : // Account-switcher card: with the status service available, the whole card opens the panel (accounts + "Status").
+                        accountSwitcher && !onSwitchAccountClick && presence
+                        ? () => setSwitcherOpen((v) => !v)
+                        : undefined
                     : toggleOpen
                 }
                 open={open}
@@ -1121,6 +1194,7 @@ export default function Sidebar({
                 }
                 switcherActive={userMenu ? userMenuOpen : switcherOpen}
                 menuMode={Boolean(userMenu)}
+                status={presence?.self}
                 name={user.name}
                 roleName={
                   user.title || user.organization
@@ -1134,6 +1208,7 @@ export default function Sidebar({
                 {switcherOpen && accountSwitcher && (
                   <AccountSwitcherPanel
                     {...accountSwitcher}
+                    presence={presence}
                     anchorRef={userCardRef}
                     onClose={() => setSwitcherOpen(false)}
                   />
@@ -1141,6 +1216,7 @@ export default function Sidebar({
                 {userMenuOpen && userMenu && (
                   <UserMenuPanel
                     {...userMenu}
+                    presence={presence}
                     anchorRef={userCardRef}
                     onClose={() => setUserMenuOpen(false)}
                   />

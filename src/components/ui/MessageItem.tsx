@@ -4,7 +4,7 @@ import Avatar from "./Avatar";
 
 export interface MessageItemProps {
   /** Auteur : nom affiché, photo (facultative) et adresse (initiales de secours). */
-  author: { name: string; email?: string; src?: string | null };
+  author: { name: string; email?: string; src?: string | null; /** Compte Volcanium : rond de statut sur la photo (dans un `PresenceProvider`). */ userId?: string | null };
   /** Heure déjà formatée (« 14:32 »). */
   time: string;
   /** Texte d'info-bulle de l'heure (date complète). */
@@ -41,7 +41,7 @@ export default function MessageItem({ author, time, timeTitle, editedLabel, comp
             {time}
           </span>
         ) : (
-          <Avatar name={author.name} email={author.email} src={author.src} size={36} />
+          <Avatar name={author.name} email={author.email} src={author.src} userId={author.userId} size={36} />
         )}
       </div>
       <div className="min-w-0 flex-1">

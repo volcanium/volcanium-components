@@ -4,6 +4,8 @@ import { IconX } from "@tabler/icons-react";
 import Avatar from "./Avatar";
 import Tabs, { TabItem } from "./Tabs";
 import { useLanguage } from "../../utils/useLanguage";
+import PresenceDot, { presenceLabelKey } from "../../presence/PresenceDot";
+import { usePresenceOf } from "../../presence/PresenceProvider";
 
 /** Onglet de la fiche. Son `content` peut être une fonction recevant `goTo` (bouton « Afficher plus » qui ouvre un autre onglet). */
 export interface ProfileTab extends Omit<TabItem, "content"> {
@@ -19,6 +21,8 @@ export interface ProfilePopoverProps {
   email?: string;
   /** URL de la photo de profil ; à défaut, les initiales. */
   avatarSrc?: string | null;
+  /** Compte Volcanium de la personne : affiche son statut (rond sur la photo + libellé) quand l'app est dans un `PresenceProvider` et qu'il est visible. */
+  userId?: string | null;
   /** Étiquette à côté du nom (« Externe », « Interne »…), par exemple un `<Tag>`. */
   tag?: ReactNode;
   /** Courte description (poste, bio) : n'est affichée que si elle est fournie. */
@@ -46,7 +50,7 @@ const MARGIN = 8;
  * si elle manque de place en dessous, se ferme avec Échap, un clic à l'extérieur ou la croix.
  * @see {@link https://vcomponents.tmenv.fr/?path=/docs/ui-profilepopover--docs}
  */
-export default function ProfilePopover({ children, name, email, avatarSrc, tag, bio, actions, tabs, defaultTab, onOpenChange, triggerClassName = "", triggerLabel }: ProfilePopoverProps) {
+export default function ProfilePopover({ children, name, email, avatarSrc, userId, tag, bio, actions, tabs, defaultTab, onOpenChange, triggerClassName = "", triggerLabel }: ProfilePopoverProps) {
   const { t } = useLanguage();
   const id = useId();
   const trigger = useRef<HTMLButtonElement>(null);
@@ -54,6 +58,7 @@ export default function ProfilePopover({ children, name, email, avatarSrc, tag, 
   const [open, setOpen] = useState(false);
   const [place, setPlace] = useState<Placement | null>(null);
   const [tab, setTab] = useState(defaultTab ?? tabs[0]?.id ?? "");
+  const status = usePresenceOf(userId);
 
   const change = useCallback((next: boolean) => {
     setOpen(next);
@@ -130,10 +135,16 @@ export default function ProfilePopover({ children, name, email, avatarSrc, tag, 
             <IconX size={16} aria-hidden />
           </button>
           <div className="flex items-start gap-4 p-4 pb-3 pr-10">
-            <Avatar name={name} {...(email ? { email } : {})} src={avatarSrc ?? null} size={72} />
+            <Avatar name={name} {...(email ? { email } : {})} src={avatarSrc ?? null} size={72} {...(status ? { status } : {})} />
             <div className="min-w-0 flex-1">
               <h2 className="break-words text-lg font-semibold leading-tight">{name}</h2>
               {email && email !== name && <p className="break-all text-sm text-vc-text/60">{email}</p>}
+              {status && (
+                <p className="mt-1 flex items-center gap-1.5 text-sm text-vc-text/80">
+                  <PresenceDot status={status} size={10} />
+                  {t(presenceLabelKey(status))}
+                </p>
+              )}
               {tag && <div className="mt-1.5">{tag}</div>}
               {bio && <p className="mt-2 text-sm text-vc-text/80">{bio}</p>}
               {actions && <div className="mt-3 flex flex-wrap items-center gap-2">{actions}</div>}

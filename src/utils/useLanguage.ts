@@ -84,7 +84,13 @@ export type TranslationKey =
   | "previous_month"
   | "next_month"
   | "open_calendar"
-  | "confirm_retype";
+  | "confirm_retype"
+  | "presence_label"
+  | "presence_online"
+  | "presence_offline"
+  | "presence_idle"
+  | "presence_in_call"
+  | "presence_dnd";
 
 type Dictionary = Record<TranslationKey, string>;
 
@@ -174,6 +180,12 @@ const dictionaries: Record<"fr" | "en", Dictionary> = {
     next_month: "Mois suivant",
     open_calendar: "Ouvrir le calendrier",
     confirm_retype: "Pour confirmer, recopiez : {text}",
+    presence_label: "Statut",
+    presence_online: "En ligne",
+    presence_offline: "Hors ligne",
+    presence_idle: "Inactif",
+    presence_in_call: "En appel",
+    presence_dnd: "Ne pas déranger",
   },
   en: {
     rte_toolbar: "Formatting",
@@ -260,6 +272,12 @@ const dictionaries: Record<"fr" | "en", Dictionary> = {
     next_month: "Next month",
     open_calendar: "Open calendar",
     confirm_retype: "To confirm, type: {text}",
+    presence_label: "Status",
+    presence_online: "Online",
+    presence_offline: "Offline",
+    presence_idle: "Idle",
+    presence_in_call: "In a call",
+    presence_dnd: "Do not disturb",
   },
 };
 

@@ -2,6 +2,8 @@ import type { ReactNode } from "react";
 import clsx from "clsx";
 import { IconHandStop, IconMicrophoneOff } from "@tabler/icons-react";
 import Avatar from "./Avatar";
+import PresenceDot from "../../presence/PresenceDot";
+import { usePresenceOf } from "../../presence/PresenceProvider";
 
 export interface VideoTileProps {
   /** Nom affiché sous la vidéo. */
@@ -18,6 +20,8 @@ export interface VideoTileProps {
   handRaised?: boolean;
   handLabel?: string;
   micOffLabel?: string;
+  /** Compte Volcanium du participant : son statut s'affiche à côté du nom (dans un `PresenceProvider`). Absent pour un invité externe. */
+  userId?: string | null;
   /** Mention affichée à côté du nom (« Vous », « Invité »…), déjà traduite. */
   badge?: string;
   /** Actions au survol (couper le micro, retirer…). */
@@ -26,7 +30,8 @@ export interface VideoTileProps {
 }
 
 /** Tuile d'un participant de visioconférence : vidéo ou photo, nom, micro coupé, prise de parole. Reçoit sa vidéo en enfant. */
-export default function VideoTile({ name, src, video, micOff = false, speaking = false, handRaised = false, handLabel, micOffLabel, badge, actions, className }: VideoTileProps) {
+export default function VideoTile({ name, src, userId, video, micOff = false, speaking = false, handRaised = false, handLabel, micOffLabel, badge, actions, className }: VideoTileProps) {
+  const status = usePresenceOf(userId);
   return (
     <div
       className={clsx(
@@ -38,6 +43,7 @@ export default function VideoTile({ name, src, video, micOff = false, speaking =
       {video ?? <Avatar name={name} src={src} size={72} />}
       <div className="absolute bottom-2 left-2 flex max-w-[85%] items-center gap-1.5 rounded-md bg-vc-scrim px-2 py-1 text-xs text-vc-text">
         {micOff && <IconMicrophoneOff size={14} aria-label={micOffLabel} className="shrink-0 text-vc-danger" />}
+        {status && <PresenceDot status={status} size={9} />}
         <span className="truncate">{name}</span>
         {badge && <span className="shrink-0 text-vc-text/60">· {badge}</span>}
       </div>
