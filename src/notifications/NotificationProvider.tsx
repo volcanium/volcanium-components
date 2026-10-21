@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import NotificationCard from "./NotificationCard";
+import { CompteStreamBusContext } from "../presence/PresenceProvider";
 import { startRingtone } from "./ringtone";
 
 /** Action d'une notification : adresse a ouvrir (`href`) ou requete a envoyer (`request`, sans cookie : l'adresse porte son jeton). */
@@ -100,6 +101,7 @@ export function NotificationProvider({ compteUrl, userId, showCards = true, ring
   const base = trim(compteUrl);
   const [items, setItems] = useState<readonly NotificationItem[]>(EMPTY);
   const election = useRef<ReturnType<typeof createElection> | null>(null);
+  const bus = useContext(CompteStreamBusContext);
   const [ringing, setRinging] = useState<ReadonlySet<string>>(new Set()); // appels pour lesquels CET onglet sonne
 
   useEffect(() => {
@@ -131,6 +133,17 @@ export function NotificationProvider({ compteUrl, userId, showCards = true, ring
       }
     };
 
+    const handle = (ev: ServerEvent) => {
+      if (ev.type === "snapshot") {
+        const keep = new Set(ev.items.map((n) => n.id));
+        for (const id of [...timers.keys()]) if (!keep.has(id)) drop(id);
+        for (const n of ev.items) add(n);
+      } else if (ev.type === "notify") add(ev.item);
+      else if (ev.type === "dismiss") drop(ev.id);
+    };
+
+    // Dans un `PresenceProvider` : on ecoute SON flux (un seul EventSource par onglet). Sans lui : flux a part.
+    let unsubscribe: (() => void) | undefined;
     const open = () => {
       if (stopped) return;
       const es = new EventSource(`${base}/user/notifications/stream?expect=${encodeURIComponent(userId)}`, { withCredentials: true });
@@ -139,12 +152,7 @@ export function NotificationProvider({ compteUrl, userId, showCards = true, ring
       es.onmessage = (m) => {
         let ev: ServerEvent;
         try { ev = JSON.parse(m.data) as ServerEvent; } catch { return; }
-        if (ev.type === "snapshot") {
-          const keep = new Set(ev.items.map((n) => n.id));
-          for (const id of [...timers.keys()]) if (!keep.has(id)) drop(id);
-          for (const n of ev.items) add(n);
-        } else if (ev.type === "notify") add(ev.item);
-        else if (ev.type === "dismiss") drop(ev.id);
+        handle(ev);
       };
       es.onerror = () => {
         es.close();
@@ -154,9 +162,11 @@ export function NotificationProvider({ compteUrl, userId, showCards = true, ring
         retry = setTimeout(open, Math.min(60_000, 2_000 * 2 ** Math.min(attempts, 5)));
       };
     };
-    open();
+    if (bus) unsubscribe = bus.subscribe((ev) => handle(ev as ServerEvent));
+    else open();
     return () => {
       stopped = true;
+      unsubscribe?.();
       clearTimeout(retry);
       source?.close();
       for (const t of timers.values()) clearTimeout(t);
@@ -165,7 +175,7 @@ export function NotificationProvider({ compteUrl, userId, showCards = true, ring
       setRinging(new Set());
       setItems(EMPTY);
     };
-  }, [base, userId]);
+  }, [base, userId, bus]);
 
   const ringNow = ringtone && ringing.size > 0;
   useEffect(() => (ringNow ? startRingtone() : undefined), [ringNow]);

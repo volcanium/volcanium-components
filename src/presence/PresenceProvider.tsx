@@ -45,6 +45,16 @@ interface CtxValue {
 }
 const Ctx = createContext<CtxValue | null>(null);
 
+/**
+ * Les notifications (`NotificationProvider`) voyagent sur le MEME flux que la presence : un seul `EventSource` par onglet vers Compte.
+ * Chrome limite a 6 connexions par hote en HTTP/1.1 : un second flux par app ouverte suffisait a bloquer les autres requetes (selecteur d'apps, comptes).
+ */
+export interface CompteStreamBus {
+  /** Recoit chaque evenement SSE nomme « notification » (et le renvoie de zero apres une reconnexion : nouveau « snapshot »). */
+  subscribe(listener: (event: unknown) => void): () => void;
+}
+export const CompteStreamBusContext = createContext<CompteStreamBus | null>(null);
+
 const trim = (u: string) => u.replace(/\/+$/, "");
 
 /**
@@ -55,6 +65,10 @@ const trim = (u: string) => u.replace(/\/+$/, "");
 export function PresenceProvider({ compteUrl, userId, idleAfterMs = 5 * 60_000, children }: PresenceProviderProps) {
   const store = useRef<{ state: PresenceState; listeners: Set<() => void> }>({ state: INITIAL, listeners: new Set() });
   const connectionId = useRef<string | null>(null);
+  const notificationListeners = useRef(new Set<(event: unknown) => void>());
+  const bus = useMemo<CompteStreamBus>(() => ({
+    subscribe: (l) => { notificationListeners.current.add(l); return () => void notificationListeners.current.delete(l); },
+  }), []);
   const base = trim(compteUrl);
 
   const set = useCallback((next: Partial<PresenceState>) => {
@@ -103,7 +117,7 @@ export function PresenceProvider({ compteUrl, userId, idleAfterMs = 5 * 60_000, 
 
     const open = () => {
       if (stopped) return;
-      const es = new EventSource(`${base}/user/presence/stream?expect=${encodeURIComponent(userId)}`, { withCredentials: true });
+      const es = new EventSource(`${base}/user/presence/stream?expect=${encodeURIComponent(userId)}&notifications=1`, { withCredentials: true });
       source = es;
       es.addEventListener("hello", (e) => {
         try {
@@ -113,6 +127,11 @@ export function PresenceProvider({ compteUrl, userId, idleAfterMs = 5 * 60_000, 
         }
         attempts = 0;
         if (idle) sendIdle(); // un onglet deja inactif au moment de se (re)connecter le dit tout de suite
+      });
+      es.addEventListener("notification", (m) => {
+        let ev: unknown;
+        try { ev = JSON.parse((m as MessageEvent).data); } catch { return; }
+        for (const l of notificationListeners.current) l(ev);
       });
       es.onmessage = (m) => {
         let ev: ServerEvent;
@@ -184,7 +203,11 @@ export function PresenceProvider({ compteUrl, userId, idleAfterMs = 5 * 60_000, 
   );
 
   const value = useMemo<CtxValue>(() => ({ subscribe, get, userId: userId ?? "", setStatus }), [subscribe, get, userId, setStatus]);
-  return <Ctx.Provider value={value}>{children}</Ctx.Provider>;
+  return (
+    <Ctx.Provider value={value}>
+      <CompteStreamBusContext.Provider value={bus}>{children}</CompteStreamBusContext.Provider>
+    </Ctx.Provider>
+  );
 }
 
 const SERVER_SNAPSHOT: PresenceState = INITIAL;
