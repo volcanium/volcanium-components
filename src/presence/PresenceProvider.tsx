@@ -87,7 +87,17 @@ export function PresenceProvider({ compteUrl, userId, idleAfterMs = 5 * 60_000, 
     let idle = false;
     let lastInput = Date.now();
 
+    // Transport : WebSocket (pas de plafond de connexions HTTP du navigateur) ; repli SSE si le serveur ne le propose pas (ancien Compte,
+    // proxy sans « upgrade ») apres deux echecs d'ouverture.
+    let socket: WebSocket | null = null;
+    let useSse = typeof WebSocket === "undefined";
+    let socketFailures = 0;
+
     const sendIdle = () => {
+      if (socket && socket.readyState === WebSocket.OPEN) {
+        socket.send(JSON.stringify({ type: "activity", idle }));
+        return;
+      }
       if (!connectionId.current) return;
       void fetch(`${base}/user/presence/activity`, {
         method: "POST",
@@ -115,8 +125,51 @@ export function PresenceProvider({ compteUrl, userId, idleAfterMs = 5 * 60_000, 
     for (const e of events) window.addEventListener(e, onInput, { passive: true });
     document.addEventListener("visibilitychange", onVisibility);
 
-    const open = () => {
+    const handlePresence = (ev: ServerEvent) => {
+      const cur = store.current.state;
+      if (ev.type === "snapshot") set({ ready: true, self: ev.self, manual: ev.manual, users: ev.users, known: new Set(ev.known ?? []) });
+      else if (ev.type === "status") {
+        const users = { ...cur.users };
+        const known = cur.known.has(ev.userId) ? cur.known : new Set(cur.known).add(ev.userId);
+        if (ev.status === "offline") delete users[ev.userId];
+        else users[ev.userId] = ev.status;
+        set(ev.manual !== undefined ? { users, known, self: ev.status, manual: ev.manual } : { users, known });
+      }
+    };
+    const emitNotification = (ev: unknown) => { for (const l of notificationListeners.current) l(ev); };
+    const scheduleRetry = () => {
+      set({ ready: false });
       if (stopped) return;
+      attempts += 1;
+      // Refus (session expiree, autre compte) ou coupure : delai croissant, de 2 s a 60 s.
+      retry = setTimeout(open, Math.min(60_000, 1_000 * 2 ** Math.min(attempts, 6)));
+    };
+
+    const openSocket = () => {
+      const ws = new WebSocket(`${base.replace(/^http/, "ws")}/user/presence/ws?expect=${encodeURIComponent(userId)}`);
+      socket = ws;
+      let opened = false;
+      ws.onopen = () => {
+        opened = true;
+        attempts = 0;
+        socketFailures = 0;
+        if (idle) sendIdle(); // un onglet deja inactif au moment de se (re)connecter le dit tout de suite
+      };
+      ws.onmessage = (m) => {
+        let msg: { ch?: string; ev?: unknown };
+        try { msg = JSON.parse(String(m.data)) as { ch?: string; ev?: unknown }; } catch { return; }
+        if (msg.ch === "presence") handlePresence(msg.ev as ServerEvent);
+        else if (msg.ch === "notification") emitNotification(msg.ev);
+      };
+      ws.onclose = () => {
+        if (socket === ws) socket = null;
+        if (!opened && ++socketFailures >= 2) useSse = true;
+        scheduleRetry();
+      };
+      ws.onerror = () => ws.close();
+    };
+
+    const openSse = () => {
       const es = new EventSource(`${base}/user/presence/stream?expect=${encodeURIComponent(userId)}&notifications=1`, { withCredentials: true });
       source = es;
       es.addEventListener("hello", (e) => {
@@ -126,40 +179,26 @@ export function PresenceProvider({ compteUrl, userId, idleAfterMs = 5 * 60_000, 
           return;
         }
         attempts = 0;
-        if (idle) sendIdle(); // un onglet deja inactif au moment de se (re)connecter le dit tout de suite
+        if (idle) sendIdle();
       });
       es.addEventListener("notification", (m) => {
-        let ev: unknown;
-        try { ev = JSON.parse((m as MessageEvent).data); } catch { return; }
-        for (const l of notificationListeners.current) l(ev);
+        try { emitNotification(JSON.parse((m as MessageEvent).data)); } catch { /* evenement invalide */ }
       });
       es.onmessage = (m) => {
-        let ev: ServerEvent;
-        try {
-          ev = JSON.parse(m.data) as ServerEvent;
-        } catch {
-          return;
-        }
-        const cur = store.current.state;
-        if (ev.type === "snapshot") set({ ready: true, self: ev.self, manual: ev.manual, users: ev.users, known: new Set(ev.known ?? []) });
-        else if (ev.type === "status") {
-          const users = { ...cur.users };
-          const known = cur.known.has(ev.userId) ? cur.known : new Set(cur.known).add(ev.userId);
-          if (ev.status === "offline") delete users[ev.userId];
-          else users[ev.userId] = ev.status;
-          set(ev.manual !== undefined ? { users, known, self: ev.status, manual: ev.manual } : { users, known });
-        }
+        try { handlePresence(JSON.parse(m.data) as ServerEvent); } catch { /* evenement invalide */ }
       };
       es.onerror = () => {
-        // Refus (session expiree, autre compte) ou coupure : on referme et on retente avec un delai croissant.
         es.close();
         if (source === es) source = null;
         connectionId.current = null;
-        set({ ready: false });
-        if (stopped) return;
-        attempts += 1;
-        retry = setTimeout(open, Math.min(60_000, 2_000 * 2 ** Math.min(attempts, 5)));
+        scheduleRetry();
       };
+    };
+
+    const open = () => {
+      if (stopped) return;
+      if (useSse) openSse();
+      else openSocket();
     };
     open();
     return () => {
@@ -167,6 +206,7 @@ export function PresenceProvider({ compteUrl, userId, idleAfterMs = 5 * 60_000, 
       clearTimeout(retry);
       clearInterval(idleTimer);
       source?.close();
+      socket?.close();
       for (const e of events) window.removeEventListener(e, onInput);
       document.removeEventListener("visibilitychange", onVisibility);
       store.current.state = INITIAL;
