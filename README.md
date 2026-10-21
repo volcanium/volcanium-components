@@ -38,3 +38,6 @@ import { VolcaniumProvider, Button } from "@volcanium/volcanium-components";
 - `npm run storybook` : Storybook (bascule clair/sombre via `data-theme`)
 - `npm run docs:dev` : site de documentation (`docs-site/`)
 - `npm run build` : build `tsup` (`dist/`)
+
+## Notifications entre apps (3.7.0)
+`<NotificationProvider compteUrl userId>` (dans `VolcaniumProvider`, à côté de `PresenceProvider`) ouvre un flux vers Volcanium Compte et affiche les notifications des autres apps : carte en haut à droite (`NotificationCard`) et sonnerie synthétisée pour les appels entrants. `useNotifications()` pour afficher soi-même. Voir `Documentation/09-notifications.md`.
