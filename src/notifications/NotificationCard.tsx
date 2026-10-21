@@ -6,10 +6,10 @@ import { useLanguage, type TranslationKey } from "../utils/useLanguage";
 import type { NotificationAction, NotificationItem } from "./NotificationProvider";
 
 const ICONS: Record<string, ReactNode> = {
-  answer: <IconPhone size={16} aria-hidden />,
-  decline: <IconPhoneOff size={16} aria-hidden />,
-  messages: <IconMessage size={16} aria-hidden />,
-  open: <IconExternalLink size={16} aria-hidden />,
+  answer: <IconPhone size={20} aria-hidden />,
+  decline: <IconPhoneOff size={20} aria-hidden />,
+  messages: <IconMessage size={20} aria-hidden />,
+  open: <IconExternalLink size={20} aria-hidden />,
 };
 const LABELS: Record<string, TranslationKey> = {
   answer: "notif_answer",
@@ -36,15 +36,15 @@ export default function NotificationCard({ item, onAction, onDismiss, className 
   return (
     <div
       role="alert"
-      className={clsx("vc-notif-in pointer-events-auto w-full overflow-hidden rounded-xl border border-vc-line-strong bg-vc-container text-vc-text shadow-2xl", className)}
+      className={clsx("vc-notif-in pointer-events-auto w-full overflow-hidden rounded-2xl border border-vc-line-strong bg-vc-container text-vc-text shadow-2xl", className)}
     >
-      <div className="flex items-start gap-3 p-3">
-        <span className={clsx("relative mt-0.5 inline-flex shrink-0 rounded-full", item.ring && !item.silent && "vc-notif-ring")}>
-          <Avatar name={item.title} src={item.image} size={44} />
+      <div className="flex items-center gap-3 px-4 pb-3 pt-4">
+        <span className={clsx("relative inline-flex shrink-0 rounded-full", item.ring && !item.silent && "vc-notif-ring")}>
+          <Avatar name={item.title} src={item.image} size={48} />
         </span>
         <div className="min-w-0 flex-1">
-          <p className="truncate text-sm font-semibold">{item.title}</p>
-          {body && <p className="truncate text-xs text-vc-text/70">{body}</p>}
+          <p className="truncate text-sm font-semibold leading-tight">{item.title}</p>
+          {body && <p className="mt-0.5 truncate text-xs text-vc-text/70">{body}</p>}
           {item.subtitle && <p className="truncate text-xs text-vc-text/50">{item.subtitle}</p>}
         </div>
         <button
@@ -52,30 +52,33 @@ export default function NotificationCard({ item, onAction, onDismiss, className 
           aria-label={t("close")}
           title={t("notif_dismiss")}
           onClick={() => onDismiss(item)}
-          className="-mr-1 -mt-1 inline-flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-full text-vc-text/60 transition-colors hover:bg-vc-veil-strong hover:text-vc-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vc-main/50"
+          className="-mr-1 -mt-5 inline-flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center self-start rounded-full text-vc-text/50 transition-colors hover:bg-vc-veil-strong hover:text-vc-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vc-main/50"
         >
           <IconX size={14} aria-hidden />
         </button>
       </div>
       {item.actions.length > 0 && (
-        <div className="flex flex-wrap gap-2 border-t border-vc-line bg-vc-veil px-3 py-2">
+        <div className="grid grid-flow-col auto-cols-fr gap-2 px-4 pb-4">
           {item.actions.map((a) => {
             const style = a.style ?? DEFAULT_STYLE[a.id] ?? "secondary";
             const key = LABELS[a.id];
+            const label = a.label ?? (key ? t(key) : a.id);
+            const icon = ICONS[a.id];
             return (
               <button
                 key={a.id}
                 type="button"
+                aria-label={label}
+                title={label}
                 onClick={() => onAction(item, a)}
                 className={clsx(
-                  "inline-flex h-8 cursor-pointer items-center gap-1.5 rounded-full px-3 text-xs font-medium transition-opacity hover:opacity-90 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vc-main/50",
+                  "inline-flex h-10 cursor-pointer items-center justify-center rounded-full px-3 text-xs font-medium shadow-sm transition-all hover:scale-[1.03] hover:opacity-90 active:scale-95 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vc-main/50",
                   style === "primary" && "bg-vc-success text-vc-back",
                   style === "danger" && "bg-vc-danger text-vc-on-main",
                   style === "secondary" && "border border-vc-line-strong bg-vc-veil text-vc-text hover:bg-vc-veil-strong",
                 )}
               >
-                {ICONS[a.id]}
-                {a.label ?? (key ? t(key) : a.id)}
+                {icon ?? label}
               </button>
             );
           })}

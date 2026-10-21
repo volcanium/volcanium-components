@@ -52,6 +52,8 @@ export interface NotificationProviderProps {
   showCards?: boolean;
   /** Joue la sonnerie des appels entrants. @default true */
   ringtone?: boolean;
+  /** Ouvre l'adresse d'une action a la place du nouvel onglet (ex. navigation interne d'une app a page unique) : renvoyer `true` si c'est fait. */
+  openHref?: (href: string) => boolean | void;
   children: ReactNode;
 }
 
@@ -94,7 +96,7 @@ function createElection() {
  * une carte en haut a droite (photo, texte, boutons), et pour un appel entrant une sonnerie tant qu'on n'a pas repondu.
  * Compte n'envoie rien quand la personne est « en appel » ou « ne pas deranger ». A placer dans `VolcaniumProvider`, a cote de `PresenceProvider`.
  */
-export function NotificationProvider({ compteUrl, userId, showCards = true, ringtone = true, children }: NotificationProviderProps) {
+export function NotificationProvider({ compteUrl, userId, showCards = true, ringtone = true, openHref, children }: NotificationProviderProps) {
   const base = trim(compteUrl);
   const [items, setItems] = useState<readonly NotificationItem[]>(EMPTY);
   const election = useRef<ReturnType<typeof createElection> | null>(null);
@@ -181,8 +183,10 @@ export function NotificationProvider({ compteUrl, userId, showCards = true, ring
     }).catch(() => undefined);
   }, [base, userId]);
 
+  const openRef = useRef(openHref);
+  openRef.current = openHref;
   const run = useCallback((item: NotificationItem, action: NotificationAction) => {
-    if (action.href) window.open(action.href, "_blank", "noopener,noreferrer");
+    if (action.href) { if (!openRef.current?.(action.href)) window.open(action.href, "_blank", "noopener,noreferrer"); }
     else if (action.request) void fetch(action.request.url, { method: action.request.method, credentials: "omit", mode: "cors" }).catch(() => undefined);
     dismiss(item.id);
   }, [dismiss]);
