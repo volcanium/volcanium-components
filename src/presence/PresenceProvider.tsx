@@ -115,14 +115,25 @@ export function PresenceProvider({ compteUrl, userId, idleAfterMs = 5 * 60_000, 
       lastInput = Date.now();
       if (idle) setIdle(false);
     };
+    // Chrome rejoue un « pointermove » quand le contenu bouge sous un curseur immobile (message qui arrive, animation, visio) : sans ce
+    // filtre une app ouverte devant un clavier abandonne ne passait jamais « inactif ». Seul un vrai deplacement compte.
+    let pointerX = NaN;
+    let pointerY = NaN;
+    const onPointerMove = (e: PointerEvent) => {
+      if (e.screenX === pointerX && e.screenY === pointerY) return;
+      pointerX = e.screenX;
+      pointerY = e.screenY;
+      onInput();
+    };
     const onVisibility = () => {
       if (document.visibilityState === "visible") onInput();
     };
     const idleTimer = setInterval(() => {
       if (Date.now() - lastInput >= idleAfterMs) setIdle(true);
     }, 15_000);
-    const events = ["pointerdown", "pointermove", "keydown", "wheel", "touchstart"] as const;
+    const events = ["pointerdown", "keydown", "wheel", "touchstart"] as const;
     for (const e of events) window.addEventListener(e, onInput, { passive: true });
+    window.addEventListener("pointermove", onPointerMove, { passive: true });
     document.addEventListener("visibilitychange", onVisibility);
 
     const handlePresence = (ev: ServerEvent) => {
@@ -208,6 +219,7 @@ export function PresenceProvider({ compteUrl, userId, idleAfterMs = 5 * 60_000, 
       source?.close();
       socket?.close();
       for (const e of events) window.removeEventListener(e, onInput);
+      window.removeEventListener("pointermove", onPointerMove);
       document.removeEventListener("visibilitychange", onVisibility);
       store.current.state = INITIAL;
     };
