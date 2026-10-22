@@ -40,7 +40,7 @@ export default function Textarea({
       <textarea
         {...props}
         id={textareaId}
-        className={`px-3 py-1 ${variants[variant]} ${resizeMap[resize]} w-52 max-w-full min-w-30 min-h-20 max-h-100 border border-vc-line-strong focus:border-vc-accent/50 outline-0 ${className || ""}`}
+        className={`px-3 py-1 max-sm:w-full max-sm:text-base max-sm:py-2 ${variants[variant]} ${resizeMap[resize]} w-52 max-w-full min-w-30 min-h-20 max-h-100 border border-vc-line-strong focus:border-vc-accent/50 outline-0 ${className || ""}`}
       />
     </Squircle>
   );

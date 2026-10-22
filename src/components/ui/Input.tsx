@@ -51,7 +51,7 @@ export default function Input({
           id={inputId}
           disabled={disabled}
           className={clsx(
-            "w-full px-3.5 py-2 border border-vc-line-strong outline-none transition-colors duration-200 focus:border-vc-main/60 disabled:cursor-not-allowed placeholder:text-vc-secondary/40",
+            "w-full px-3.5 py-2 max-sm:py-2.5 max-sm:text-base border border-vc-line-strong outline-none transition-colors duration-200 focus:border-vc-main/60 disabled:cursor-not-allowed placeholder:text-vc-secondary/40",
             isPassword && "pr-10",
             varaiants[variant],
           )}

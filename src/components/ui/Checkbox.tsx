@@ -34,7 +34,7 @@ export default function Checkbox({ checked, onChange, label, hint, className, di
         <IconCheck size={12} stroke={3} aria-hidden="true" className="pointer-events-none absolute left-0.5 top-0.5 text-vc-on-main opacity-0 peer-checked:opacity-100" />
       </span>
       {(label || hint) && (
-        <label htmlFor={inputId} className={clsx("min-w-0 text-sm", !disabled && "cursor-pointer")}>
+        <label htmlFor={inputId} className={clsx("min-w-0 text-sm max-sm:py-1.5", !disabled && "cursor-pointer")}>
           {label}
           {hint && <span className="block text-xs text-vc-text/60">{hint}</span>}
         </label>

@@ -197,7 +197,7 @@ export default function Modal(props: ModalProps) {
               exit="exit"
               onClick={(e: React.MouseEvent) => e.stopPropagation()}
               onKeyDown={handleTrapFocus}
-              className="sm:w-11/12 sm:min-w-125 max-w-2xl sm:h-auto h-full max-h-[90vh] w-full sm:justify-start justify-between flex flex-col bg-vc-container border border-vc-line shadow-[0_24px_60px_-20px_rgba(0,0,0,0.55)] p-5 sm:p-7"
+              className="sm:w-11/12 sm:min-w-125 max-w-2xl sm:h-auto h-full max-h-[90vh] max-sm:max-h-[calc(100dvh-1.5rem)] w-full sm:justify-start justify-between flex flex-col bg-vc-container border border-vc-line shadow-[0_24px_60px_-20px_rgba(0,0,0,0.55)] p-5 sm:p-7 max-sm:pb-[calc(1.25rem+env(safe-area-inset-bottom))]"
             >
               {/* `min-h-0` is required for a flex child to actually shrink
                   below its content's natural height and let overflow-y-auto
@@ -240,7 +240,7 @@ export default function Modal(props: ModalProps) {
                         onRefuse();
                         onClose();
                       }}
-                      className="flex-1 sm:flex-none"
+                      className="flex-1 sm:flex-none max-sm:py-3"
                       variant="secondary"
                       {...getButtonProps(btn?.close)}
                     >
@@ -249,7 +249,7 @@ export default function Modal(props: ModalProps) {
                     <Button
                       onClick={handleConfrimBtn}
                       form={((children as ReactElement<any>)?.props as any)?.id || formId}
-                      className="flex-1 sm:flex"
+                      className="flex-1 sm:flex max-sm:py-3"
                       variant="primary"
                       {...getButtonProps(btn?.confirm)}
                     >

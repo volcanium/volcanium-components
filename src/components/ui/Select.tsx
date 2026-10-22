@@ -89,7 +89,7 @@ export default function Select<T = unknown>({
       aria-expanded={open}
       aria-controls={listboxId}
       onClick={() => setOpen(!open)}
-      className={`w-fit min-w-52 max-w-full px-3.5! justify-between! bg-vc-container border border-vc-line-strong text-start text-vc-secondary transition-colors duration-200 hover:border-vc-text/30 focus-visible:border-vc-main/60 relative ${open ? "border-vc-main/60!" : ""} ${className}`}
+      className={`w-fit min-w-52 max-w-full max-sm:w-full max-sm:py-2.5! max-sm:text-base px-3.5! justify-between! bg-vc-container border border-vc-line-strong text-start text-vc-secondary transition-colors duration-200 hover:border-vc-text/30 focus-visible:border-vc-main/60 relative ${open ? "border-vc-main/60!" : ""} ${className}`}
     >
       <span className={`min-w-0 truncate pr-5 ${selected ? "" : "text-vc-secondary/40"}`}>
         {selected ? selected.label : actualPlaceholder}
@@ -108,7 +108,7 @@ export default function Select<T = unknown>({
   );
 
   const SelectWrapper = (
-    <div className="relative inline-block font-vc-main text-vc-text">
+    <div className="relative inline-block max-sm:block font-vc-main text-vc-text">
       {TriggerElement}
       <OptionsMenu
         triggerRef={triggerRef}
