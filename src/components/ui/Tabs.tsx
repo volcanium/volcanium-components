@@ -37,7 +37,13 @@ export default function Tabs({ tabs, value, onChange, className = "", contentCla
   // Téléphone : l'onglet actif reste visible dans la barre qui défile.
   useEffect(() => {
     if (!isMobileViewport()) return;
-    refs.current[value]?.scrollIntoView?.({ block: "nearest", inline: "center" });
+    // On fait defiler la barre seule (jamais `scrollIntoView`, qui decale aussi la page et ses conteneurs).
+    const el = refs.current[value];
+    const bar = el?.parentElement;
+    if (!el || !bar) return;
+    const r = el.getBoundingClientRect();
+    const b = bar.getBoundingClientRect();
+    bar.scrollBy?.({ left: r.left - b.left - (b.width - r.width) / 2, behavior: "smooth" });
   }, [value]);
 
   const onKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
