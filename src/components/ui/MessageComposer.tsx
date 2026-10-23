@@ -52,7 +52,7 @@ export default function MessageComposer({ value, onChange, onSend, canSend, send
         rows={1}
         disabled={disabled}
         onChange={(e) => onChange(e.target.value)}
-        className="block w-full resize-none bg-transparent px-3 pt-2.5 pb-1 text-sm leading-6 text-vc-text outline-none placeholder:text-vc-text/40"
+        className="block w-full resize-none bg-transparent px-3 pt-2.5 pb-1 text-sm max-sm:text-base leading-6 text-vc-text outline-none placeholder:text-vc-text/40"
       />
       <div className="flex items-center justify-between gap-2 px-2 pb-2">
         <div className="flex items-center gap-1">{toolbar}</div>
@@ -63,7 +63,7 @@ export default function MessageComposer({ value, onChange, onSend, canSend, send
           disabled={!canSend || sending || disabled}
           onClick={onSend}
           className={clsx(
-            "inline-flex h-8 w-8 cursor-pointer items-center justify-center rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vc-main/50 disabled:cursor-not-allowed",
+            "inline-flex h-8 w-8 max-sm:h-10 max-sm:w-10 cursor-pointer items-center justify-center rounded-md transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vc-main/50 disabled:cursor-not-allowed",
             canSend ? "bg-vc-main text-vc-on-main hover:brightness-110" : "text-vc-text/40",
             sending && "animate-pulse",
           )}

@@ -26,7 +26,7 @@ export default function ListRow({ title, tag, subtitle, actions, align = "center
         </div>
         {subtitle && <div className="text-xs opacity-60">{subtitle}</div>}
       </div>
-      {actions && <div className="flex gap-1">{actions}</div>}
+      {actions && <div className="flex gap-1 max-sm:flex-wrap">{actions}</div>}
     </li>
   );
 }

@@ -1,5 +1,6 @@
 import { ReactNode, useId, useLayoutEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { isMobileViewport } from "../../utils/viewport";
 
 export interface TooltipButtonProps {
   children: ReactNode;
@@ -30,7 +31,10 @@ export default function TooltipButton({ children, tooltip }: TooltipButtonProps)
   const [visible, setVisible] = useState(false);
   const [position, setPosition] = useState<Position | null>(null);
 
-  const show = () => setVisible(true);
+  // Téléphone : pas de survol, et l'info-bulle resterait collée après un toucher : on ne l'affiche pas.
+  const show = () => {
+    if (!isMobileViewport()) setVisible(true);
+  };
   const hide = () => setVisible(false);
 
   useLayoutEffect(() => {

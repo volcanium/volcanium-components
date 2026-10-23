@@ -1,4 +1,5 @@
-import { ReactNode, useRef, KeyboardEvent } from "react";
+import { ReactNode, useEffect, useRef, KeyboardEvent } from "react";
+import { isMobileViewport } from "../../utils/viewport";
 
 export interface TabItem {
   id: string;
@@ -32,6 +33,12 @@ export default function Tabs({ tabs, value, onChange, className = "", contentCla
   const refs = useRef<Record<string, HTMLButtonElement | null>>({});
   const enabled = tabs.filter((t) => !t.disabled);
   const active = tabs.find((t) => t.id === value);
+
+  // Téléphone : l'onglet actif reste visible dans la barre qui défile.
+  useEffect(() => {
+    if (!isMobileViewport()) return;
+    refs.current[value]?.scrollIntoView?.({ block: "nearest", inline: "center" });
+  }, [value]);
 
   const onKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
     const i = enabled.findIndex((t) => t.id === value);
@@ -69,7 +76,7 @@ export default function Tabs({ tabs, value, onChange, className = "", contentCla
               tabIndex={selected ? 0 : -1}
               disabled={t.disabled}
               onClick={() => onChange(t.id)}
-              className={`flex shrink-0 cursor-pointer items-center gap-2 whitespace-nowrap border-b-2 px-4 py-2.5 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
+              className={`flex shrink-0 cursor-pointer items-center gap-2 whitespace-nowrap border-b-2 px-4 py-2.5 max-sm:min-h-11 max-sm:py-3 text-sm transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${
                 selected
                   ? "border-vc-main font-medium text-vc-text"
                   : "border-transparent text-vc-text/60 hover:border-vc-line-strong hover:text-vc-text"

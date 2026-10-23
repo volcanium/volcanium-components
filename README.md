@@ -41,3 +41,6 @@ import { VolcaniumProvider, Button } from "@volcanium/volcanium-components";
 
 ## Notifications entre apps (3.7.0, boutons-icônes et `openHref` en 3.8.0)
 `<NotificationProvider compteUrl userId>` (dans `VolcaniumProvider`, à côté de `PresenceProvider`) ouvre un flux vers Volcanium Compte et affiche les notifications des autres apps : carte en haut à droite (`NotificationCard`) et sonnerie synthétisée pour les appels entrants. `useNotifications()` pour afficher soi-même. Voir `Documentation/09-notifications.md`.
+
+## Mobile (3.10.0)
+Sous **640 px** (point de rupture `sm` de Tailwind), les composants passent en mode téléphone : cibles tactiles de 40 à 44 px, champs à 16 px (pas de zoom iOS), menus, calendrier et fenêtres qui ne sortent pas de l'écran, `dvh`, zones sûres (`env(safe-area-inset-*)`), tableaux qui défilent à l'horizontale, infobulles désactivées (pas de survol). **À partir de 640 px rien ne change.** Ajouts facultatifs : `Sidebar` `hideMobileTrigger`, `MessageItem` `actionsVisible`, `VideoTile` `deafened` / `deafenedLabel` / `actionsVisible`. Utilitaire interne `isMobileViewport()` (`src/utils/viewport.ts`). Pour que les zones sûres s'appliquent, l'app met `viewport-fit=cover` dans sa balise `viewport`.

@@ -22,7 +22,7 @@ export default function Chip({ children, onRemove, removeLabel, className }: Chi
           aria-label={removeLabel}
           title={removeLabel}
           onClick={onRemove}
-          className="inline-flex h-4 w-4 cursor-pointer items-center justify-center rounded-sm opacity-60 transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vc-main/50"
+          className="inline-flex h-4 w-4 max-sm:h-6 max-sm:w-6 cursor-pointer items-center justify-center rounded-sm opacity-60 transition-opacity hover:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vc-main/50"
         >
           <IconX size={12} />
         </button>

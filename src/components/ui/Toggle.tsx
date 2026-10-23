@@ -34,7 +34,7 @@ export default function Toggle({
         aria-checked={checked}
         disabled={disabled || loading}
         onClick={() => !(disabled || loading) && onChange(!checked)}
-        className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors disabled:opacity-50 disabled:cursor-not-allowed ${
+        className={`relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition-colors max-sm:before:absolute max-sm:before:-inset-2 max-sm:before:content-[''] disabled:opacity-50 disabled:cursor-not-allowed ${
           checked ? "bg-vc-main" : `${uncheckedBg} shadow-inner`
         }`}
       >

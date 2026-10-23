@@ -41,7 +41,7 @@ export default function BarStrip({ items, label, heightClass = "h-8", gapClass =
             <span
               role="tooltip"
               className={clsx(
-                "pointer-events-none absolute bottom-full z-20 mb-2 hidden w-max max-w-[240px] rounded-md border border-vc-line bg-vc-container px-3 py-2 text-left text-xs shadow-lg group-hover:block group-focus:block",
+                "pointer-events-none absolute bottom-full z-20 mb-2 hidden w-max max-w-[240px] max-sm:max-w-[min(240px,calc(100vw-2rem))] rounded-md border border-vc-line bg-vc-container px-3 py-2 text-left text-xs shadow-lg group-hover:block group-focus:block",
                 place,
               )}
             >

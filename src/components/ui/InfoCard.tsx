@@ -135,10 +135,10 @@ export default function InfoCard({
           )}
           {error && <span className="text-xs text-vc-danger">{error}</span>}
           <div className="flex items-center gap-2 text-xs text-vc-text/50">
-            <button type="button" onClick={() => void commit()} disabled={saving} aria-label={t("validate")} className="cursor-pointer rounded-md bg-vc-main/90 p-1 text-vc-on-main hover:bg-vc-main disabled:opacity-50">
+            <button type="button" onClick={() => void commit()} disabled={saving} aria-label={t("validate")} className="cursor-pointer rounded-md bg-vc-main/90 p-1 max-sm:p-2.5 text-vc-on-main hover:bg-vc-main disabled:opacity-50">
               <IconCheck size={14} />
             </button>
-            <button type="button" onClick={cancel} aria-label="Annuler" className="cursor-pointer rounded-md bg-vc-veil-strong p-1 hover:bg-vc-line-strong">
+            <button type="button" onClick={cancel} aria-label="Annuler" className="cursor-pointer rounded-md bg-vc-veil-strong p-1 max-sm:p-2.5 hover:bg-vc-line-strong">
               <IconX size={14} />
             </button>
             <span>{editType === "textarea" ? t("hint_ctrl_enter_validate") : t("hint_enter_validate")} · {t("hint_escape_cancel")}</span>
@@ -158,7 +158,7 @@ export default function InfoCard({
           )}
         >
           <span className="min-w-0 flex-1 break-words">{value === "" || value == null ? <span className="text-vc-text/40">—</span> : value}</span>
-          {canEdit && <IconPencil size={14} className="mt-0.5 shrink-0 text-vc-text/0 transition-colors group-hover:text-vc-main" />}
+          {canEdit && <IconPencil size={14} className="mt-0.5 shrink-0 text-vc-text/0 max-sm:text-vc-text/40 transition-colors group-hover:text-vc-main" />}
         </div>
       )}
       {hint && !editing && <span className="text-xs text-vc-text/45">{hint}</span>}

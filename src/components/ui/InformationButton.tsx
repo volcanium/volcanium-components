@@ -130,7 +130,7 @@ export function InformationButton({
   };
 
   const baseClassName = clsx(
-    "flex w-full flex-1 items-center gap-3 text-left py-2.5 px-4 bg-vc-back border border-vc-line transition-all duration-300 ease-out",
+    "flex w-full flex-1 items-center gap-3 text-left py-2.5 max-sm:min-h-12 px-4 bg-vc-back border border-vc-line transition-all duration-300 ease-out",
     className,
   );
 

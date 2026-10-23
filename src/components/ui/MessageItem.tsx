@@ -21,11 +21,13 @@ export interface MessageItemProps {
   footer?: ReactNode;
   /** Barre d'actions (réagir, répondre, modifier…) : visible au survol et au focus. */
   actions?: ReactNode;
+  /** Force l'affichage de la barre d'actions (téléphone : pas de survol, l'app l'affiche au toucher du message). @default false */
+  actionsVisible?: boolean;
   className?: string;
 }
 
 /** Une ligne de conversation (chat d'équipe) : photo, auteur, heure, corps, pied et actions au survol. */
-export default function MessageItem({ author, time, timeTitle, editedLabel, compact = false, highlighted = false, children, footer, actions, className }: MessageItemProps) {
+export default function MessageItem({ author, time, timeTitle, editedLabel, compact = false, highlighted = false, children, footer, actions, actionsVisible = false, className }: MessageItemProps) {
   return (
     <div
       className={clsx(
@@ -60,7 +62,7 @@ export default function MessageItem({ author, time, timeTitle, editedLabel, comp
         {footer && <div className="mt-1 flex flex-wrap items-center gap-1.5">{footer}</div>}
       </div>
       {actions && (
-        <div className="invisible absolute -top-3 right-4 z-10 flex items-center gap-0.5 rounded-md border border-vc-line-strong bg-vc-container p-0.5 shadow-sm group-hover:visible group-focus-within:visible">
+        <div className={clsx("absolute -top-3 right-4 z-10 flex items-center gap-0.5 rounded-md border border-vc-line-strong bg-vc-container p-0.5 shadow-sm max-sm:max-w-[calc(100%-1rem)] max-sm:right-2 max-sm:flex-wrap", actionsVisible ? "visible" : "invisible group-hover:visible group-focus-within:visible")}>
           {actions}
         </div>
       )}

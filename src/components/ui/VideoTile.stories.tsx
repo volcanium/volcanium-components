@@ -15,6 +15,7 @@ export const Reunion: Story = {
       <div className="grid max-w-3xl grid-cols-2 gap-3">
         <VideoTile name="Julien Rilliot" badge="Vous" speaking />
         <VideoTile name="Mélina David" micOff micOffLabel="Micro coupé" />
+        <VideoTile name="Julien R." deafened deafenedLabel="Casque coupé" />
         <VideoTile name="Sam Invité" badge="Invité" handRaised handLabel="Main levée" />
         <VideoTile name="Alex Martin" />
       </div>

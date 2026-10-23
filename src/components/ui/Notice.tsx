@@ -35,7 +35,7 @@ export default function Notice({ tone = "warning", title, action, dense, childre
       className={clsx("rounded-lg border", dense ? "p-2 text-xs" : "p-3 text-sm", TONES[tone], className)}
     >
       <div className={clsx(action && "flex flex-wrap items-center justify-between gap-3")}>
-        <div>
+        <div className="min-w-0 break-words">
           {title && <p className="font-semibold">{title}</p>}
           <div>{children}</div>
         </div>

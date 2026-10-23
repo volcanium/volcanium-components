@@ -195,7 +195,7 @@ export default function Nav({
             {displayNav && links.length > 0 && (
               <motion.button
                 onClick={() => setIsMenuOpen((p) => !p)}
-                className="relative w-9 h-9 flex items-center justify-center rounded-lg text-vc-main overflow-hidden"
+                className="relative w-9 h-9 max-sm:w-11 max-sm:h-11 flex items-center justify-center rounded-lg text-vc-main overflow-hidden"
                 whileTap={{ scale: 0.88 }}
                 style={{
                   backgroundColor: isMenuOpen

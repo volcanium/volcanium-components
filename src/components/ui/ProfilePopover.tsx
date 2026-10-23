@@ -131,7 +131,7 @@ export default function ProfilePopover({ children, name, email, avatarSrc, userI
           style={{ left: place?.left ?? 0, top: place?.top ?? 0, visibility: place ? "visible" : "hidden" }}
           className="fixed z-50 flex max-h-[min(36rem,calc(100dvh-1rem))] w-[26rem] max-w-[calc(100vw-1rem)] flex-col overflow-hidden rounded-xl border border-vc-line-strong bg-vc-container text-vc-text shadow-2xl"
         >
-          <button type="button" onClick={() => { change(false); trigger.current?.focus(); }} aria-label={t("close")} className="absolute right-2 top-2 cursor-pointer rounded-full p-1 text-vc-text/60 hover:bg-vc-veil hover:text-vc-text">
+          <button type="button" onClick={() => { change(false); trigger.current?.focus(); }} aria-label={t("close")} className="absolute right-2 top-2 cursor-pointer rounded-full p-1 max-sm:p-2.5 text-vc-text/60 hover:bg-vc-veil hover:text-vc-text">
             <IconX size={16} aria-hidden />
           </button>
           <div className="flex items-start gap-4 p-4 pb-3 pr-10">

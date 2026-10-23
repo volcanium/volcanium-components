@@ -22,7 +22,7 @@ export default function ReactionPill({ emoji, count, active = false, title, onCl
       title={title}
       aria-pressed={active}
       className={clsx(
-        "inline-flex h-6 cursor-pointer items-center gap-1 rounded-full border px-2 text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vc-main/50",
+        "inline-flex h-6 max-sm:h-8 cursor-pointer items-center gap-1 rounded-full border px-2 text-xs transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vc-main/50",
         active ? "border-vc-main/60 bg-vc-main/15 text-vc-text" : "border-vc-line-strong bg-vc-veil text-vc-text/80 hover:bg-vc-veil-strong",
         className,
       )}

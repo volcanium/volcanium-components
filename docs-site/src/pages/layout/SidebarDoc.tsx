@@ -39,6 +39,7 @@ export default function SidebarDoc() {
           { name: "user", type: "{ name; roleName?; role?; avatarUrl?; initials? }", description: "Shows a user card under the header." },
           { name: "onUserModif", type: "() => void", description: "Shows an edit icon on the user card, called on click." },
           { name: "showBranding", type: "boolean", default: "true", description: "Shows the \"Panel powered by volcanium studio\" footer link." },
+          { name: "hideMobileTrigger", type: "boolean", default: "false", description: "Below 640px: hides the floating hamburger button (the app opens the drawer itself through isOpen / onToggle, e.g. from a tab bar) and removes the top space it reserved." },
           { name: "children", type: "ReactNode", description: "Main content area next to the sidebar." },
         ]}
       />

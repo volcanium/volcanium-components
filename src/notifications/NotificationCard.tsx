@@ -52,7 +52,7 @@ export default function NotificationCard({ item, onAction, onDismiss, className 
           aria-label={t("close")}
           title={t("notif_dismiss")}
           onClick={() => onDismiss(item)}
-          className="-mr-1 -mt-5 inline-flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center self-start rounded-full text-vc-text/50 transition-colors hover:bg-vc-veil-strong hover:text-vc-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vc-main/50"
+          className="-mr-1 -mt-5 inline-flex h-7 w-7 max-sm:h-10 max-sm:w-10 max-sm:-mr-2 max-sm:-mt-6 shrink-0 cursor-pointer items-center justify-center self-start rounded-full text-vc-text/50 transition-colors hover:bg-vc-veil-strong hover:text-vc-text focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vc-main/50"
         >
           <IconX size={14} aria-hidden />
         </button>

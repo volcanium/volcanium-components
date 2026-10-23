@@ -41,7 +41,7 @@ export default function Hero({
 
       {}
       {bottom && (
-        <div className="w-full flex justify-center pb-8 p-4 z-10 relative">
+        <div className="w-full flex justify-center pb-8 max-sm:pb-[max(2rem,env(safe-area-inset-bottom))] p-4 z-10 relative">
           {bottom}
         </div>
       )}

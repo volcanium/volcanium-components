@@ -22,7 +22,7 @@ export default function Card({ title, description, actions, compact, as: Tag = "
   return (
     <Tag className={clsx("rounded-lg border border-vc-line bg-vc-veil space-y-3", compact ? "p-4" : "p-5", className)} {...rest}>
       {(title || actions) && (
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center justify-between gap-3 max-sm:flex-wrap">
           {title && <Title level="sm">{title}</Title>}
           {actions}
         </div>

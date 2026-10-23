@@ -45,7 +45,7 @@ export interface TableCellProps<Row> {
 
 /** Hauteur uniforme de toute cellule (lecture ou edition), pour qu'une ligne
  * ne bouge jamais lorsqu'on entre/sort du mode edition. */
-export const TABLE_ROW_HEIGHT = "h-9";
+export const TABLE_ROW_HEIGHT = "h-9 max-sm:h-11";
 
 function displayValue<Row>(column: TableColumnDef<Row>, value: any, row: Row): ReactNode {
   if (column.cellRenderer) return column.cellRenderer({ value, data: row });
@@ -88,7 +88,7 @@ export default function TableCell<Row>({
           aria-checked={!!value}
           role="checkbox"
           className={clsx(
-            "flex h-5 w-5 items-center justify-center rounded-md border transition-all duration-150",
+            "relative flex h-5 w-5 items-center justify-center rounded-md border transition-all duration-150 max-sm:before:absolute max-sm:before:-inset-3 max-sm:before:content-['']",
             value ? "bg-vc-main border-vc-main" : "bg-vc-container border-vc-line-strong",
             column.editable
               ? "cursor-pointer hover:border-vc-main/60 active:scale-90"
@@ -248,7 +248,7 @@ function InlineTextEditor({
         onBlur={commit}
         onKeyDown={handleKeyDown}
         onClick={(e) => e.stopPropagation()}
-        className="w-full! h-9! py-0! box-border"
+        className="w-full! h-9! max-sm:h-11! py-0! box-border"
       />
     </div>
   );
@@ -284,7 +284,7 @@ function InlineSelectEditor({
           setOpen(false);
           onCommit(v);
         }}
-        className="w-fit! min-w-32! h-9!"
+        className="w-fit! min-w-32! h-9! max-sm:h-11!"
       />
     </div>
   );

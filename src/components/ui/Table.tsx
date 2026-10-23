@@ -26,6 +26,7 @@ import TableDeleteRowModal from "./TableDeleteRowModal";
 import { notify } from "./notify";
 import { useLanguage } from "../../utils/useLanguage";
 import { useClickOutside } from "../../utils/useDropdown";
+import { isMobileViewport } from "../../utils/viewport";
 
 export type { TableColumnDef, TableCellType, TableCellValueParams } from "./TableCell";
 
@@ -466,10 +467,10 @@ export default function Table<Row extends Record<string, any>>({
       className={clsx("flex flex-col gap-2 w-full", className)}
     >
       <Squircle cornerRadius={11} cornerSmoothing={1} asChild>
-        <div className="flex flex-col gap-4 p-5 text-left bg-vc-container border border-vc-line w-full">
+        <div className="flex flex-col gap-4 p-5 max-sm:p-3 text-left bg-vc-container border border-vc-line w-full">
           <div className="flex items-center justify-between gap-3 flex-wrap">
             <Title>{title}</Title>
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1.5 max-sm:flex-wrap">
               {selectable && selectedRows.length > 0 && (
                 <>
                   <span className="text-sm text-vc-secondary/70 mr-1">
@@ -544,8 +545,8 @@ export default function Table<Row extends Record<string, any>>({
               </div>
             )}
             <table
-              className="w-full border-collapse text-sm"
-              style={lockedWidths ? { tableLayout: "fixed" } : undefined}
+              className="w-full border-collapse text-sm max-sm:min-w-[calc(var(--vc-cols)*7rem)]"
+              style={{ ["--vc-cols" as string]: colsDefs.length + (selectable ? 1 : 0), ...(lockedWidths ? { tableLayout: "fixed" } : {}) }}
             >
               {lockedWidths && (
                 <colgroup>
@@ -557,7 +558,7 @@ export default function Table<Row extends Record<string, any>>({
               <thead>
                 <tr ref={headerRowRef} className="border-b border-vc-line">
                   {selectable && (
-                    <th className="w-10 py-2 pl-2 pr-2">
+                    <th className="w-10 py-2 max-sm:py-3 pl-2 pr-2">
                       <Checkbox checked={allVisibleSelected} onChange={toggleAll} />
                     </th>
                   )}
@@ -582,7 +583,7 @@ export default function Table<Row extends Record<string, any>>({
                       <th
                         key={col.field}
                         className={clsx(
-                          "group/header relative py-2 px-2 text-left font-medium text-vc-secondary/70 select-none whitespace-nowrap overflow-hidden",
+                          "group/header relative py-2 max-sm:py-3 px-2 text-left font-medium text-vc-secondary/70 select-none whitespace-nowrap overflow-hidden",
                           col.sortable !== false && "cursor-pointer hover:text-vc-secondary",
                         )}
                         onClick={() => col.sortable !== false && toggleSort(col.field)}
@@ -661,7 +662,7 @@ export default function Table<Row extends Record<string, any>>({
                       >
                         {selectable && (
                           <td className="py-1.5 pl-2 pr-2 align-middle">
-                            <div className="h-9 flex items-center">
+                            <div className="h-9 max-sm:h-11 flex items-center">
                               <Checkbox checked={selectedKeys.has(key)} onChange={() => toggleRow(row)} />
                             </div>
                           </td>
@@ -698,7 +699,7 @@ export default function Table<Row extends Record<string, any>>({
                       totalPages: total !== null ? Math.max(1, Math.ceil(total / pageSize)) : "…",
                     })}
               </span>
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1.5 max-sm:gap-2">
                 <TableIconButton
                   tooltip={t("table_previous_page")}
                   disabled={page === 0}
@@ -751,7 +752,7 @@ function Checkbox({ checked, onChange }: { checked: boolean; onChange: () => voi
         onChange();
       }}
       className={clsx(
-        "flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-md border transition-colors cursor-pointer",
+        "relative flex h-4.5 w-4.5 shrink-0 items-center justify-center rounded-md border transition-colors cursor-pointer max-sm:before:absolute max-sm:before:-inset-3 max-sm:before:content-['']",
         checked ? "bg-vc-main border-vc-main" : "bg-vc-container border-vc-line-strong hover:border-vc-text/30",
       )}
     >
@@ -797,7 +798,9 @@ function ColumnFilterButton({
     const updatePosition = () => {
       const rect = triggerRef.current?.getBoundingClientRect();
       if (!rect) return;
-      setPosition({ left: rect.left, top: rect.bottom + 6 });
+      // Téléphone : le menu ne sort pas de l'écran (160 px = largeur minimale du menu).
+      const left = isMobileViewport() ? Math.max(8, Math.min(rect.left, window.innerWidth - 160 - 8)) : rect.left;
+      setPosition({ left, top: rect.bottom + 6 });
     };
     updatePosition();
     window.addEventListener("resize", updatePosition);
@@ -823,10 +826,10 @@ function ColumnFilterButton({
         }}
         title={`${t("table_filter")} : ${typeof label === "string" ? label : ""}`}
         className={clsx(
-          "inline-flex items-center gap-0.5 rounded normal-case font-normal transition-opacity outline-none",
+          "inline-flex items-center gap-0.5 rounded normal-case font-normal transition-opacity outline-none max-sm:p-2 max-sm:-m-2",
           active
             ? "text-vc-main opacity-100"
-            : "opacity-0 group-hover/header:opacity-60 hover:opacity-100!",
+            : "opacity-0 max-sm:opacity-60 group-hover/header:opacity-60 hover:opacity-100!",
         )}
       >
         <IconFilter size={13} />
@@ -848,7 +851,7 @@ function ColumnFilterButton({
                 return (
                   <label
                     key={value}
-                    className="flex items-center gap-2 px-3 py-1.5 hover:bg-vc-veil cursor-pointer"
+                    className="flex items-center gap-2 px-3 py-1.5 max-sm:py-3 hover:bg-vc-veil cursor-pointer"
                   >
                     <Checkbox checked={checked} onChange={() => toggleValue(value)} />
                     <span className={checked ? "text-vc-main font-medium" : "text-vc-secondary"}>{opt.label}</span>
@@ -860,7 +863,7 @@ function ColumnFilterButton({
               <button
                 type="button"
                 onClick={() => onChange([])}
-                className="w-full text-left px-3 py-2 text-xs text-vc-secondary/70 hover:text-vc-main border-t border-vc-line"
+                className="w-full text-left px-3 py-2 max-sm:py-3 text-xs text-vc-secondary/70 hover:text-vc-main border-t border-vc-line"
               >
                 {t("table_filter_reset")}
               </button>
@@ -894,7 +897,7 @@ function TableIconButton({
         disabled={disabled}
         onClick={onClick}
         className={clsx(
-          "flex h-7 w-7 items-center justify-center rounded-2xl transition-colors",
+          "flex h-7 w-7 max-sm:h-10 max-sm:w-10 items-center justify-center rounded-2xl transition-colors",
           active ? "bg-vc-main text-vc-on-main" : "bg-vc-back text-vc-secondary hover:text-vc-text",
           disabled && "opacity-30 pointer-events-none",
           className,

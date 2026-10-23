@@ -43,7 +43,7 @@ export interface SimpleTableProps<Row> {
 export default function SimpleTable<Row>({ caption, columns, rows, rowKey, empty, dense, hideHeader, hoverable, rowAlign = "middle", className }: SimpleTableProps<Row>) {
   const pad = dense ? "py-1" : "py-1.5";
   return (
-    <table className={clsx("w-full", dense ? "text-xs" : "text-sm", className)}>
+    <table className={clsx("w-full max-sm:block max-sm:overflow-x-auto", dense ? "text-xs" : "text-sm", className)}>
       <caption className="sr-only">{caption}</caption>
       <thead className={clsx(hideHeader && "sr-only")}>
         <tr className="text-left opacity-60">

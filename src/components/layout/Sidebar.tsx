@@ -180,6 +180,8 @@ export interface SidebarProps {
   brandingLabel?: React.ReactNode;
   /** Content shown right under the user card, at the card's width (e.g. a mailbox selector). Hidden while the sidebar is collapsed to icons. */
   belowUser?: React.ReactNode;
+  /** Mobile (< 640 px) : masque le bouton hamburger flottant (l'app ouvre le tiroir elle-même via `isOpen` / `onToggle`, par exemple depuis une barre d'onglets) et retire la réserve de place qu'il occupait en haut du contenu. @default false */
+  hideMobileTrigger?: boolean;
   /** Content to display next to the sidebar (via children) */
   children?: React.ReactNode;
 }
@@ -328,7 +330,7 @@ function AppSwitcherPanel({
       exit={{ opacity: 0, y: -6, scale: 0.98 }}
       transition={{ duration: 0.16, ease: [0.16, 1, 0.3, 1] }}
       style={{ position: "fixed", top: coords.top, left: coords.left }}
-      className="z-[999] w-72 max-w-[85vw] rounded-2xl border border-vc-line bg-vc-container shadow-xl p-2 flex flex-col gap-1"
+      className="z-[999] w-72 max-w-[85vw] max-sm:max-h-[calc(100dvh-1.5rem)] max-sm:overflow-y-auto rounded-2xl border border-vc-line bg-vc-container shadow-xl p-2 flex flex-col gap-1"
     >
       <p className="px-2 pt-1.5 pb-2 text-[11px] font-semibold uppercase tracking-wide text-vc-secondary/50">
         {labels?.title ?? t("apps")}
@@ -346,7 +348,7 @@ function AppSwitcherPanel({
               disabled={app.active}
               onClick={() => go(app)}
               className={clsx(
-                "flex items-center gap-2.5 rounded-xl p-2 text-left transition-colors",
+                "flex items-center gap-2.5 rounded-xl p-2 max-sm:min-h-11 text-left transition-colors",
                 app.active ? "bg-vc-veil-strong" : "cursor-pointer hover:bg-vc-veil",
               )}
             >
@@ -778,7 +780,7 @@ function AccountSwitcherPanel({
       exit={{ opacity: 0, y: -6, scale: 0.98 }}
       transition={{ duration: 0.16, ease: [0.16, 1, 0.3, 1] }}
       style={{ position: "fixed", top: coords.top, left: coords.left }}
-      className="z-[999] w-72 max-w-[85vw] rounded-2xl border border-vc-line bg-vc-container shadow-xl p-2 flex flex-col gap-1"
+      className="z-[999] w-72 max-w-[85vw] max-sm:max-h-[calc(100dvh-1.5rem)] max-sm:overflow-y-auto rounded-2xl border border-vc-line bg-vc-container shadow-xl p-2 flex flex-col gap-1"
     >
       <p className="px-2 pt-1.5 pb-2 text-[11px] font-semibold uppercase tracking-wide text-vc-secondary/50">
         {labels?.title ?? t("accounts")}
@@ -847,7 +849,7 @@ function AccountSwitcherPanel({
           <button
             type="button"
             onClick={onAdd}
-            className="flex items-center gap-2.5 rounded-xl p-2 text-left text-[13px] text-vc-secondary/85 hover:bg-vc-veil hover:text-vc-secondary transition-colors"
+            className="flex items-center gap-2.5 rounded-xl p-2 max-sm:min-h-11 text-left text-[13px] text-vc-secondary/85 hover:bg-vc-veil hover:text-vc-secondary transition-colors"
           >
             <div className="w-8 h-8 rounded-full shrink-0 flex items-center justify-center border border-dashed border-vc-line">
               <IconUserPlus size={16} className="text-vc-secondary/60" />
@@ -882,7 +884,7 @@ function StatusMenu({ presence, open, onToggle, onClose }: { presence: PresenceA
         type="button"
         aria-expanded={open}
         onClick={onToggle}
-        className="flex items-center gap-2.5 rounded-xl p-2 text-left text-[13px] text-vc-secondary/85 hover:bg-vc-veil hover:text-vc-secondary transition-colors"
+        className="flex items-center gap-2.5 rounded-xl p-2 max-sm:min-h-11 text-left text-[13px] text-vc-secondary/85 hover:bg-vc-veil hover:text-vc-secondary transition-colors"
       >
         <div className="w-7 h-7 rounded-lg shrink-0 flex items-center justify-center bg-vc-veil">
           <PresenceDot status={shown} size={12} />
@@ -903,7 +905,7 @@ function StatusMenu({ presence, open, onToggle, onClose }: { presence: PresenceA
                 onClose();
                 void presence.setStatus(status === "online" ? "auto" : (status as ManualPresence));
               }}
-              className="flex items-center gap-2.5 rounded-xl p-2 text-left text-[13px] text-vc-secondary/85 hover:bg-vc-veil hover:text-vc-secondary transition-colors"
+              className="flex items-center gap-2.5 rounded-xl p-2 max-sm:min-h-11 text-left text-[13px] text-vc-secondary/85 hover:bg-vc-veil hover:text-vc-secondary transition-colors"
             >
               <div className="w-7 h-7 shrink-0 flex items-center justify-center">
                 <PresenceDot status={status} size={12} />
@@ -1011,7 +1013,7 @@ function UserMenuPanel({
       exit={{ opacity: 0, y: -6, scale: 0.98 }}
       transition={{ duration: 0.16, ease: [0.16, 1, 0.3, 1] }}
       style={{ position: "fixed", top: coords.top, left: coords.left }}
-      className="z-[999] w-60 max-w-[85vw] rounded-2xl border border-vc-line bg-vc-container shadow-xl p-1.5 flex flex-col gap-0.5"
+      className="z-[999] w-60 max-w-[85vw] max-sm:max-h-[calc(100dvh-1.5rem)] max-sm:overflow-y-auto rounded-2xl border border-vc-line bg-vc-container shadow-xl p-1.5 flex flex-col gap-0.5"
     >
       {rows.map(({ key, label, icon: Icon, onClick }) => (
         <button
@@ -1021,7 +1023,7 @@ function UserMenuPanel({
             onClose();
             onClick();
           }}
-          className="flex items-center gap-2.5 rounded-xl p-2 text-left text-[13px] text-vc-secondary/85 hover:bg-vc-veil hover:text-vc-secondary transition-colors"
+          className="flex items-center gap-2.5 rounded-xl p-2 max-sm:min-h-11 text-left text-[13px] text-vc-secondary/85 hover:bg-vc-veil hover:text-vc-secondary transition-colors"
         >
           <div className="w-7 h-7 rounded-lg shrink-0 flex items-center justify-center bg-vc-veil">
             <Icon size={15} stroke={1.75} />
@@ -1056,6 +1058,7 @@ export default function Sidebar({
   showBranding = true,
   brandingLabel,
   belowUser,
+  hideMobileTrigger = false,
   children,
 }: SidebarProps) {
   const { t } = useLanguage();
@@ -1094,15 +1097,15 @@ export default function Sidebar({
   }, [activePath]);
 
   return (
-    <main className="flex h-screen font-vc-main text-vc-text bg-vc-back overflow-hidden relative">
+    <main className="flex h-screen max-sm:h-dvh font-vc-main text-vc-text bg-vc-back overflow-hidden relative">
       {/* Mobile-only hamburger trigger — replaces the collapsed icon strip entirely below `sm` */}
-      {!open && (
+      {!open && !hideMobileTrigger && (
         <Squircle cornerRadius={7} cornerSmoothing={1} asChild>
           <button
             type="button"
             onClick={toggleOpen}
             aria-label={t("open_menu")}
-            className="sm:hidden fixed top-4 left-4 z-30 w-10 h-10 flex items-center justify-center bg-vc-container text-vc-secondary border border-vc-line active:scale-95 transition-transform duration-150 cursor-pointer"
+            className="sm:hidden fixed top-[max(1rem,env(safe-area-inset-top))] left-4 z-30 w-10 h-10 flex items-center justify-center bg-vc-container text-vc-secondary border border-vc-line active:scale-95 transition-transform duration-150 cursor-pointer"
           >
             <IconMenu2 size={20} stroke={1.75} />
           </button>
@@ -1124,6 +1127,7 @@ export default function Sidebar({
           // just moves on/off screen — no width animation involved there at all.
           // Desktop: unaffected, still the icon-strip <-> full-width expand/collapse.
           "flex flex-col overflow-y-auto overflow-x-hidden vc-scroll-hover shrink-0 w-full px-3 pt-5 py-3",
+          "max-sm:pt-[max(1.25rem,env(safe-area-inset-top))] max-sm:pb-[max(0.75rem,env(safe-area-inset-bottom))]",
           "fixed sm:static h-full z-20 bg-vc-back border-r border-vc-line",
           "transition-transform sm:transition-[width] duration-300 ease-in-out",
           open
@@ -1141,7 +1145,7 @@ export default function Sidebar({
                 aria-label={appSwitcher.labels?.button ?? t("switch_app")}
                 title={appSwitcher.labels?.button ?? t("switch_app")}
                 className={clsx(
-                  "shrink-0 w-8 h-8 flex items-center justify-center rounded-lg text-vc-secondary/70 hover:text-vc-secondary hover:bg-vc-veil active:scale-95 transition-all duration-200 cursor-pointer",
+                  "shrink-0 w-8 h-8 max-sm:w-10 max-sm:h-10 flex items-center justify-center rounded-lg text-vc-secondary/70 hover:text-vc-secondary hover:bg-vc-veil active:scale-95 transition-all duration-200 cursor-pointer",
                   appsOpen && "bg-vc-veil text-vc-secondary",
                 )}
               >
@@ -1277,7 +1281,7 @@ export default function Sidebar({
         </div>
       </div>
 
-      <div className="overflow-auto flex-1 pt-16 sm:pt-0 sm:p-0 pb-4 w-full h-full relative">
+      <div className={clsx("overflow-auto flex-1 sm:pt-0 sm:p-0 pb-4 w-full h-full relative", hideMobileTrigger ? "pt-0" : "pt-16")}>
         {children}
       </div>
     </main>

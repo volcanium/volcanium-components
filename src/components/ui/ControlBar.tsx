@@ -12,7 +12,7 @@ export interface ControlBarProps {
 /** Barre de contrôle centrée au bas d'une réunion : regroupe les `ControlButton`. */
 export default function ControlBar({ label, children, className }: ControlBarProps) {
   return (
-    <div role="toolbar" aria-label={label} className={clsx("flex flex-wrap items-center justify-center gap-2 rounded-full border border-vc-line bg-vc-container px-3 py-2", className)}>
+    <div role="toolbar" aria-label={label} className={clsx("flex flex-wrap items-center justify-center gap-2 rounded-full border border-vc-line bg-vc-container px-3 py-2 max-sm:max-w-full max-sm:gap-1.5", className)}>
       {children}
     </div>
   );

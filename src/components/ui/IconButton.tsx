@@ -25,7 +25,7 @@ const IconButton = forwardRef<HTMLButtonElement, IconButtonProps>(
       disabled={busy || disabled}
       className={clsx(
         "inline-flex shrink-0 cursor-pointer items-center justify-center rounded-md border border-vc-line-strong transition-colors hover:bg-vc-veil-strong focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-vc-main/50 disabled:cursor-not-allowed disabled:opacity-40",
-        size === "sm" ? "h-6 w-6" : "h-8 w-8",
+        size === "sm" ? "h-6 w-6 max-sm:h-10 max-sm:w-10" : "h-8 w-8 max-sm:h-10 max-sm:w-10",
         busy && "animate-pulse",
         className,
       )}

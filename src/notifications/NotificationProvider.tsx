@@ -206,7 +206,7 @@ export function NotificationProvider({ compteUrl, userId, showCards = true, ring
     <Ctx.Provider value={api}>
       {children}
       {showCards && items.length > 0 && (
-        <div className="pointer-events-none fixed right-4 top-4 z-[100] flex w-[min(22rem,calc(100vw-2rem))] flex-col gap-2" aria-live="assertive">
+        <div className="pointer-events-none fixed right-4 top-4 max-sm:top-[max(1rem,env(safe-area-inset-top))] z-[100] flex w-[min(22rem,calc(100vw-2rem))] flex-col gap-2" aria-live="assertive">
           {items.map((n) => <NotificationCard key={n.id} item={n} onAction={run} onDismiss={(i) => dismiss(i.id)} />)}
         </div>
       )}

@@ -4,6 +4,7 @@ import { IconSearch } from "@tabler/icons-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { useLanguage } from "../../utils/useLanguage";
 import { useClickOutside } from "../../utils/useDropdown";
+import { isMobileViewport } from "../../utils/viewport";
 
 export interface OptionsMenuOption<T = unknown> {
   label: ReactNode;
@@ -89,10 +90,14 @@ export default function OptionsMenu<T = unknown>({
       const spaceBelow = window.innerHeight - rect.bottom;
       const spaceAbove = rect.top;
       const openUpward = spaceBelow < maxPanelHeight && spaceAbove > spaceBelow;
+      // Téléphone : le panneau reste dans l'écran (largeur bornée, décalage à gauche si besoin).
+      const mobile = isMobileViewport();
+      const width = mobile ? Math.min(Math.max(rect.width, minWidth), window.innerWidth - 2 * margin) : rect.width;
+      const left = mobile ? Math.max(margin, Math.min(rect.left, window.innerWidth - Math.max(width, minWidth) - margin)) : rect.left;
       setPosition(
         openUpward
-          ? { left: rect.left, width: rect.width, bottom: window.innerHeight - rect.top + margin }
-          : { left: rect.left, width: rect.width, top: rect.bottom + margin },
+          ? { left, width, bottom: window.innerHeight - rect.top + margin }
+          : { left, width, top: rect.bottom + margin },
       );
     };
     updatePosition();
@@ -155,7 +160,7 @@ export default function OptionsMenu<T = unknown>({
                   value={query}
                   onChange={(e) => handleQueryChange(e.target.value)}
                   placeholder={searchPlaceholder || t("select_search_placeholder")}
-                  className="flex-1 bg-transparent outline-0 text-sm min-w-0 placeholder:text-vc-secondary/40"
+                  className="flex-1 bg-transparent outline-0 text-sm max-sm:text-base min-w-0 placeholder:text-vc-secondary/40"
                   onClick={(e) => e.stopPropagation()}
                 />
               </div>
@@ -163,7 +168,7 @@ export default function OptionsMenu<T = unknown>({
             <div
               id={listboxId}
               role="listbox"
-              className="p-2 flex flex-col gap-1 max-h-60 overflow-y-auto"
+              className="p-2 flex flex-col gap-1 max-h-60 max-sm:max-h-[min(15rem,40dvh)] overflow-y-auto"
             >
               {searchable && loading ? (
                 <div className="px-3 py-2 text-sm opacity-50">{t("select_loading")}</div>
@@ -195,7 +200,7 @@ export default function OptionsMenu<T = unknown>({
                       exit={{ opacity: 0 }}
                       transition={{ duration: 0.12 }}
                       className={`
-                        px-3 py-2 rounded-lg text-left text-sm transition-colors duration-150 truncate shrink-0
+                        px-3 py-2 max-sm:py-3 rounded-lg text-left text-sm transition-colors duration-150 truncate shrink-0
                         hover:bg-vc-veil hover:text-vc-secondary
                         ${value === opt.value ? "bg-vc-veil-strong text-vc-secondary" : "bg-transparent text-vc-secondary/80"}
                       `}

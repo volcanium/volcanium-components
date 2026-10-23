@@ -30,6 +30,7 @@ import { IconCalendar, IconChevronDown, IconChevronLeft, IconChevronRight } from
 import { motion, AnimatePresence } from "framer-motion";
 import { useLanguage } from "../../utils/useLanguage";
 import { useClickOutside } from "../../utils/useDropdown";
+import { isMobileViewport } from "../../utils/viewport";
 
 export type DatePickerLanguage = "fr" | "en" | "es";
 
@@ -183,7 +184,8 @@ export default function DatePicker({
       const rect = wrapperRef.current?.getBoundingClientRect();
       if (!rect) return;
       const margin = 8;
-      const panelWidth = 296;
+      // Téléphone : plus large (cases tactiles) mais jamais plus que l'écran.
+      const panelWidth = isMobileViewport() ? Math.min(340, window.innerWidth - 2 * margin) : 296;
       const maxPanelHeight = 360;
       const spaceBelow = window.innerHeight - rect.bottom;
       const spaceAbove = rect.top;
@@ -191,7 +193,9 @@ export default function DatePicker({
       // The panel has a fixed, sensible width regardless of how wide the
       // trigger field is (it can span an entire modal) — clamped so it
       // never overflows the right edge of the viewport.
-      const left = Math.min(rect.left, window.innerWidth - panelWidth - margin);
+      const left = isMobileViewport()
+        ? Math.max(margin, Math.min(rect.left, window.innerWidth - panelWidth - margin))
+        : Math.min(rect.left, window.innerWidth - panelWidth - margin);
       setPosition(
         openUpward
           ? { left, width: panelWidth, bottom: window.innerHeight - rect.top + margin }
@@ -304,7 +308,7 @@ export default function DatePicker({
                 <button
                   type="button"
                   onClick={() => setCursor((c) => subMonths(c, 1))}
-                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-vc-secondary/60 transition-colors duration-150 hover:bg-vc-veil hover:text-vc-secondary cursor-pointer"
+                  className="flex h-7 w-7 max-sm:h-10 max-sm:w-10 shrink-0 items-center justify-center rounded-full text-vc-secondary/60 transition-colors duration-150 hover:bg-vc-veil hover:text-vc-secondary cursor-pointer"
                   aria-label={t("previous_month")}
                 >
                   <IconChevronLeft size={16} />
@@ -315,7 +319,7 @@ export default function DatePicker({
                     <button
                       type="button"
                       onClick={() => setMonthMenuOpen((v) => !v)}
-                      className="flex items-center gap-1 px-2 py-1 rounded-md text-sm font-semibold text-vc-secondary capitalize transition-colors duration-150 hover:bg-vc-veil cursor-pointer"
+                      className="flex items-center gap-1 px-2 py-1 max-sm:py-2 rounded-md text-sm font-semibold text-vc-secondary capitalize transition-colors duration-150 hover:bg-vc-veil cursor-pointer"
                     >
                       {monthLabels[cursor.getMonth()]}
                       <IconChevronDown size={13} className="text-vc-secondary/50" />
@@ -337,7 +341,7 @@ export default function DatePicker({
                                 setCursor((c) => setMonth(c, i));
                                 setMonthMenuOpen(false);
                               }}
-                              className={`px-2 py-1.5 rounded-md text-xs capitalize truncate transition-colors duration-150 cursor-pointer hover:bg-vc-veil-strong ${
+                              className={`px-2 py-1.5 max-sm:py-2.5 rounded-md text-xs capitalize truncate transition-colors duration-150 cursor-pointer hover:bg-vc-veil-strong ${
                                 i === cursor.getMonth() ? "bg-vc-veil-strong text-vc-secondary" : "text-vc-secondary/75"
                               }`}
                             >
@@ -365,14 +369,14 @@ export default function DatePicker({
                       }
                     }}
                     onBlur={() => setYearText(String(cursor.getFullYear()))}
-                    className="w-14 bg-transparent text-sm font-semibold text-vc-secondary outline-none text-center rounded-md py-1 transition-colors duration-150 hover:bg-vc-veil focus:bg-vc-veil"
+                    className="w-14 max-sm:w-16 bg-transparent text-sm max-sm:text-base font-semibold text-vc-secondary outline-none text-center rounded-md py-1 transition-colors duration-150 hover:bg-vc-veil focus:bg-vc-veil"
                   />
                 </div>
 
                 <button
                   type="button"
                   onClick={() => setCursor((c) => addMonths(c, 1))}
-                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-vc-secondary/60 transition-colors duration-150 hover:bg-vc-veil hover:text-vc-secondary cursor-pointer"
+                  className="flex h-7 w-7 max-sm:h-10 max-sm:w-10 shrink-0 items-center justify-center rounded-full text-vc-secondary/60 transition-colors duration-150 hover:bg-vc-veil hover:text-vc-secondary cursor-pointer"
                   aria-label={t("next_month")}
                 >
                   <IconChevronRight size={16} />
@@ -434,7 +438,7 @@ export default function DatePicker({
             placeholder={placeholder || PLACEHOLDERS[lang]}
             onChange={(e) => handleTextChange(e.target.value)}
             onBlur={handleTextBlur}
-            className="flex-1 w-full min-w-0 bg-transparent py-2 outline-none placeholder:text-vc-secondary/40 disabled:cursor-not-allowed"
+            className="flex-1 w-full min-w-0 bg-transparent py-2 max-sm:py-2.5 max-sm:text-base outline-none placeholder:text-vc-secondary/40 disabled:cursor-not-allowed"
           />
           <button
             type="button"
@@ -443,7 +447,7 @@ export default function DatePicker({
             aria-label={t("open_calendar")}
             aria-haspopup="dialog"
             aria-expanded={open}
-            className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-vc-secondary/50 transition-colors duration-150 hover:bg-vc-veil-strong hover:text-vc-secondary cursor-pointer disabled:cursor-not-allowed"
+            className="flex h-7 w-7 max-sm:h-10 max-sm:w-10 shrink-0 items-center justify-center rounded-full text-vc-secondary/50 transition-colors duration-150 hover:bg-vc-veil-strong hover:text-vc-secondary cursor-pointer disabled:cursor-not-allowed"
           >
             <IconCalendar size={16} />
           </button>
