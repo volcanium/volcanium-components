@@ -1063,7 +1063,8 @@ export default function Sidebar({
 }: SidebarProps) {
   const { t } = useLanguage();
   const presence = usePresence();
-  const [internalOpen, setInternalOpen] = useState(isOpen);
+  // Tablette (640 a 1023 px) : sans pilotage par l'app, la barre demarre repliee en rail pour laisser la place au contenu. Le bureau ne change pas.
+  const [internalOpen, setInternalOpen] = useState(() => isOpen && !(typeof window !== "undefined" && window.matchMedia("(min-width: 640px) and (max-width: 1023px)").matches));
   const open = onToggle ? isOpen : internalOpen;
   const [switcherOpen, setSwitcherOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
