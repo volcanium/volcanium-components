@@ -21,3 +21,14 @@ export const AppelEntrant: Story = {
     </div>
   ),
 };
+
+const base = { source: "demo", ring: false, silent: false, createdAt: 0, expiresAt: 8_000 } as const;
+const message: NotificationItem = { ...base, id: "m", kind: "message", title: "Camille Durand", subtitle: "#général", body: "On se voit à 14 h pour la démo ? J'ai préparé les maquettes.", priority: "high", actions: [{ id: "open", href: "#" }, { id: "reply", href: "#" }] };
+const mail: NotificationItem = { ...base, id: "ma", kind: "mail", title: "Atelier Lumière", subtitle: "Re : Devis du 12 octobre", body: "Bonjour, voici les remarques sur la dernière version…", actions: [{ id: "open", href: "#" }] };
+const invoice: NotificationItem = { ...base, id: "i", kind: "invoice", title: "Facture F-2026-0142 payée", body: "1 240,00 € reçus de Studio Nord", actions: [{ id: "open", href: "#" }] };
+const noop = () => undefined;
+
+export const Message: Story = { args: { item: message, onAction: noop, onDismiss: noop } };
+export const Mail: Story = { args: { item: mail, onAction: noop, onDismiss: noop } };
+export const Facture: Story = { args: { item: invoice, onAction: noop, onDismiss: noop } };
+export const Sortie: Story = { args: { item: mail, leaving: true, onAction: noop, onDismiss: noop } };

@@ -2,6 +2,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import NotificationCard from "./NotificationCard";
 import { CompteStreamBusContext } from "../presence/PresenceProvider";
 import { startRingtone } from "./ringtone";
+import { chimeTimbreFor, playChime } from "./chime";
 
 /** Action d'une notification : adresse a ouvrir (`href`) ou requete a envoyer (`request`, sans cookie : l'adresse porte son jeton). */
 export interface NotificationAction {
@@ -25,7 +26,10 @@ export interface NotificationItem {
   image?: string;
   /** Sonnerie en boucle tant que la carte est affichee. */
   ring: boolean;
+  /** Pas de son (statut de la personne ou preference) : la carte s'affiche quand meme. */
   silent: boolean;
+  /** `high` = mention ou message direct : petit son un peu plus marque. Absent = `normal`. */
+  priority?: "normal" | "high";
   actions: NotificationAction[];
   createdAt: number;
   expiresAt: number;
@@ -53,6 +57,10 @@ export interface NotificationProviderProps {
   showCards?: boolean;
   /** Joue la sonnerie des appels entrants. @default true */
   ringtone?: boolean;
+  /** Joue les petits sons des autres notifications (message, mail...) : un seul onglet, une fois par rafale. @default true */
+  chime?: boolean;
+  /** Renvoie `true` pour ne NI afficher NI sonner cette notification dans cette app / cet onglet (ex. la personne regarde deja la conversation). Evaluee a l'arrivee et a l'affichage. */
+  suppress?: (item: NotificationItem) => boolean;
   /** Ouvre l'adresse d'une action a la place du nouvel onglet (ex. navigation interne d'une app a page unique) : renvoyer `true` si c'est fait. */
   openHref?: (href: string) => boolean | void;
   children: ReactNode;
@@ -97,11 +105,19 @@ function createElection() {
  * une carte en haut a droite (photo, texte, boutons), et pour un appel entrant une sonnerie tant qu'on n'a pas repondu.
  * Compte n'envoie rien quand la personne est « en appel » ou « ne pas deranger ». A placer dans `VolcaniumProvider`, a cote de `PresenceProvider`.
  */
-export function NotificationProvider({ compteUrl, userId, showCards = true, ringtone = true, openHref, children }: NotificationProviderProps) {
+export function NotificationProvider({ compteUrl, userId, showCards = true, ringtone = true, chime = true, suppress, openHref, children }: NotificationProviderProps) {
   const base = trim(compteUrl);
   const [items, setItems] = useState<readonly NotificationItem[]>(EMPTY);
   const election = useRef<ReturnType<typeof createElection> | null>(null);
   const bus = useContext(CompteStreamBusContext);
+  const suppressRef = useRef(suppress);
+  suppressRef.current = suppress;
+  const chimeRef = useRef(chime);
+  chimeRef.current = chime;
+  const isSuppressed = useCallback((n: NotificationItem) => { try { return suppressRef.current?.(n) === true; } catch { return false; } }, []);
+  const [leaving, setLeaving] = useState<ReadonlySet<string>>(new Set()); // cartes en train de sortir (animation)
+  const [tick, setTick] = useState(0); // re-evalue `suppress` au retour sur l'onglet
+  const ctl = useRef<{ pause(id: string): void; resume(id: string): void } | null>(null);
   const [ringing, setRinging] = useState<ReadonlySet<string>>(new Set()); // appels pour lesquels CET onglet sonne
 
   useEffect(() => {
@@ -111,21 +127,74 @@ export function NotificationProvider({ compteUrl, userId, showCards = true, ring
     let retry: ReturnType<typeof setTimeout> | undefined;
     let attempts = 0;
     let stopped = false;
-    const timers = new Map<string, ReturnType<typeof setTimeout>>();
+    const timers = new Map<string, ReturnType<typeof setTimeout> | undefined>(); // cartes vivantes (valeur undefined = expiration en pause)
+    const due = new Map<string, number>(); // echeance (ms epoch) des cartes dont le delai court
+    const remaining = new Map<string, number>(); // delai restant des cartes en pause
+    const lastChime = new Map<string, number>(); // dernier son par id : un `notify` qui republie le meme id ne re-sonne pas avant 5 s
+    let lastAnyChime = 0; // un son par 1,2 s au total
     const el = (election.current = createElection());
 
     const drop = (id: string) => {
       clearTimeout(timers.get(id));
       timers.delete(id);
+      due.delete(id);
+      remaining.delete(id);
+      lastChime.delete(id);
       el.forget(id);
+      setLeaving((cur) => { if (!cur.has(id)) return cur; const next = new Set(cur); next.delete(id); return next; });
       setItems((cur) => (cur.some((n) => n.id === id) ? cur.filter((n) => n.id !== id) : cur));
       setRinging((cur) => { if (!cur.has(id)) return cur; const next = new Set(cur); next.delete(id); return next; });
     };
-    const add = (item: NotificationItem) => {
+    // Fin de vie : petite animation de sortie (220 ms) puis la carte est retiree.
+    const expire = (id: string) => {
+      due.delete(id);
+      setLeaving((cur) => new Set(cur).add(id));
+      timers.set(id, setTimeout(() => drop(id), 220));
+    };
+    const schedule = (id: string, ms: number) => {
+      clearTimeout(timers.get(id));
+      due.set(id, Date.now() + ms);
+      timers.set(id, setTimeout(() => expire(id), ms));
+    };
+    ctl.current = {
+      // Survol / focus : le delai est gele (au moins 2 s restantes a la reprise).
+      pause(id) {
+        if (!timers.has(id) || remaining.has(id) || !due.has(id)) return;
+        clearTimeout(timers.get(id));
+        timers.set(id, undefined);
+        remaining.set(id, Math.max(2_000, (due.get(id) ?? 0) - Date.now()));
+      },
+      resume(id) {
+        const ms = remaining.get(id);
+        if (ms === undefined || !timers.has(id)) return;
+        remaining.delete(id);
+        schedule(id, ms);
+      },
+    };
+    const chimeFor = (item: NotificationItem) => {
+      const now = Date.now();
+      const prev = lastChime.get(item.id);
+      if (prev !== undefined && now - prev < 5_000) return; // la conversation continue : la carte est mise a jour, pas de re-ding
+      lastChime.set(item.id, now);
+      const key = `chime:${item.id}:${item.createdAt}`;
+      void el.rings(key).then((mine) => {
+        window.setTimeout(() => el.forget(key), 1_000);
+        if (!mine || stopped || !chimeRef.current || !timers.has(item.id)) return;
+        const t = Date.now();
+        if (t - lastAnyChime < 1_200) return;
+        if (playChime(chimeTimbreFor(item.kind), item.priority ?? "normal")) lastAnyChime = t;
+      });
+    };
+    const add = (item: NotificationItem, fresh = true) => {
+      if (isSuppressed(item)) { drop(item.id); return; }
+      const known = timers.has(item.id);
       setItems((cur) => [...cur.filter((n) => n.id !== item.id), item]);
-      clearTimeout(timers.get(item.id));
+      setLeaving((cur) => { if (!cur.has(item.id)) return cur; const next = new Set(cur); next.delete(item.id); return next; });
       // Filet de securite si l'evenement « dismiss » se perd : la carte ne reste jamais plus longtemps que sa duree de vie.
-      timers.set(item.id, setTimeout(() => drop(item.id), Math.max(1_000, item.expiresAt - item.createdAt)));
+      const ttl = Math.max(1_000, item.expiresAt - item.createdAt);
+      if (remaining.has(item.id)) { clearTimeout(timers.get(item.id)); remaining.set(item.id, ttl); timers.set(item.id, undefined); }
+      else if (!(known && !fresh)) schedule(item.id, ttl); // un snapshot de reconnexion ne prolonge pas une carte deja la
+      if (fresh && !item.ring && !item.silent) chimeFor(item);
       if (item.ring && !item.silent) {
         void el.rings(item.id).then((mine) => {
           if (mine && !stopped && timers.has(item.id)) setRinging((cur) => new Set(cur).add(item.id));
@@ -137,7 +206,7 @@ export function NotificationProvider({ compteUrl, userId, showCards = true, ring
       if (ev.type === "snapshot") {
         const keep = new Set(ev.items.map((n) => n.id));
         for (const id of [...timers.keys()]) if (!keep.has(id)) drop(id);
-        for (const n of ev.items) add(n);
+        for (const n of ev.items) add(n, false);
       } else if (ev.type === "notify") add(ev.item);
       else if (ev.type === "dismiss") drop(ev.id);
     };
@@ -175,7 +244,15 @@ export function NotificationProvider({ compteUrl, userId, showCards = true, ring
       setRinging(new Set());
       setItems(EMPTY);
     };
-  }, [base, userId, bus]);
+  }, [base, userId, bus, isSuppressed]);
+
+  // Retour sur l'onglet : `suppress` peut avoir change (la personne a quitte la conversation, ou y est arrivee).
+  useEffect(() => {
+    const bump = () => { if (document.visibilityState !== "hidden") setTick((n) => n + 1); };
+    window.addEventListener("focus", bump);
+    document.addEventListener("visibilitychange", bump);
+    return () => { window.removeEventListener("focus", bump); document.removeEventListener("visibilitychange", bump); };
+  }, []);
 
   const ringNow = ringtone && ringing.size > 0;
   useEffect(() => (ringNow ? startRingtone() : undefined), [ringNow]);
@@ -201,13 +278,25 @@ export function NotificationProvider({ compteUrl, userId, showCards = true, ring
     dismiss(item.id);
   }, [dismiss]);
 
-  const api = useMemo<NotificationsApi>(() => ({ items, dismiss, run }), [items, dismiss, run]);
+  // Affichage : on re-evalue `suppress` (la personne peut etre arrivee dans la conversation depuis l'arrivee de la carte).
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const visible = useMemo(() => (suppress ? items.filter((n) => !isSuppressed(n)) : items), [items, tick, !!suppress, isSuppressed]);
+  const api = useMemo<NotificationsApi>(() => ({ items: visible, dismiss, run }), [visible, dismiss, run]);
   return (
     <Ctx.Provider value={api}>
       {children}
-      {showCards && items.length > 0 && (
+      {showCards && visible.length > 0 && (
         <div className="pointer-events-none fixed right-4 top-4 max-sm:top-[max(1rem,env(safe-area-inset-top))] z-[100] flex w-[min(22rem,calc(100vw-2rem))] flex-col gap-2" aria-live="assertive">
-          {items.map((n) => <NotificationCard key={n.id} item={n} onAction={run} onDismiss={(i) => dismiss(i.id)} />)}
+          {visible.map((n) => (
+            <NotificationCard
+              key={n.id}
+              item={n}
+              leaving={leaving.has(n.id)}
+              onAction={run}
+              onDismiss={(i) => dismiss(i.id)}
+              onHoldChange={(i, held) => (held ? ctl.current?.pause(i.id) : ctl.current?.resume(i.id))}
+            />
+          ))}
         </div>
       )}
     </Ctx.Provider>

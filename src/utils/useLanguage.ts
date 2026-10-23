@@ -95,6 +95,7 @@ export type TranslationKey =
   | "notif_decline"
   | "notif_messages"
   | "notif_open"
+  | "notif_reply"
   | "notif_dismiss"
   | "notif_body_call_incoming"
   | "notif_body_call_incoming_audio";
@@ -197,6 +198,7 @@ const dictionaries: Record<"fr" | "en", Dictionary> = {
     notif_decline: "Raccrocher",
     notif_messages: "Messages",
     notif_open: "Ouvrir",
+    notif_reply: "Répondre",
     notif_dismiss: "Ignorer",
     notif_body_call_incoming: "Appel vidéo entrant…",
     notif_body_call_incoming_audio: "Appel audio entrant…",
@@ -296,13 +298,28 @@ const dictionaries: Record<"fr" | "en", Dictionary> = {
     notif_decline: "Decline",
     notif_messages: "Messages",
     notif_open: "Open",
+    notif_reply: "Reply",
     notif_dismiss: "Dismiss",
     notif_body_call_incoming: "Incoming video call…",
     notif_body_call_incoming_audio: "Incoming audio call…",
   },
 };
 
+// Espagnol : partiel (notifications seulement), le reste retombe sur l'anglais.
+const es: Dictionary = {
+  ...dictionaries.en,
+  notif_answer: "Contestar",
+  notif_decline: "Rechazar",
+  notif_messages: "Mensajes",
+  notif_open: "Abrir",
+  notif_reply: "Responder",
+  notif_dismiss: "Cerrar",
+  notif_body_call_incoming: "Videollamada entrante…",
+  notif_body_call_incoming_audio: "Llamada de audio entrante…",
+};
+
 function resolveDictionary(language: string): Dictionary {
+  if (language === "es") return es;
   return dictionaries[language as "fr" | "en"] || dictionaries.en;
 }
 

@@ -99,6 +99,8 @@ export type { NotificationProviderProps, NotificationsApi, NotificationItem, Not
 export { default as NotificationCard } from "./notifications/NotificationCard";
 export type { NotificationCardProps } from "./notifications/NotificationCard";
 export { startRingtone } from "./notifications/ringtone";
+export { playChime, chimeTimbreFor } from "./notifications/chime";
+export type { ChimeTimbre } from "./notifications/chime";
 export { default as Avatar, initialsOf } from "./components/ui/Avatar";
 export type { AvatarProps } from "./components/ui/Avatar";
 export { default as MessageItem } from "./components/ui/MessageItem";

@@ -178,4 +178,6 @@ html {
 .vc-notif-in { animation: vc-notif-in 0.22s ease-out both; }
 @keyframes vc-notif-ring { 0% { box-shadow: 0 0 0 0 color-mix(in srgb, var(--color-vc-main) 55%, transparent); } 70%, 100% { box-shadow: 0 0 0 12px transparent; } }
 .vc-notif-ring { animation: vc-notif-ring 1.6s ease-out infinite; }
-@media (prefers-reduced-motion: reduce) { .vc-notif-in, .vc-notif-ring { animation: none; } }
+@keyframes vc-notif-out { from { opacity: 1; transform: none; } to { opacity: 0; transform: translateX(16px) scale(0.98); } }
+.vc-notif-out { animation: vc-notif-out 0.2s ease-in both; pointer-events: none; }
+@media (prefers-reduced-motion: reduce) { .vc-notif-in, .vc-notif-ring, .vc-notif-out { animation: none; } }
