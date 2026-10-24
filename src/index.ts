@@ -128,3 +128,14 @@ export { default as Sidebar } from "./components/layout/Sidebar";
 export type { SidebarProps, UserMenuProps, AccountSwitcherProps, AppSwitcherProps, AppSwitcherApp } from "./components/layout/Sidebar";
 export { default as Hero } from "./components/layout/Hero";
 export { default as Nav } from "./components/layout/Nav";
+
+// Calendrier complet (Mail et Communication : une seule implementation, l'application hote fournit `CalendarHost`).
+export { createCalendarApi } from "./calendar/api";
+export type { CalendarApi, CalendarCall } from "./calendar/api";
+export type { CalendarHost, CalendarPeople } from "./calendar/host";
+export { calendarMessages } from "./calendar/messages";
+export type { CalendarKey, CalendarDictionary } from "./calendar/messages";
+export * from "./calendar/types";
+export * from "./calendar/time";
+export { BIRTHDAY_CALENDAR_ID, BIRTHDAY_COLOR, birthdayCalendar, birthdayContactId, birthdayEvents, birthdayFromFields, formatBirthday, isBirthdayEvent } from "./calendar/birthdays";
+export { joinLink } from "./calendar/EventDialog";

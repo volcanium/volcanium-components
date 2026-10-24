@@ -1,6 +1,6 @@
 {
   "name": "@volcanium/volcanium-components",
-  "version": "3.12.0",
+  "version": "3.13.0",
   "description": "UI Components Library for Volcanium",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -19,6 +19,15 @@
       "import": "./dist/rich-text.mjs",
       "require": "./dist/rich-text.js",
       "default": "./dist/rich-text.mjs"
+    },
+    "./calendar": {
+      "types": {
+        "import": "./dist/calendar.d.mts",
+        "require": "./dist/calendar.d.ts"
+      },
+      "import": "./dist/calendar.mjs",
+      "require": "./dist/calendar.js",
+      "default": "./dist/calendar.mjs"
     },
     ".": {
       "types": {
@@ -45,7 +54,8 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "docs:dev": "npm --prefix docs-site run dev",
-    "docs:build": "npm --prefix docs-site run build"
+    "docs:build": "npm --prefix docs-site run build",
+    "test": "vitest run"
   },
   "peerDependencies": {
     "react": "^18.0.0 || ^19.0.0",
@@ -79,7 +89,8 @@
     "tailwind-merge": "^2.5.2",
     "tailwindcss": "^4.3.3",
     "tsup": "^8.2.4",
-    "typescript": "5.6.3"
+    "typescript": "5.6.3",
+    "vitest": "^3.2.7"
   },
   "dependencies": {
     "@squircle-js/react": "^1.3.0",
