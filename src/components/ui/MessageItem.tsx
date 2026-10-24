@@ -19,6 +19,8 @@ export interface MessageItemProps {
   children: ReactNode;
   /** Pièces jointes, réactions, lien « N réponses » : sous le texte. */
   footer?: ReactNode;
+  /** Rend la photo et le nom de l'auteur cliquables : l'app enveloppe chaque partie (typiquement dans un `ProfilePopover` qui ouvre la fiche de la personne). Absent = texte simple. */
+  renderAuthor?: (content: ReactNode, part: "avatar" | "name") => ReactNode;
   /** Barre d'actions (réagir, répondre, modifier…) : visible au survol et au focus. */
   actions?: ReactNode;
   /** Force l'affichage de la barre d'actions (téléphone : pas de survol, l'app l'affiche au toucher du message). @default false */
@@ -27,7 +29,8 @@ export interface MessageItemProps {
 }
 
 /** Une ligne de conversation (chat d'équipe) : photo, auteur, heure, corps, pied et actions au survol. */
-export default function MessageItem({ author, time, timeTitle, editedLabel, compact = false, highlighted = false, children, footer, actions, actionsVisible = false, className }: MessageItemProps) {
+export default function MessageItem({ author, time, timeTitle, editedLabel, compact = false, highlighted = false, children, footer, renderAuthor, actions, actionsVisible = false, className }: MessageItemProps) {
+  const wrap = (content: ReactNode, part: "avatar" | "name"): ReactNode => (renderAuthor ? renderAuthor(content, part) : content);
   return (
     <div
       className={clsx(
@@ -43,13 +46,13 @@ export default function MessageItem({ author, time, timeTitle, editedLabel, comp
             {time}
           </span>
         ) : (
-          <Avatar name={author.name} email={author.email} src={author.src} userId={author.userId} size={36} />
+          wrap(<Avatar name={author.name} email={author.email} src={author.src} userId={author.userId} size={36} />, "avatar")
         )}
       </div>
       <div className="min-w-0 flex-1">
         {!compact && (
           <div className="flex items-baseline gap-2">
-            <span className="truncate text-sm font-semibold text-vc-text">{author.name}</span>
+            {wrap(<span className="truncate text-sm font-semibold text-vc-text">{author.name}</span>, "name")}
             <time title={timeTitle} className="shrink-0 text-xs text-vc-text/50">
               {time}
             </time>
