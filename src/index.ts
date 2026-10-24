@@ -139,3 +139,25 @@ export * from "./calendar/types";
 export * from "./calendar/time";
 export { BIRTHDAY_CALENDAR_ID, BIRTHDAY_COLOR, birthdayCalendar, birthdayContactId, birthdayEvents, birthdayFromFields, formatBirthday, isBirthdayEvent } from "./calendar/birthdays";
 export { joinLink } from "./calendar/EventDialog";
+
+// Contacts (Mail et Communication : une seule implementation, l'application hote fournit `ContactsHost`).
+export { createContactsApi } from "./contacts/api";
+export type { ContactsApi, ContactsCall } from "./contacts/api";
+export * from "./contacts/api";
+export { ContactsProvider, useContacts } from "./contacts/ContactsContext";
+export type { ContactsState } from "./contacts/ContactsContext";
+export { ContactsHostProvider } from "./contacts/host";
+export type { ContactsHost, Colleague, PersonContext } from "./contacts/host";
+export { contactsMessages } from "./contacts/messages";
+export type { ContactsKey, ContactsDictionary } from "./contacts/messages";
+export { splitName } from "./contacts/name";
+export { formatAddress } from "./contacts/address";
+export * from "./contacts/duplicates";
+export * from "./contacts/sort";
+export { isValidEmail, parseRecipients } from "./contacts/recipients";
+export type { Recipient } from "./contacts/recipients";
+export { photoFromFile } from "./contacts/photo";
+export { default as ContactAvatar } from "./contacts/ContactAvatar";
+export { default as ContactDialog } from "./contacts/ContactDialog";
+export { default as FilterPopover } from "./contacts/FilterPopover";
+export { default as OriginTag } from "./contacts/OriginTag";

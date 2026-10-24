@@ -1,6 +1,6 @@
 {
   "name": "@volcanium/volcanium-components",
-  "version": "3.13.0",
+  "version": "3.14.0",
   "description": "UI Components Library for Volcanium",
   "main": "dist/index.js",
   "module": "dist/index.mjs",
@@ -28,6 +28,24 @@
       "import": "./dist/calendar.mjs",
       "require": "./dist/calendar.js",
       "default": "./dist/calendar.mjs"
+    },
+    "./contacts": {
+      "types": {
+        "import": "./dist/contacts.d.mts",
+        "require": "./dist/contacts.d.ts"
+      },
+      "import": "./dist/contacts.mjs",
+      "require": "./dist/contacts.js",
+      "default": "./dist/contacts.mjs"
+    },
+    "./lib": {
+      "types": {
+        "import": "./dist/lib.d.mts",
+        "require": "./dist/lib.d.ts"
+      },
+      "import": "./dist/lib.mjs",
+      "require": "./dist/lib.js",
+      "default": "./dist/lib.mjs"
     },
     ".": {
       "types": {
