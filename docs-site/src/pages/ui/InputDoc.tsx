@@ -7,10 +7,10 @@ export default function InputDoc() {
   return (
     <DocPage
       name="Input"
-      description="Styled text input with an optional label and two background variants."
+      description={"Champ de saisie avec libellé facultatif et deux styles de fond."}
     >
       <Example
-        title="Plain / with label / loading"
+        title={"Simple, avec libellé, en chargement"}
         code={`<Input placeholder="Type here" />\n<Input label="Email" value={value} onChange={(e) => setValue(e.target.value)}>you@example.com</Input>\n<Input variant="secondary" label="Loading example" loading />`}
       >
         <Input>Type here</Input>
@@ -28,39 +28,39 @@ export default function InputDoc() {
           {
             name: "children",
             type: "string",
-            description: "Used as the placeholder text.",
+            description: "Sert de texte indicatif.",
           },
           {
             name: "label",
             type: "ReactNode",
-            description: "Label rendered below the input.",
+            description: "Libellé affiché sous le champ.",
           },
           {
             name: "variant",
             type: '"one" | "secondary"',
             default: '"one"',
-            description: "Background color: bg-back or bg-container.",
+            description: "Couleur de fond : bg-back ou bg-container.",
           },
           {
             name: "loading",
             type: "boolean",
-            description: "Shows a spinning refresh icon next to the label.",
+            description: "Affiche une icône de chargement à côté du libellé.",
           },
           {
             name: "id",
             type: "string",
-            description: "Input id (auto-generated otherwise).",
+            description: "Identifiant (généré automatiquement par défaut).",
           },
           {
             name: "className",
             type: "string",
-            description: "Extra classes on the <input>.",
+            description: "Classes supplémentaires du champ.",
           },
           {
             name: "...props",
             type: "InputHTMLAttributes<HTMLInputElement>",
             description:
-              "Any native input prop (value, onChange, type, disabled, ...).",
+              "Toute propriété native d'un input (value, onChange, type, disabled…).",
           },
         ]}
       />

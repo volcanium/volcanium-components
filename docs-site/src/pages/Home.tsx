@@ -5,22 +5,21 @@ export default function Home() {
     <div className="flex flex-col gap-8 max-w-3xl">
       <div className="flex flex-col gap-3">
         <h1 className="text-5xl font-title text-main">@volcanium/volcanium-components</h1>
-        <p className="text-white/70 text-lg">UI Components Library for Volcanium</p>
+        <p className="text-white/70 text-lg">Bibliothèque de composants Volcanium</p>
       </div>
 
       <p className="text-white/70">
-        This is a standalone documentation site for the component library, independent from
-        Storybook. Browse the sidebar to see every exported component, its props, and live,
-        rendered usage examples.
+        Parcourez le menu pour consulter chaque composant, ses propriétés et des exemples en
+        direct.
       </p>
 
       <div className="flex flex-col gap-2">
-        <h2 className="text-2xl font-title text-secondary">Install</h2>
+        <h2 className="text-2xl font-title text-secondary">Installation</h2>
         <CodeBlock code={`npm install @volcanium/volcanium-components`} />
       </div>
 
       <div className="flex flex-col gap-2">
-        <h2 className="text-2xl font-title text-secondary">Usage</h2>
+        <h2 className="text-2xl font-title text-secondary">Utilisation</h2>
         <CodeBlock
           code={`import { VolcaniumProvider, Button } from "@volcanium/volcanium-components";
 import "@volcanium/volcanium-components/index.css";
@@ -36,9 +35,8 @@ export default function App() {
       </div>
 
       <p className="text-white/50 text-sm">
-        Version 1.2.1. Components are grouped in the sidebar by purpose — Actions, Forms &
-        Inputs, Feedback & Overlays, Data Display, Content and Layout — to make things easier
-        to browse.
+        Version 1.2.1. Les composants sont regroupés par usage : actions, formulaires et saisie,
+        retours et fenêtres, affichage des données, contenu et mise en page.
       </p>
     </div>
   );

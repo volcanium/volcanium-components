@@ -422,7 +422,7 @@ function UserCard({
             {showImage ? (
               <img
                 src={avatarUrl}
-                alt="Avatar"
+                alt="Photo de profil"
                 referrerPolicy="no-referrer"
                 onError={() => setFailedUrl(avatarUrl)}
                 className="h-9 w-9 rounded-full ring-1 ring-vc-line bg-vc-back object-cover"
@@ -442,7 +442,7 @@ function UserCard({
           )}
         >
           <h2 className="text-[14.5px] font-medium leading-tight truncate w-40">
-            {name || "Name"}
+            {name || "Nom"}
           </h2>
           <h3 className="text-vc-secondary/50 truncate text-xs mt-0.5">
             {roleName}
@@ -1044,8 +1044,8 @@ function UserMenuPanel({
 export default function Sidebar({
   isOpen = true,
   onToggle,
-  title = "Name",
-  subtitle = "App",
+  title = "Nom",
+  subtitle = "Application",
   tabs = [],
   specificTabs = [],
   bottomTabs = [],
@@ -1271,7 +1271,7 @@ export default function Sidebar({
                 <LinkV onClick={() => window.open("https://volcanium-studio.com/")}>{brandingLabel}</LinkV>
               ) : (
                 <>
-                  Panel powered by{" "}
+                  Propulsé par{" "}
                   <LinkV onClick={() => window.open("https://volcanium-studio.com/")}>
                     volcanium studio
                   </LinkV>

@@ -5,7 +5,7 @@ export default function ToastDoc() {
   return (
     <DocPage
       name="ToastProvider / notify"
-      description="ToastProvider renders a toast stack (top-right) and registers itself as the global handler for notify.*. Mount ToastProvider once near the root (this docs site does it in main.tsx) and call notify.info/success/warn/error(message, durationMs?) from anywhere."
+      description={"ToastProvider affiche les notifications en haut à droite et reçoit les appels notify.*. Placez-le une seule fois à la racine, puis appelez notify.info, success, warn ou error(message, durationMs?) où vous voulez."}
     >
       <Example code={`import { notify } from "@volcanium/volcanium-components";\n\nnotify.info("Heads up!");\nnotify.success("Saved successfully");\nnotify.warn("Careful with that");\nnotify.error("Something went wrong");`}>
         <Button onClick={() => notify.info("Heads up!")}>notify.info</Button>
@@ -16,12 +16,11 @@ export default function ToastDoc() {
 
       <PropsTable
         rows={[
-          { name: "children", type: "ReactNode", description: "ToastProviderProps: the rest of the app tree, rendered alongside the toast stack." },
+          { name: "children", type: "ReactNode", description: "Le reste de l'application, affiché avec les notifications." },
         ]}
       />
       <p className="text-white/60 text-sm">
-        Only the most recently mounted ToastProvider receives notify.* calls — there is no
-        queueing across multiple providers.
+        Seul le ToastProvider monté en dernier reçoit les appels notify.*.
       </p>
     </DocPage>
   );

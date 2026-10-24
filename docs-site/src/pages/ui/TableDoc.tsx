@@ -30,10 +30,10 @@ export default function TableDoc() {
   return (
     <DocPage
       name="Table"
-      description="Data table: quick search, pagination, filters, cell editing and CRUD hooks. All data operations (fetch, create, delete) are supplied by the consumer via callbacks — the component itself has no HTTP client."
+      description={"Tableau de données avec recherche, pagination, filtres et modification des cellules. Le chargement, la création et la suppression se font par vos propres fonctions."}
     >
       <Example
-        title="Client-side data"
+        title={"Données côté client"}
         code={`const colsDefs = [\n  { field: "id", headerName: "ID" },\n  { field: "name", headerName: "Name", editable: true },\n  { field: "email", headerName: "Email", editable: true },\n  { field: "role", headerName: "Role" },\n];\n\n<Table\n  title="Users"\n  colsDefs={colsDefs}\n  fetchMethod={async () => allRows}\n  modifMethod={(e) => console.log("cell changed", e)}\n/>`}
       >
         <div className="w-full">
@@ -48,7 +48,7 @@ export default function TableDoc() {
       </Example>
 
       <Example
-        title="Server-side search and pagination"
+        title={"Recherche et pagination côté serveur"}
         code={`<Table\n  title="Users (server-side)"\n  colsDefs={colsDefs}\n  serverSide\n  pageSize={10}\n  fetchMethod={async ({ search, page, pageSize, filters }) => {\n    const filtered = allRows.filter((r) =>\n      (!search || r.name.toLowerCase().includes(search.toLowerCase())) &&\n      (!filters.role || r.role === filters.role),\n    );\n    const start = page * pageSize;\n    return { data: filtered.slice(start, start + pageSize), total: filtered.length };\n  }}\n  modifMethod={() => {}}\n/>`}
       >
         <div className="w-full">
@@ -77,22 +77,22 @@ export default function TableDoc() {
 
       <PropsTable
         rows={[
-          { name: "colsDefs", type: "TableColumnDef<Row>[]", description: "Column definitions (TableColumnDef)." },
-          { name: "title", type: "string", description: "Table title." },
-          { name: "fetchMethod", type: "(params?: TableFetchParams) => Promise<Row[] | { data, total? }>", description: "Loads data. In serverSide mode, receives { search, page, pageSize, filters }." },
-          { name: "modifMethod", type: "(params: CellValueChangedEvent<Row>) => void", description: "Called when a cell is edited." },
-          { name: "rowSelection", type: "RowSelectionOptions<Row>", description: "AG Grid row selection config, e.g. { mode: \"multiRow\" }." },
-          { name: "reloadKey", type: "string | number", description: "Changing this value forces a data reload." },
-          { name: "loading", type: "boolean", default: "true", description: "External loading flag, shown as the grid overlay." },
-          { name: "onSelect", type: "(rows: Row[]) => void", description: "Called with the current row selection." },
-          { name: "newRow", type: "NewRowConfig", description: "Configuration to enable a \"new row\" modal + button." },
-          { name: "deleteRow", type: "boolean", description: "Enables delete via a confirmation modal (requires deleteRequest)." },
-          { name: "deleteRequest", type: "(rows: Row[]) => Promise<void>", description: "Deletes the given rows; required when deleteRow is set." },
-          { name: "openRequest", type: "(rows: Row[]) => void", description: "Called on row double-click or the toolbar's open button." },
-          { name: "copyButton", type: "boolean", default: "false", description: "Shows a copy-selection toolbar button." },
-          { name: "serverSide", type: "boolean", default: "false", description: "Enables server-driven search/pagination/filters." },
-          { name: "pageSize", type: "number", default: "25", description: "Rows per page in serverSide mode." },
-          { name: "searchPlaceholder", type: "string", description: "Search input placeholder." },
+          { name: "colsDefs", type: "TableColumnDef<Row>[]", description: "Définition des colonnes (TableColumnDef)." },
+          { name: "title", type: "string", description: "Titre du tableau." },
+          { name: "fetchMethod", type: "(params?: TableFetchParams) => Promise<Row[] | { data, total? }>", description: "Charge les données. En mode serverSide, reçoit { search, page, pageSize, filters }." },
+          { name: "modifMethod", type: "(params: CellValueChangedEvent<Row>) => void", description: "Appelée à la modification d'une cellule." },
+          { name: "rowSelection", type: "RowSelectionOptions<Row>", description: "Sélection des lignes, par exemple { mode: \"multiRow\" }." },
+          { name: "reloadKey", type: "string | number", description: "Changer cette valeur recharge les données." },
+          { name: "loading", type: "boolean", default: "true", description: "Indicateur de chargement externe, affiché sur le tableau." },
+          { name: "onSelect", type: "(rows: Row[]) => void", description: "Appelée avec les lignes sélectionnées." },
+          { name: "newRow", type: "NewRowConfig", description: "Configuration du bouton et de la fenêtre d'ajout de ligne." },
+          { name: "deleteRow", type: "boolean", description: "Active la suppression avec confirmation (nécessite deleteRequest)." },
+          { name: "deleteRequest", type: "(rows: Row[]) => Promise<void>", description: "Supprime les lignes ; obligatoire avec deleteRow." },
+          { name: "openRequest", type: "(rows: Row[]) => void", description: "Appelée au double-clic sur une ligne ou au clic sur Ouvrir." },
+          { name: "copyButton", type: "boolean", default: "false", description: "Affiche le bouton de copie de la sélection." },
+          { name: "serverSide", type: "boolean", default: "false", description: "Active la recherche, la pagination et les filtres côté serveur." },
+          { name: "pageSize", type: "number", default: "25", description: "Lignes par page en mode serverSide." },
+          { name: "searchPlaceholder", type: "string", description: "Texte indicatif de la recherche." },
         ]}
       />
     </DocPage>

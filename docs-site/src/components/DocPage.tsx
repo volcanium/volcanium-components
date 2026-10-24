@@ -13,9 +13,9 @@ export function PropsTable({ rows }: { rows: PropRow[] }) {
       <table className="w-full text-sm border-collapse">
         <thead>
           <tr className="bg-container text-left">
-            <th className="p-2 px-3 font-semibold">Name</th>
+            <th className="p-2 px-3 font-semibold">Nom</th>
             <th className="p-2 px-3 font-semibold">Type</th>
-            <th className="p-2 px-3 font-semibold">Default</th>
+            <th className="p-2 px-3 font-semibold">Défaut</th>
             <th className="p-2 px-3 font-semibold">Description</th>
           </tr>
         </thead>

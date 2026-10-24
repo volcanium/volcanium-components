@@ -3,7 +3,7 @@ import DocPage, { Example, PropsTable } from "../../components/DocPage";
 
 export default function LinkDoc() {
   return (
-    <DocPage name="Link" description="A styled anchor that navigates via react-router's navigate() when a link prop is given, in addition to any native href behavior.">
+    <DocPage name="Link" description={"Lien stylé. Avec la propriété link, la navigation passe par le routeur."}>
       <Example code={`<Link link="/ui/link">Go to this page (via router)</Link>\n<Link href="https://volcanium-studio.com/" target="_blank">External href</Link>`}>
         <Link link="/ui/link">Go to this page (via router)</Link>
         <Link href="https://volcanium-studio.com/" target="_blank" rel="noreferrer">
@@ -12,9 +12,9 @@ export default function LinkDoc() {
       </Example>
       <PropsTable
         rows={[
-          { name: "children", type: "ReactNode", description: "Link text/content." },
-          { name: "link", type: "string", description: "When set, calls react-router's navigate(link) on click." },
-          { name: "...props", type: "AnchorHTMLAttributes<HTMLAnchorElement>", description: "Any native anchor prop, e.g. href, target." },
+          { name: "children", type: "ReactNode", description: "Contenu du lien." },
+          { name: "link", type: "string", description: "Navigue vers cette adresse au clic." },
+          { name: "...props", type: "AnchorHTMLAttributes<HTMLAnchorElement>", description: "Toute propriété native d'un lien (href, target…)." },
         ]}
       />
     </DocPage>

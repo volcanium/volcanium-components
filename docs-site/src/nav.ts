@@ -10,7 +10,7 @@ export interface NavGroup {
 
 export const navGroups: NavGroup[] = [
   {
-    group: "Config",
+    group: "Configuration",
     items: [
       { path: "/config/volcanium-provider", label: "VolcaniumProvider" },
       { path: "/ui/theme-toggle", label: "ThemeToggle" },
@@ -25,7 +25,7 @@ export const navGroups: NavGroup[] = [
     ],
   },
   {
-    group: "Forms & Inputs",
+    group: "Formulaires et saisie",
     items: [
       { path: "/ui/input", label: "Input" },
       { path: "/ui/textarea", label: "Textarea" },
@@ -36,7 +36,7 @@ export const navGroups: NavGroup[] = [
     ],
   },
   {
-    group: "Feedback & Overlays",
+    group: "Retours et fenêtres",
     items: [
       { path: "/ui/modal", label: "Modal" },
       { path: "/ui/confirm-modal", label: "ConfirmModal / PromptModal" },
@@ -48,7 +48,7 @@ export const navGroups: NavGroup[] = [
     ],
   },
   {
-    group: "Data Display",
+    group: "Affichage des données",
     items: [
       { path: "/ui/table", label: "Table" },
       { path: "/ui/check-list-item", label: "CheckListItem" },
@@ -58,14 +58,14 @@ export const navGroups: NavGroup[] = [
     ],
   },
   {
-    group: "Content",
+    group: "Contenu",
     items: [
       { path: "/ui/title", label: "Title" },
       { path: "/ui/container", label: "Container" },
     ],
   },
   {
-    group: "Layout",
+    group: "Mise en page",
     items: [
       { path: "/layout/center", label: "Center" },
       { path: "/layout/grid", label: "Grid" },

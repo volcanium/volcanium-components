@@ -3,7 +3,7 @@ import DocPage, { Example, PropsTable } from "../../components/DocPage";
 
 export default function ContainerDoc() {
   return (
-    <DocPage name="Container" description="A card with a title and content section, optionally clickable/navigable via a link.">
+    <DocPage name="Container" description="Carte avec un titre et un contenu, éventuellement cliquable.">
       <Example code={`<Container title="Plain container">\n  <p>Some content inside the card.</p>\n</Container>\n\n<Container title="Clickable container" link="/ui/container">\n  <p>Click anywhere on this card to navigate.</p>\n</Container>`}>
         <Container title="Plain container">
           <p>Some content inside the card.</p>
@@ -14,10 +14,10 @@ export default function ContainerDoc() {
       </Example>
       <PropsTable
         rows={[
-          { name: "title", type: "string", description: "Title text displayed at the top." },
-          { name: "children", type: "ReactNode", description: "Content rendered inside the container." },
-          { name: "fix", type: "boolean", default: "false", description: "Applies fixed width styling (w-200) instead of full width." },
-          { name: "link", type: "string", description: "When set, wraps the card in a react-router Link and shows an arrow icon on hover." },
+          { name: "title", type: "string", description: "Titre affiché en haut." },
+          { name: "children", type: "ReactNode", description: "Contenu de la carte." },
+          { name: "fix", type: "boolean", default: "false", description: "Largeur fixe au lieu de la pleine largeur." },
+          { name: "link", type: "string", description: "Rend la carte cliquable et affiche une flèche au survol." },
         ]}
       />
     </DocPage>

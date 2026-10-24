@@ -3,11 +3,11 @@ import { ThemeToggle } from "@lib";
 
 export default function ThemeToggleDoc() {
   return (
-    <DocPage name="ThemeToggle" description="A small switch flipping the VolcaniumProvider theme between dark and light. The choice is remembered in localStorage under `volcanium-theme` (shared by every Volcanium app; disable with `themeStorageKey={false}` on the provider).">
-      <Example title="Basic" code={`<ThemeToggle />`}>
+    <DocPage name="ThemeToggle" description={"Interrupteur entre thème sombre et thème clair. Le choix est mémorisé sous volcanium-theme et partagé par toutes les applications Volcanium (désactivable avec themeStorageKey={false} sur le fournisseur)."}>
+      <Example title={"Exemple de base"} code={`<ThemeToggle />`}>
         <ThemeToggle />
       </Example>
-      <PropsTable rows={[{ name: "className", type: "string", description: "Extra classes." }]} />
+      <PropsTable rows={[{ name: "className", type: "string", description: "Classes supplémentaires." }]} />
     </DocPage>
   );
 }

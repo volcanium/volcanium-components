@@ -7,8 +7,8 @@ export default function ConfirmModalDoc() {
   const [prompt, setPrompt] = useState(false);
   const [name, setName] = useState("My project");
   return (
-    <DocPage name="ConfirmModal / PromptModal" description="Replacements for window.confirm / window.prompt. The action may be async: if it rejects, the error is displayed and the window stays open; otherwise it closes. Default labels follow the VolcaniumProvider language.">
-      <Example title="ConfirmModal (destructive, type-to-confirm)" code={`<ConfirmModal\n  isOpen={open}\n  onClose={() => setOpen(false)}\n  title="Delete project"\n  danger\n  requireText="my-project"\n  onConfirm={async () => { await deleteProject(); }}\n>\n  This cannot be undone.\n</ConfirmModal>`}>
+    <DocPage name="ConfirmModal / PromptModal" description="Fenêtres de confirmation et de saisie. Si l'action échoue, l'erreur s'affiche et la fenêtre reste ouverte. Les libellés par défaut suivent la langue de VolcaniumProvider.">
+      <Example title="ConfirmModal (suppression avec saisie de confirmation)" code={`<ConfirmModal\n  isOpen={open}\n  onClose={() => setOpen(false)}\n  title="Delete project"\n  danger\n  requireText="my-project"\n  onConfirm={async () => { await deleteProject(); }}\n>\n  This cannot be undone.\n</ConfirmModal>`}>
         <Button onClick={() => setConfirm(true)}>Delete…</Button>
         <ConfirmModal isOpen={confirm} onClose={() => setConfirm(false)} title="Delete project" danger requireText="my-project" onConfirm={async () => {}}>This cannot be undone.</ConfirmModal>
       </Example>
@@ -17,14 +17,14 @@ export default function ConfirmModalDoc() {
         <PromptModal isOpen={prompt} onClose={() => setPrompt(false)} title="Rename" label="Name" initialValue={name} onSubmit={(v) => setName(v)} />
       </Example>
       <PropsTable rows={[
-        { name: "isOpen / onClose / title", type: "boolean / () => void / string", description: "Visibility, close handler, title." },
-        { name: "onConfirm (Confirm)", type: "() => void | Promise<unknown>", description: "Run on confirmation." },
-        { name: "onSubmit (Prompt)", type: "(value: string) => void | Promise<unknown>", description: "Run with the typed value (Enter submits)." },
-        { name: "danger", type: "boolean", description: "Destructive style for the confirm button." },
-        { name: "requireText", type: "string", description: "The user must retype this text to enable the button." },
-        { name: "secondary", type: "{ label, onClick }", description: "Additional button (ConfirmModal)." },
-        { name: "confirmLabel / cancelLabel", type: "string", description: "Override the translated defaults." },
-        { name: "label / initialValue / placeholder", type: "string", description: "Field settings (PromptModal)." },
+        { name: "isOpen / onClose / title", type: "boolean / () => void / string", description: "Affichage, fermeture et titre." },
+        { name: "onConfirm (Confirm)", type: "() => void | Promise<unknown>", description: "Exécutée à la confirmation." },
+        { name: "onSubmit (Prompt)", type: "(value: string) => void | Promise<unknown>", description: "Exécutée avec la valeur saisie (Entrée pour valider)." },
+        { name: "danger", type: "boolean", description: "Style d'action destructive pour le bouton de confirmation." },
+        { name: "requireText", type: "string", description: "Texte à recopier pour activer le bouton." },
+        { name: "secondary", type: "{ label, onClick }", description: "Bouton supplémentaire (ConfirmModal)." },
+        { name: "confirmLabel / cancelLabel", type: "string", description: "Remplacent les libellés par défaut." },
+        { name: "label / initialValue / placeholder", type: "string", description: "Réglages du champ (PromptModal)." },
       ]} />
     </DocPage>
   );

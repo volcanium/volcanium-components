@@ -5,7 +5,7 @@ import DocPage, { Example, PropsTable } from "../../components/DocPage";
 export default function ToggleDoc() {
   const [checked, setChecked] = useState(false);
   return (
-    <DocPage name="Toggle" description={'An accessible switch (role="switch") with an optional label and loading state.'}>
+    <DocPage name="Toggle" description={"Interrupteur accessible (role=\"switch\") avec libellé et état de chargement facultatifs."}>
 
       <Example title='variant="one" (default) — bg-back track' code={`const [checked, setChecked] = useState(false);\n\n<Toggle checked={checked} onChange={setChecked} label="Enable notifications" />`}>
         <Toggle checked={checked} onChange={setChecked} label="Enable notifications" />
@@ -15,12 +15,12 @@ export default function ToggleDoc() {
       </Example>
       <PropsTable
         rows={[
-          { name: "checked", type: "boolean", description: "Current state." },
-          { name: "onChange", type: "(checked: boolean) => void", description: "Called with the new state." },
-          { name: "disabled", type: "boolean", description: "Disables interaction." },
-          { name: "label", type: "ReactNode", description: "Label shown to the left of the switch." },
-          { name: "loading", type: "boolean", description: "Disables interaction and shows a spinning icon next to the label." },
-          { name: "variant", type: '"one" | "secondary"', default: '"one"', description: "Unchecked track color: bg-back or bg-container." },
+          { name: "checked", type: "boolean", description: "État actuel." },
+          { name: "onChange", type: "(checked: boolean) => void", description: "Appelée avec le nouvel état." },
+          { name: "disabled", type: "boolean", description: "Désactive l'interrupteur." },
+          { name: "label", type: "ReactNode", description: "Libellé affiché à gauche de l'interrupteur." },
+          { name: "loading", type: "boolean", description: "Désactive l'interrupteur et affiche une icône de chargement." },
+          { name: "variant", type: '"one" | "secondary"', default: '"one"', description: "Couleur de la piste désactivée : bg-back ou bg-container." },
         ]}
       />
     </DocPage>

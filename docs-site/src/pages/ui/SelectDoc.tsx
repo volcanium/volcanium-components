@@ -42,17 +42,17 @@ export default function SelectDoc() {
   return (
     <DocPage
       name="Select"
-      description="A custom dropdown select with an animated options list. Adding a `label` doesn't change its look — the trigger always renders the same way. Pass `searchable` to add a search box to the dropdown — the same component used to be split into `Select` / `SearchSelect`; it is now one component with search as an opt-in."
+      description={"Liste déroulante animée. Le libellé ne change pas l'apparence du bouton. Ajoutez searchable pour afficher un champ de recherche."}
     >
       <Example
-        title="Basic"
+        title={"Exemple de base"}
         code={`const options = [\n  { label: "Apple", value: "apple" },\n  { label: "Banana", value: "banana" },\n  { label: "Cherry", value: "cherry" },\n];\n\n<Select options={options} value={value} onChange={setValue} />`}
       >
         <Select options={options} value={value} onChange={setValue} />
       </Example>
 
       <Example
-        title="With label"
+        title={"Avec libellé"}
         code={`<Select label="Fruit" options={options} value={value2} onChange={setValue2} />`}
       >
         <Select label="Fruit" options={options} value={value2} onChange={setValue2} />
@@ -72,7 +72,7 @@ export default function SelectDoc() {
       </Example>
 
       <Example
-        title="Searchable with server-side filtering"
+        title={"Recherche filtrée par le serveur"}
         code={`const [results, setResults] = useState(countries);\nconst [loading, setLoading] = useState(false);\n\nconst handleSearch = (query) => {\n  setLoading(true);\n  fetchCountries(query).then((data) => {\n    setResults(data);\n    setLoading(false);\n  });\n};\n\n<Select\n  searchable\n  options={results}\n  loading={loading}\n  onSearchChange={handleSearch}\n  value={value}\n  onChange={setValue}\n  noResultsText="No matching country"\n/>`}
       >
         <Select
@@ -85,24 +85,24 @@ export default function SelectDoc() {
           noResultsText="No matching country"
         />
         <p className="text-xs text-white/40 mt-2">
-          Query passed to <code>onSearchChange</code>: "{serverQuery}"
+          Recherche transmise à <code>onSearchChange</code> : "{serverQuery}"
         </p>
       </Example>
 
       <PropsTable
         rows={[
           { name: "options", type: "SelectOption<T>[]", default: "[]", description: "{ label: ReactNode, value: T, searchText?: string }[]." },
-          { name: "value", type: "T", description: "Currently selected value." },
-          { name: "onChange", type: "(value: T) => void", description: "Called with the newly selected value." },
-          { name: "placeholder", type: "string", description: "Shown when nothing is selected." },
-          { name: "label", type: "ReactNode", description: "Optional label rendered below the trigger — doesn't change the trigger's style." },
-          { name: "searchable", type: "boolean", default: "false", description: "Adds a search box to the dropdown panel." },
-          { name: "onSearchChange", type: "(query: string) => void", description: "Drive filtering yourself (server-side) instead of the built-in client-side filter. Only used when `searchable`." },
-          { name: "loading", type: "boolean", default: "false", description: "Shows a loading row instead of the option list. Only used when `searchable`." },
-          { name: "searchPlaceholder", type: "string", description: "Placeholder for the search input. Only used when `searchable`." },
-          { name: "noResultsText", type: "ReactNode", description: "Shown when the filtered list is empty. Only used when `searchable`." },
-          { name: "id", type: "string", description: "Id for the trigger element (auto-generated otherwise)." },
-          { name: "className", type: "string", description: "Extra classes on the trigger." },
+          { name: "value", type: "T", description: "Valeur sélectionnée." },
+          { name: "onChange", type: "(value: T) => void", description: "Appelée avec la nouvelle valeur." },
+          { name: "placeholder", type: "string", description: "Affiché quand rien n'est sélectionné." },
+          { name: "label", type: "ReactNode", description: "Libellé facultatif sous le bouton, sans effet sur son style." },
+          { name: "searchable", type: "boolean", default: "false", description: "Ajoute un champ de recherche à la liste." },
+          { name: "onSearchChange", type: "(query: string) => void", description: "Gère le filtrage vous-même (côté serveur) au lieu du filtre intégré. Utilisée avec searchable." },
+          { name: "loading", type: "boolean", default: "false", description: "Affiche un chargement à la place des options. Utilisée avec searchable." },
+          { name: "searchPlaceholder", type: "string", description: "Texte indicatif du champ de recherche. Utilisée avec searchable." },
+          { name: "noResultsText", type: "ReactNode", description: "Affiché quand aucune option ne correspond. Utilisée avec searchable." },
+          { name: "id", type: "string", description: "Identifiant du bouton (généré automatiquement par défaut)." },
+          { name: "className", type: "string", description: "Classes supplémentaires du bouton." },
         ]}
       />
     </DocPage>

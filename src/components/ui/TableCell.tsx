@@ -142,7 +142,7 @@ export default function TableCell<Row>({
           e.stopPropagation();
           onStartEdit();
         }}
-        title={column.editable ? "Cliquer pour modifier" : undefined}
+        title={column.editable ? "Cliquez pour modifier" : undefined}
         className={clsx(
           TABLE_ROW_HEIGHT,
           "flex items-center rounded-lg px-1 -mx-1 truncate transition-colors duration-150",

@@ -8,10 +8,10 @@ export default function ButtonDoc() {
   return (
     <DocPage
       name="Button"
-      description="Standard button with 4 visual variants, an optional icon, and a loading state that replaces the icon with a spinner. Can also render as a link (react-router Link when inside a Router, else a plain <a>)."
+      description="Bouton avec plusieurs styles, une icône facultative et un état de chargement. Peut aussi servir de lien."
     >
       <Example
-        title="Variants"
+        title="Styles"
         code={`<Button variant="accent">Accent</Button>\n<Button variant="primary">Primary</Button>\n<Button variant="secondary">Secondary</Button>\n<Button variant="dangerous">Dangerous</Button>\n<Button variant="discret">Discret</Button>`}
       >
         <Button variant="accent">Accent</Button>
@@ -22,17 +22,17 @@ export default function ButtonDoc() {
       </Example>
 
       <Example
-        title="Icon + loading"
+        title="Icône et chargement"
         code={`<Button icon={<IconPlus size={18} />}>Add item</Button>\n<Button loading={loading} onClick={() => setLoading(true)}>Save</Button>`}
       >
         <Button icon={<IconPlus size={18} />}>Add item</Button>
         <Button loading={loading} onClick={() => setLoading((v) => !v)}>
-          {loading ? "Loading..." : "Toggle loading"}
+          {loading ? "Chargement…" : "Activer le chargement"}
         </Button>
       </Example>
 
       <Example
-        title="As a link"
+        title="En lien"
         code={`<Button link="/ui/button">Go to this page</Button>`}
       >
         <Button link="/ui/button">Go to this page</Button>
@@ -43,51 +43,51 @@ export default function ButtonDoc() {
           {
             name: "children",
             type: "ReactNode",
-            description: "Button label/content.",
+            description: "Contenu du bouton.",
           },
           {
             name: "variant",
             type: '"primary" | "secondary" | "tertiary" | "lum"',
             default: '"primary"',
-            description: "Visual style.",
+            description: "Style du bouton.",
           },
           {
             name: "link",
             type: "string",
-            description: "When set, renders as a Link/<a> wrapping the button.",
+            description: "Transforme le bouton en lien.",
           },
           {
             name: "linkClassName",
             type: "string",
-            description: "Class applied to the wrapping link element.",
+            description: "Classes du lien.",
           },
           {
             name: "loading",
             type: "boolean",
             default: "false",
             description:
-              "Shows a spinner instead of the icon and disables clicks.",
+              "Affiche un indicateur de chargement et désactive le clic.",
           },
           {
             name: "icon",
             type: "ReactNode",
             description:
-              "Icon rendered before children (hidden while loading).",
+              "Icône affichée avant le contenu (masquée pendant le chargement).",
           },
           {
             name: "className",
             type: "string",
-            description: "Extra classes on the <button>.",
+            description: "Classes supplémentaires du bouton.",
           },
           {
             name: "onClick",
             type: "(e) => void",
-            description: "Click handler, skipped while loading.",
+            description: "Action au clic (ignorée pendant le chargement).",
           },
           {
             name: "...props",
             type: "ButtonHTMLAttributes<HTMLButtonElement>",
-            description: "Any native button prop, e.g. disabled, type, form.",
+            description: "Toute propriété native d'un bouton (disabled, type, form…).",
           },
         ]}
       />

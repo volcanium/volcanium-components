@@ -5,12 +5,12 @@ import { Button, FullPageLoader } from "@lib";
 export default function FullPageLoaderDoc() {
   const [show, setShow] = useState(false);
   return (
-    <DocPage name="FullPageLoader" description="A fixed, full-viewport overlay with a centered Loader, for the case where the whole page is just waiting (e.g. a slow redirect). Prefer it to `<Loader full />` on its own.">
-      <Example title="Overlay (click to show for 2 s)" code={`{loading && <FullPageLoader />}`}>
+    <DocPage name="FullPageLoader" description={"Calque plein écran avec un Loader centré, pour une page entière en attente (redirection lente, par exemple)."}>
+      <Example title={"Calque (s'affiche 2 secondes au clic)"} code={`{loading && <FullPageLoader />}`}>
         <Button onClick={() => { setShow(true); setTimeout(() => setShow(false), 2000); }}>Show loader</Button>
         {show && <FullPageLoader />}
       </Example>
-      <PropsTable rows={[{ name: "hide", type: "boolean", description: "Hides the bar (same as Loader)." }]} />
+      <PropsTable rows={[{ name: "hide", type: "boolean", description: "Masque la barre (comme Loader)." }]} />
     </DocPage>
   );
 }

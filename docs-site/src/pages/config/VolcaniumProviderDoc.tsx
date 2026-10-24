@@ -5,12 +5,12 @@ function LangSwitcher() {
   const { language, setLanguage } = useVolcaniumConfig();
   return (
     <div className="flex items-center gap-3">
-      <span className="text-white/70">Current language: {language}</span>
+      <span className="text-white/70">Langue actuelle : {language}</span>
       <button
         className="px-3 py-1 rounded-lg bg-main text-white"
         onClick={() => setLanguage(language === "en" ? "fr" : "en")}
       >
-        Toggle fr/en
+        Basculer fr/en
       </button>
     </div>
   );
@@ -20,9 +20,9 @@ export default function VolcaniumProviderDoc() {
   return (
     <DocPage
       name="VolcaniumProvider"
-      description="Root context provider for the library. Several components (Nav, Sidebar, Modal, InDev, Table, Select, Stepper) read shared French/English text through it via the useLanguage hook, so wrap your app in it once at the top level."
+      description={"Fournisseur de contexte de la bibliothèque. Plusieurs composants (Nav, Sidebar, Modal, InDev, Table, Select, Stepper) y lisent leurs textes en français ou en anglais. Placez-le une seule fois à la racine de l'application."}
     >
-      <Example title="Live language toggle (this whole docs site is wrapped in one)" code={`import { VolcaniumProvider, useVolcaniumConfig } from "@volcanium/volcanium-components";
+      <Example title={"Changement de langue en direct"} code={`import { VolcaniumProvider, useVolcaniumConfig } from "@volcanium/volcanium-components";
 
 function LangSwitcher() {
   const { language, setLanguage } = useVolcaniumConfig();
@@ -45,14 +45,14 @@ export default function App() {
 
       <PropsTable
         rows={[
-          { name: "children", type: "ReactNode", description: "App tree that gets access to the config context." },
-          { name: "config", type: "Partial<VolcaniumConfig>", default: "{}", description: "Initial config. Currently supports { lang: \"fr\" | \"en\" | string }." },
+          { name: "children", type: "ReactNode", description: "Application qui accède à la configuration." },
+          { name: "config", type: "Partial<VolcaniumConfig>", default: "{}", description: "Configuration initiale. Accepte { lang: \"fr\" | \"en\" | string }." },
         ]}
       />
 
       <div className="flex flex-col gap-2">
         <h3 className="text-lg font-semibold text-secondary">useVolcaniumConfig()</h3>
-        <p className="text-white/70">Returns {"{ language, setLanguage }"} — read/write the current language from anywhere under the provider.</p>
+        <p className="text-white/70">Renvoie {"{ language, setLanguage }"} : lit et modifie la langue depuis n'importe quel composant du fournisseur.</p>
       </div>
     </DocPage>
   );

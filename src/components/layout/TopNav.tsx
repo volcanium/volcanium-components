@@ -17,7 +17,7 @@ export interface TopNavProps {
   children?: ReactNode;
 }
 
-export default function TopNav({ title = "App", titleLink = "/", buttons = [], className = "", children }: TopNavProps) {
+export default function TopNav({ title = "Application", titleLink = "/", buttons = [], className = "", children }: TopNavProps) {
   return (
     <div className={`flex flex-col gap-0 w-full ${className}`}>
       <div className="bg-vc-container p-1 px-5 pt-2 w-full border-b border-vc-line-strong flex flex-row justify-between items-center gap-3 max-sm:flex-wrap max-sm:px-3 max-sm:pt-[max(0.5rem,env(safe-area-inset-top))] max-sm:pb-2">
