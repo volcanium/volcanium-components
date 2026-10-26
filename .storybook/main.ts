@@ -8,6 +8,7 @@ const config: StorybookConfig = {
     "@storybook/addon-interactions",
     "@storybook/addon-a11y",
   ],
+  staticDirs: [{ from: "./fonts", to: "/fonts" }],
   framework: {
     name: "@storybook/react-vite",
     options: {},

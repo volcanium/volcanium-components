@@ -1261,10 +1261,12 @@ export default function Sidebar({
             </div>
           )}
           {showBranding && (
+            // Collapsed: the block must not keep its height (a multi-line `brandingLabel` would leave a gap under the last tab), hence max-h-0.
             <small
               className={clsx(
-                "text-center truncate text-[11px] tracking-wide transition-opacity duration-200",
-                open ? "opacity-100 delay-150" : "opacity-0",
+                "text-center text-[11px] tracking-wide transition-opacity duration-200 overflow-hidden",
+                open ? "opacity-100 delay-150 truncate" : "opacity-0 max-h-0 -mt-3",
+                open && brandingLabel && "border-t border-vc-line pt-3",
               )}
             >
               {brandingLabel ? (
