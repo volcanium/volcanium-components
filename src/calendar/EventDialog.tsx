@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { Button, Checkbox, Chip, ConfirmModal, Input, Modal, Notice, SegmentedControl, Select, Textarea, notify } from "./ui";
 import { useCalendarHost, useI18n } from "./host";
 import type { CalendarKey as MessageKey } from "./messages";
@@ -7,6 +7,7 @@ import { browserTimeZone } from "./time";
 import { IconVideo } from "@tabler/icons-react";
 import { colorOf } from "./colors";
 import BirthdayForm from "./BirthdayForm";
+import GuestsField from "./GuestsField";
 import { formFrom, isEmail, newForm, toInput, validate, withPendingGuest, type FormState } from "./eventForm";
 
 /** Lien de reunion Volcanium (`/join/xxxx-xxxx-xxxx`) dans le lieu d'un evenement ; `null` sinon. Seul ce motif precis est reconnu. */
@@ -72,22 +73,12 @@ export default function EventDialog({ target, calendars, onClose, onChanged, onB
   const existing = target?.mode === "event" ? (source ?? target.event) : null;
   const readOnly = !!existing && !existing.isOrganizer;
   const cal = calendars.find((c) => c.id === form?.calendarId);
-  const directory = useMemo(() => members.map((m) => m.email), [members]);
   if (!target || !form) return null;
   const set = <K extends keyof FormState>(k: K, v: FormState[K]) => setForm((f) => (f ? { ...f, [k]: v } : f));
   const error = validate(form);
   const fail = (code: string | undefined, prefix: "cal.event.error.") => {
     const key = `${prefix}${code ?? ""}` as MessageKey;
     notify.error(code && ["domain_not_verified", "sending_paused", "recipient_suppressed", "not_organizer"].includes(code) ? t(key) : t("cal.event.error.generic"));
-  };
-
-  const addGuest = () => {
-    const v = guestInput.trim().toLowerCase();
-    if (!v) return;
-    if (!isEmail(v)) return setGuestError(true);
-    setGuestError(false);
-    if (!form.guests.some((g) => g.email === v)) set("guests", [...form.guests, { email: v, name: members.find((m) => m.email === v)?.name ?? "" }]);
-    setGuestInput("");
   };
 
   const save = async () => {
@@ -203,16 +194,7 @@ export default function EventDialog({ target, calendars, onClose, onChanged, onB
             )}
             {!readOnly && (
               <>
-                <div className="flex flex-wrap gap-2">
-                  {form.guests.map((g) => <Chip key={g.email} removeLabel={t("cal.event.guests.remove", { email: g.email })} onRemove={() => set("guests", form.guests.filter((x) => x.email !== g.email))}>{g.name || g.email}</Chip>)}
-                </div>
-                <div className="flex items-start gap-2">
-                  <div className="min-w-0 flex-1">
-                    <Input type="email" list="cal-directory" label={t("cal.event.guests.add")} value={guestInput} onChange={(e) => { setGuestInput(e.target.value); setGuestError(false); }} onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); addGuest(); } }} />
-                    <datalist id="cal-directory">{directory.map((a) => <option key={a} value={a} />)}</datalist>
-                  </div>
-                  <Button variant="secondary" className="h-[2.75rem] shrink-0" onClick={addGuest}>{t("cal.event.guests.addButton")}</Button>
-                </div>
+                <GuestsField label={t("cal.event.guests.add")} guests={form.guests} onChange={(g) => set("guests", g)} members={members} draft={guestInput} onDraftChange={setGuestInput} invalid={guestError} onInvalidChange={setGuestError} />
                 {guestError && <p role="alert" className="text-sm text-vc-danger">{t("cal.event.guests.invalid")}</p>}
                 <p className="text-xs text-vc-text-secondary">{t("cal.event.guests.hint")}</p>
               </>
