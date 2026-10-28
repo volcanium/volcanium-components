@@ -54,7 +54,24 @@
  * stays exactly the brand hue (`main` unchanged from the dark theme), used
  * sparingly as the accent it is, rather than tinting every surface with it.
  */
+/* Surfaces translucides de la barre de navigation (Nav) : sombres par defaut, claires dans le theme clair. */
+:root {
+  --vc-nav-glass: rgba(15, 15, 16, 0.8);
+  --vc-nav-glass-strong: rgba(15, 15, 16, 0.95);
+  --vc-nav-shadow: 0 1px 24px rgba(0, 0, 0, 0.45);
+  --vc-nav-shadow-strong: 0 12px 40px rgba(0, 0, 0, 0.55);
+  --vc-nav-chip: rgba(255, 255, 255, 0.04);
+  --vc-nav-chip-active: rgba(255, 255, 255, 0.1);
+}
+
 [data-theme="light"] {
+  --vc-nav-glass: rgba(255, 255, 255, 0.82);
+  --vc-nav-glass-strong: rgba(255, 255, 255, 0.96);
+  --vc-nav-shadow: 0 1px 24px rgba(28, 27, 26, 0.12);
+  --vc-nav-shadow-strong: 0 12px 40px rgba(28, 27, 26, 0.18);
+  --vc-nav-chip: rgba(28, 27, 26, 0.05);
+  --vc-nav-chip-active: rgba(28, 27, 26, 0.1);
+
   --color-vc-main: #ff714d;
   --color-vc-accent: #ececee;
   --color-vc-back: #f7f7f8;

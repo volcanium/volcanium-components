@@ -170,7 +170,7 @@ export default function Nav({
                 backgroundColor: "transparent",
                 backdropFilter: "blur(24px)",
                 WebkitBackdropFilter: "blur(24px)",
-                boxShadow: "0 1px 24px rgba(0,0,0,0.45)",
+                boxShadow: "var(--vc-nav-shadow)",
               }
             : { backgroundColor: overlayMode ? "transparent" : "var(--color-vc-back)" }),
         }}
@@ -199,8 +199,8 @@ export default function Nav({
                 whileTap={{ scale: 0.88 }}
                 style={{
                   backgroundColor: isMenuOpen
-                    ? "rgba(255,255,255,0.10)"
-                    : "rgba(255,255,255,0.04)",
+                    ? "var(--vc-nav-chip-active)"
+                    : "var(--vc-nav-chip)",
                 }}
               >
                 <AnimatePresence mode="wait" initial={false}>
@@ -245,10 +245,10 @@ export default function Nav({
                   left: 0,
                   right: 0,
                   top: "100%",
-                  backgroundColor: "rgba(15,15,16,0.95)",
+                  backgroundColor: "var(--vc-nav-glass-strong)",
                   backdropFilter: "blur(24px)",
                   WebkitBackdropFilter: "blur(24px)",
-                  boxShadow: "0 12px 40px rgba(0,0,0,0.55)",
+                  boxShadow: "var(--vc-nav-shadow-strong)",
                   padding: "0.5rem 1rem 1rem",
                 }),
               }}
@@ -292,7 +292,7 @@ export default function Nav({
                     duration: 0.28,
                     ease: [0.16, 1, 0.3, 1],
                   }}
-                  className="mt-1.5 pt-2 border-t border-white/10 w-full"
+                  className="mt-1.5 pt-2 border-t border-vc-line w-full"
                 >
                   {mobileBottomContent}
                 </motion.div>
@@ -312,7 +312,7 @@ export default function Nav({
         style={
           isStickyStyle
             ? {
-                backgroundColor: "rgba(15,15,16,0.8)",
+                backgroundColor: "var(--vc-nav-glass)",
                 backdropFilter: "blur(50px)",
                 WebkitBackdropFilter: "blur(50px)",
               }
