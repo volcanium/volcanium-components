@@ -12,3 +12,4 @@ export { notify } from "../components/ui/notify";
 export { default as SegmentedControl } from "../components/ui/SegmentedControl";
 export { default as Select } from "../components/ui/Select";
 export { default as Textarea } from "../components/ui/Textarea";
+export { default as Avatar } from "../components/ui/Avatar";

@@ -1,6 +1,6 @@
 import { useId, useMemo, useRef, useState, type KeyboardEvent } from "react";
-import { Chip } from "./ui";
-import { useI18n } from "./host";
+import { Avatar, Chip } from "./ui";
+import { useCalendarHost, useI18n } from "./host";
 import { isEmail } from "./eventForm";
 
 export interface Guest { email: string; name: string }
@@ -23,6 +23,7 @@ interface GuestsFieldProps {
 /** Invites comme les destinataires d'un mail : puces (avec croix) dans le champ, suggestions seulement pendant la saisie, adresse libre acceptee. */
 export default function GuestsField({ label, guests, onChange, members, draft, onDraftChange, invalid, onInvalidChange }: GuestsFieldProps) {
   const { t } = useI18n();
+  const { renderAvatar } = useCalendarHost();
   const id = useId();
   const listId = `${id}-suggestions`;
   const inputRef = useRef<HTMLInputElement>(null);
@@ -102,9 +103,16 @@ export default function GuestsField({ label, guests, onChange, members, draft, o
           aria-label={label}
           aria-invalid={invalid}
           {...(suggestions[active] ? { "aria-activedescendant": `${listId}-${active}` } : {})}
-          placeholder={guests.length === 0 ? label : ""}
-          inputMode="email"
+          placeholder={guests.length === 0 ? t("cal.event.guests.search") : ""}
+          // Ni type « email », ni « e-mail » dans le libelle visible, ni nom evocateur : sinon Chrome et Safari proposent leurs adresses PAR-DESSUS nos suggestions.
+          name="vc-guest-search"
           autoComplete="off"
+          autoCorrect="off"
+          autoCapitalize="off"
+          data-lpignore="true"
+          data-1p-ignore="true"
+          data-bwignore="true"
+          data-form-type="other"
           spellCheck={false}
           className="min-w-40 flex-1 bg-transparent py-1 text-sm text-vc-text outline-none"
         />
@@ -114,9 +122,14 @@ export default function GuestsField({ label, guests, onChange, members, draft, o
           {suggestions.map((m, i) => (
             <li key={m.email} id={`${listId}-${i}`} role="option" aria-selected={i === active}>
               {/* mousedown (pas click) : le champ garde le focus, donc ne valide pas le texte tape avant le choix */}
-              <button type="button" tabIndex={-1} onMouseDown={(e) => { e.preventDefault(); add(m.email, m.name); }} onMouseEnter={() => setActive(i)} className={`flex w-full cursor-pointer flex-col px-3 py-2 text-left ${i === active ? "bg-vc-veil" : ""}`}>
-                <span className="truncate text-sm font-medium text-vc-text">{m.name || m.email}</span>
-                {m.name && <span className="truncate text-xs text-vc-text-secondary">{m.email}</span>}
+              <button type="button" tabIndex={-1} onMouseDown={(e) => { e.preventDefault(); add(m.email, m.name); }} onMouseEnter={() => setActive(i)} className={`block w-full cursor-pointer px-3 py-2 text-left ${i === active ? "bg-vc-veil" : ""}`}>
+                <span className="flex items-center gap-3">
+                  <span className="shrink-0">{renderAvatar ? renderAvatar(m, 32) : <Avatar name={m.name || m.email} email={m.email} size={32} />}</span>
+                  <span className="flex min-w-0 flex-col">
+                    <span className="truncate text-sm font-medium text-vc-text">{m.name || m.email}</span>
+                    {m.name && <span className="truncate text-xs text-vc-text-secondary">{m.email}</span>}
+                  </span>
+                </span>
               </button>
             </li>
           ))}

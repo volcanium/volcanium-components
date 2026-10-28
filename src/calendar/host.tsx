@@ -21,6 +21,8 @@ export interface CalendarHost {
   storagePrefix: string;
   /** Collegues proposes comme invites. */
   members: readonly { email: string; name: string }[];
+  /** Pastille d'une personne dans les suggestions d'invites (photo de profil de l'hote) ; a defaut, ses initiales. */
+  renderAvatar?: (member: { email: string; name: string }, size: number) => ReactNode;
   /** Propose « reunion video Volcanium » (l'hote a Communication). */
   videoMeetings: boolean;
   /** Ouvre la fiche d'un contact (clic sur un anniversaire). */
