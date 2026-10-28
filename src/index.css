@@ -72,7 +72,8 @@
   --vc-nav-chip: rgba(28, 27, 26, 0.05);
   --vc-nav-chip-active: rgba(28, 27, 26, 0.1);
 
-  --color-vc-main: #ff714d;
+  /* Orange de marque assombri pour le texte et les boutons : #ff714d ne fait que 2,7:1 sur blanc (WCAG AA : 4,5:1 ; ici 4,6:1, texte blanc compris). */
+  --color-vc-main: #d4400f;
   --color-vc-accent: #ececee;
   --color-vc-back: #f7f7f8;
   --color-vc-container: #ffffff;
@@ -80,8 +81,9 @@
   --color-vc-text: #1f1f22;
   --color-vc-overlay: #ececee;
 
-  --color-vc-line: rgba(28, 27, 26, 0.1);
-  --color-vc-line-strong: rgba(28, 27, 26, 0.18);
+  /* Bordures de champs et de cartes : assez marquees pour se voir sur du blanc. */
+  --color-vc-line: rgba(28, 27, 26, 0.14);
+  --color-vc-line-strong: rgba(28, 27, 26, 0.28);
   --color-vc-veil: rgba(28, 27, 26, 0.05);
   --color-vc-veil-strong: rgba(28, 27, 26, 0.09);
   /* A literal `black/50` (dark theme's value) would wash the whole row out
@@ -90,10 +92,50 @@
 
   /* Darker shades: the dark theme's pastel tones lack contrast on white. */
   --color-vc-danger: #dc2626;
-  --color-vc-success: #16a34a;
+  --color-vc-success: #15803d;
   --color-vc-warning: #a16207;
 }
 
+
+/*
+ * Theme clair : texte attenue. `text-vc-text/40` (2,5:1 sur blanc), `/50` (3,2:1) et `/60` (4,3:1) sont sous le seuil de lisibilite (4,5:1)
+ * alors qu'ils passent sur fond sombre. On releve chaque palier (>= 4,5:1 des /40) sans toucher aux composants : la hierarchie
+ * (titre > texte > legende) est conservee. Meme logique pour `small` et les marques de remplissage `placeholder:`.
+ */
+[data-theme="light"] .text-vc-text\/30,
+[data-theme="light"] .text-vc-text\/40,
+[data-theme="light"] small { color: color-mix(in oklab, var(--color-vc-text) 66%, transparent); }
+[data-theme="light"] .text-vc-text\/50 { color: color-mix(in oklab, var(--color-vc-text) 70%, transparent); }
+[data-theme="light"] .text-vc-text\/60 { color: color-mix(in oklab, var(--color-vc-text) 76%, transparent); }
+[data-theme="light"] .text-vc-text\/70 { color: color-mix(in oklab, var(--color-vc-text) 84%, transparent); }
+[data-theme="light"] .placeholder\:text-vc-text\/30::placeholder,
+[data-theme="light"] .placeholder\:text-vc-text\/40::placeholder,
+[data-theme="light"] .placeholder\:text-vc-text\/50::placeholder { color: color-mix(in oklab, var(--color-vc-text) 62%, transparent); }
+/* Texte « estompe » par opacite (page de statut, legendes) : moins estompe en clair. Les etats desactives (`disabled:opacity-*`) ne changent pas. */
+[data-theme="light"] .opacity-40 { opacity: 0.62; }
+[data-theme="light"] .opacity-50 { opacity: 0.7; }
+[data-theme="light"] .opacity-60 { opacity: 0.78; }
+[data-theme="light"] .opacity-70 { opacity: 0.85; }
+
+/*
+ * Theme clair : couleurs d'etat de la palette Tailwind utilisees en texte par les apps (`text-amber-400`, `text-red-400`, `text-green-400`...).
+ * Ces teintes claires sont faites pour un fond sombre (1,6:1 a 2,5:1 sur blanc) : on les remplace par leurs equivalents fonces (>= 4,5:1),
+ * meme familles que `--color-vc-danger/success/warning`. Les fonds et bordures translucides (`bg-red-500/10`) restent.
+ */
+[data-theme="light"] .text-red-300,
+[data-theme="light"] .text-red-400,
+[data-theme="light"] .text-red-500 { color: var(--color-vc-danger); }
+[data-theme="light"] .text-green-400,
+[data-theme="light"] .text-green-500,
+[data-theme="light"] .text-emerald-400 { color: var(--color-vc-success); }
+[data-theme="light"] .text-amber-300,
+[data-theme="light"] .text-amber-400,
+[data-theme="light"] .text-amber-500,
+[data-theme="light"] .text-yellow-400 { color: var(--color-vc-warning); }
+[data-theme="light"] .text-orange-400,
+[data-theme="light"] .text-orange-500 { color: #c2410c; }
+[data-theme="light"] .text-sky-400,
+[data-theme="light"] .text-sky-500 { color: #0369a1; }
 
 @layer utilities {
   .disable-animations *,
