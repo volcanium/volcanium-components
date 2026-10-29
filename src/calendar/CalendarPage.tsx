@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Button, Checkbox, FullPageLoader, IconButton, Modal, Notice, SegmentedControl, notify } from "./ui";
+import { Button, Checkbox, IconButton, Loader, Modal, Notice, SegmentedControl, notify } from "./ui";
 import { IconCake, IconCalendarCog, IconCalendarEvent, IconChevronLeft, IconChevronRight, IconPencil, IconPlus } from "@tabler/icons-react";
 import { CalendarHostProvider, useCalendarHost, type CalendarHost } from "./host";
 import { useIsCompactCalendar } from "./viewport";
@@ -184,7 +184,8 @@ function CalendarScreen() {
     notify.success(t(event.participants.some((p) => !p.isMe) ? "cal.moved.guests" : "cal.moved"));
   };
 
-  if (calendars.state === "loading") return <FullPageLoader />;
+  // Loader dans la zone du calendrier seulement (jamais un overlay plein ecran : la barre laterale de l'app reste en place).
+  if (calendars.state === "loading") return <div className="flex min-h-[50vh] items-center justify-center p-8"><div className="w-48"><Loader full /></div></div>;
   if (calendars.state === "none") return <div className="mx-auto max-w-lg p-6"><Notice tone="info" title={t("cal.noCalendar.title")}>{t("cal.noCalendar.body")}</Notice></div>;
   if (calendars.state === "error") return <div className="p-6"><Notice tone="danger" action={<Button variant="secondary" onClick={() => void loadCalendars()}>{t("cal.retry")}</Button>}>{t("cal.loadError")}</Notice></div>;
 

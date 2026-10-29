@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Button, ConfirmModal, IconButton, Input, Notice, Select, Tag, FullPageLoader, notify } from "./ui";
+import { Button, ConfirmModal, IconButton, Input, Notice, Select, Tag, Loader, notify } from "./ui";
 import { IconArrowLeft, IconArrowsExchange, IconCheck, IconChecks, IconCopy, IconMail, IconPencil, IconPlus, IconStar, IconStarFilled, IconStarOff, IconTrash, IconUserPlus, IconUsersGroup, IconUsersPlus, IconX } from "@tabler/icons-react";
 import { useContactsHost, type Colleague, type PersonContext } from "./host";
 import type { ContactsKey as MessageKey } from "./messages";
@@ -80,7 +80,8 @@ export default function ContactsPage({ focusContactId = null, onFocusDone }: { /
   const reachable: Colleague | undefined = member ? (isSelf(member.email) ? undefined : find(member.email)) : contact ? contact.emails.map((e) => find(e.address)).find((p) => p && !isSelf(p.email)) : undefined;
   const person: PersonContext = { contact, member: member ? { name: member.name, email: member.email } : undefined, colleague: member ? find(member.email) : contact ? colleagueOf(contact) : undefined, reachable, self: !!selfSel };
 
-  if (state === "loading") return <FullPageLoader />;
+  // Loader dans la zone des contacts seulement (jamais un overlay plein ecran : la barre laterale de l'app reste en place).
+  if (state === "loading") return <div className="flex min-h-[50vh] items-center justify-center p-8"><div className="w-48"><Loader full /></div></div>;
   if (state === "unavailable") return <div className="mx-auto max-w-lg p-6"><Notice tone="info">{t("contacts.noMailbox")}</Notice></div>;
   if (state === "error") return <div className="p-6"><Notice tone="danger" action={<Button variant="secondary" onClick={() => void reload()}>{t("contacts.retry")}</Button>}>{t("contacts.loadError")}</Notice></div>;
 

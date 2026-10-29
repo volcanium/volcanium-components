@@ -4,6 +4,7 @@ export { default as Checkbox } from "../components/ui/Checkbox";
 export { default as Chip } from "../components/ui/Chip";
 export { default as ConfirmModal } from "../components/ui/ConfirmModal";
 export { default as FullPageLoader } from "../components/ui/FullPageLoader";
+export { default as Loader } from "../components/ui/Loader";
 export { default as IconButton } from "../components/ui/IconButton";
 export { default as Input } from "../components/ui/Input";
 export { default as Modal } from "../components/ui/Modal";
