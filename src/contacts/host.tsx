@@ -2,6 +2,7 @@ import { createContext, useContext, type ReactNode } from "react";
 import type { ContactsApi } from "./api";
 import type { Contact } from "./api";
 import type { ContactsKey } from "./messages";
+import type { DirectoryPerson } from "./sort";
 
 /** Un collegue de l'annuaire de l'entreprise (porte une adresse e-mail et peut recevoir un message ou un appel). */
 export interface Colleague { id: string; name: string; email: string; image?: string | null; jobTitle?: string | null }
@@ -23,8 +24,8 @@ export interface ContactsHost {
   api: ContactsApi;
   t: (key: ContactsKey, params?: Record<string, string | number>) => string;
   locale: string;
-  /** Annuaire de l'entreprise (lignes « collegue » de la liste). */
-  members: readonly { name: string; email: string }[];
+  /** Annuaire de l'entreprise (lignes « collegue » de la liste ; avec `external`, un contact externe de l'entreprise). */
+  members: readonly DirectoryPerson[];
   colleagues: {
     find(email: string): Colleague | undefined;
     /** Adresse de l'entreprise : un membre, ou le domaine de notre propre adresse. */

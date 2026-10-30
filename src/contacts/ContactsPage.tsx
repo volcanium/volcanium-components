@@ -260,10 +260,11 @@ export default function ContactsPage({ focusContactId = null, onFocusDone }: { /
                 <h2 className="flex flex-wrap items-center gap-2 break-words text-xl font-semibold">
                   <span>{contact?.name ?? member?.name ?? list?.name}</span>
                   {contact && <OriginTag internal={contact.emails.some((e) => isInternal(e.address))} />}
-                  {member && <OriginTag internal />}
-                  {(member || (contact && colleagueOf(contact))) && <Tag tone="info">{t(selfSel ? "contacts.self" : "contacts.colleague")}</Tag>}
+                  {member && <OriginTag internal={!member.external} />}
+                  {((member && !member.external) || (contact && colleagueOf(contact))) && <Tag tone="info">{t(selfSel ? "contacts.self" : "contacts.colleague")}</Tag>}
                 </h2>
-                {member && find(member.email)?.jobTitle && <p className="break-words text-sm text-vc-text-secondary">{find(member.email)!.jobTitle}</p>}
+                {member && !member.external && find(member.email)?.jobTitle && <p className="break-words text-sm text-vc-text-secondary">{find(member.email)!.jobTitle}</p>}
+                {member?.external && (member.external.jobTitle || member.external.company) && <p className="break-words text-sm text-vc-text-secondary">{[member.external.jobTitle, member.external.company].filter(Boolean).join(" · ")}</p>}
                 {contact && (contact.jobTitle || contact.company) && <p className="break-words text-sm text-vc-text-secondary">{[contact.jobTitle, contact.company].filter(Boolean).join(" · ")}</p>}
                                 {list && <p className="text-sm text-vc-text-secondary">{t("contacts.list.count", { count: list.addresses.length })}</p>}
               </div>
@@ -274,17 +275,26 @@ export default function ContactsPage({ focusContactId = null, onFocusDone }: { /
                 {canWrite && contact && contact.emails.length > 0 && <IconButton label={t("contacts.writeMail")} onClick={() => writeTo([contact.emails[0]!.address])}><IconMail size={18} /></IconButton>}
                 {canWrite && member && <IconButton label={t("contacts.writeMail")} onClick={() => writeTo([member.email])}><IconMail size={18} /></IconButton>}
                 {canWrite && list && <IconButton label={t("contacts.writeList")} onClick={() => writeTo(list.addresses)}><IconMail size={18} /></IconButton>}
-                {(contact || list || member) && <IconButton label={t(selfSel ? "contacts.self.edit" : "contacts.edit")} onClick={() => (selfSel ? window.location.assign(manageAccountUrl) : contact ? setContactDialog(contact) : member ? setContactDialog({ colleague: { name: member.name, email: member.email } }) : setListDialog(list!))}><IconPencil size={18} /></IconButton>}
+                {(contact || list || (member && !member.external)) && <IconButton label={t(selfSel ? "contacts.self.edit" : "contacts.edit")} onClick={() => (selfSel ? window.location.assign(manageAccountUrl) : contact ? setContactDialog(contact) : member ? setContactDialog({ colleague: { name: member.name, email: member.email } }) : setListDialog(list!))}><IconPencil size={18} /></IconButton>}
                 {((contact && !colleagueOf(contact)) || list) && <IconButton label={t("contacts.delete")} onClick={() => setConfirmDelete(true)}><IconTrash size={18} /></IconButton>}
               </div>
             </header>
             {selfSel && <Notice tone="info" dense action={<a href={manageAccountUrl} className="text-sm font-medium text-vc-main hover:underline">{t("contacts.self.open")}</a>}>{t("contacts.self.note")}</Notice>}
+            {member?.external && <Notice tone="info" dense>{t("contacts.external.note")}</Notice>}
             {host.renderProfile?.(person)}
             {member && (
               <section aria-label={t("contacts.field.emails")}>
                 <h3 className="mb-1 text-sm font-semibold">{t("contacts.field.emails")}</h3>
                 <ul className="divide-y divide-vc-line rounded-lg border border-vc-line">
-                  <li className="flex items-center justify-between gap-3 px-3 py-2 text-sm"><span className="min-w-0 break-all"><AddressLink address={member.email} /> <span className="ml-1 text-xs text-vc-text-secondary">{t("contacts.label.work")}</span></span></li>
+                  <li className="flex items-center justify-between gap-3 px-3 py-2 text-sm"><span className="min-w-0 break-all"><AddressLink address={member.email} /> {!member.external && <span className="ml-1 text-xs text-vc-text-secondary">{t("contacts.label.work")}</span>}</span></li>
+                </ul>
+              </section>
+            )}
+            {member?.external?.phone && (
+              <section aria-label={t("contacts.field.phones")}>
+                <h3 className="mb-1 text-sm font-semibold">{t("contacts.field.phones")}</h3>
+                <ul className="divide-y divide-vc-line rounded-lg border border-vc-line">
+                  <li className="px-3 py-2 text-sm"><a href={`tel:${member.external.phone.replace(/[^+\d]/g, "")}`} className="text-vc-main hover:underline">{member.external.phone}</a></li>
                 </ul>
               </section>
             )}

@@ -46,3 +46,15 @@ describe("liste des contacts", () => {
     expect(lists.map((l) => l.name)).toEqual(["Famille", "équipe", "Asso"]);
   });
 });
+
+describe("contacts externes de l'entreprise", () => {
+  it("ligne « annuaire » marquee externe (pas interne), avec societe et poste ; un collegue reste interne", () => {
+    const rows = buildRows([], [{ name: "Ana", email: "ana@acme.fr" }, { name: "Zoe", email: "Zoe@client.test", external: { company: "Client SA", phone: "+33 1" } }], () => false);
+    expect(rows).toEqual([
+      { kind: "member", id: "m:ana@acme.fr", name: "Ana", email: "ana@acme.fr", internal: true },
+      { kind: "member", id: "m:Zoe@client.test", name: "Zoe", email: "zoe@client.test", internal: false, external: { company: "Client SA", phone: "+33 1" } },
+    ]);
+    expect(filterRows(rows, "external").map((r) => r.name)).toEqual(["Zoe"]);
+    expect(filterRows(rows, "internal").map((r) => r.name)).toEqual(["Ana"]);
+  });
+});

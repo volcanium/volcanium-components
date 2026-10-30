@@ -9,10 +9,15 @@ export type ListSortKey = "name-asc" | "name-desc" | "size-desc" | "size-asc";
 export const LIST_SORT_KEYS: ListSortKey[] = ["name-asc", "name-desc", "size-desc", "size-asc"];
 export type OriginFilter = "all" | "internal" | "external";
 
+/** Contact EXTERNE de l'entreprise (client, fournisseur...) cree dans Entreprise : affiche avec les collegues, marque « Externe », en lecture seule. */
+export interface ExternalInfo { company?: string | null; jobTitle?: string | null; phone?: string | null }
+/** Une personne de l'annuaire : un collegue, ou (avec `external`) un contact externe de l'entreprise. */
+export interface DirectoryPerson { name: string; email: string; external?: ExternalInfo }
+
 /** Une ligne de la liste : un contact de l'utilisateur, ou un collegue de l'annuaire de l'entreprise (lecture seule). */
 export type ContactRow =
   | { kind: "contact"; id: string; name: string; contact: Contact; internal: boolean }
-  | { kind: "member"; id: string; name: string; email: string; internal: true };
+  | { kind: "member"; id: string; name: string; email: string; internal: boolean; external?: ExternalInfo };
 
 const collator = new Intl.Collator("fr", { sensitivity: "base", numeric: true });
 const keyOf = (r: ContactRow): { first: string; company: string; created: number } =>
@@ -42,11 +47,11 @@ export const filterRows = (rows: readonly ContactRow[], origin: OriginFilter): C
   origin === "all" ? [...rows] : rows.filter((r) => (origin === "internal") === r.internal);
 
 /** Lignes de la liste : les contacts de l'utilisateur (« interne » si une de leurs adresses est a l'entreprise) puis les collegues de l'annuaire qu'il n'a pas deja en contact. */
-export function buildRows(contacts: readonly Contact[], members: readonly { name: string; email: string }[], isInternal: (email: string) => boolean): ContactRow[] {
+export function buildRows(contacts: readonly Contact[], members: readonly DirectoryPerson[], isInternal: (email: string) => boolean): ContactRow[] {
   const have = new Set(contacts.flatMap((c) => c.emails.map((e) => e.address)));
   return [
     ...contacts.map((c): ContactRow => ({ kind: "contact", id: c.id, name: c.name, contact: c, internal: c.emails.some((e) => isInternal(e.address)) })),
-    ...members.filter((m) => !have.has(m.email.toLowerCase())).map((m): ContactRow => ({ kind: "member", id: `m:${m.email}`, name: m.name || m.email, email: m.email.toLowerCase(), internal: true })),
+    ...members.filter((m) => !have.has(m.email.toLowerCase())).map((m): ContactRow => ({ kind: "member", id: `m:${m.email}`, name: m.name || m.email, email: m.email.toLowerCase(), internal: !m.external, ...(m.external ? { external: m.external } : {}) })),
   ];
 }
 
