@@ -41,6 +41,8 @@ interface CtxValue {
   subscribe: (l: () => void) => () => void;
   get: () => PresenceState;
   userId: string;
+  /** URL de Compte (sans « / » final) : sert aux autres lectures de Compte faites par la librairie (fiche de profil). */
+  base: string;
   setStatus: PresenceApi["setStatus"];
 }
 const Ctx = createContext<CtxValue | null>(null);
@@ -254,7 +256,7 @@ export function PresenceProvider({ compteUrl, userId, idleAfterMs = 5 * 60_000, 
     [base, userId, set],
   );
 
-  const value = useMemo<CtxValue>(() => ({ subscribe, get, userId: userId ?? "", setStatus }), [subscribe, get, userId, setStatus]);
+  const value = useMemo<CtxValue>(() => ({ subscribe, get, userId: userId ?? "", base, setStatus }), [subscribe, get, userId, base, setStatus]);
   return (
     <Ctx.Provider value={value}>
       <CompteStreamBusContext.Provider value={bus}>{children}</CompteStreamBusContext.Provider>
@@ -287,4 +289,10 @@ export function usePresence(): PresenceApi | undefined {
 /** Statut d'un utilisateur, ou `undefined` si inconnu / invisible pour moi. */
 export function usePresenceOf(userId: string | null | undefined): PresenceStatus | undefined {
   return usePresence()?.statusOf(userId);
+}
+
+/** URL de Compte et compte de l'app (pour lire une fiche de profil), ou `undefined` hors de `PresenceProvider`. */
+export function useCompteAccess(): { base: string; userId: string } | undefined {
+  const ctx = useContext(Ctx);
+  return useMemo(() => (ctx && ctx.userId ? { base: ctx.base, userId: ctx.userId } : undefined), [ctx]);
 }

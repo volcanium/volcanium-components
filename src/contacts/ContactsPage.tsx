@@ -8,6 +8,8 @@ import { findDuplicates } from "./duplicates";
 import { CONTACT_SORT_KEYS, LIST_SORT_KEYS, buildRows, filterRows, sortLists, sortRows, type ContactRow, type ContactSortKey, type ListSortKey, type OriginFilter } from "./sort";
 import { formatAddress } from "./address";
 import { formatBirthday } from "../calendar/birthdays";
+import { useProfileCard } from "../profile/useProfileCard";
+import { splitName } from "./name";
 import ContactAvatar from "./ContactAvatar";
 import FilterPopover from "./FilterPopover";
 import OriginTag from "./OriginTag";
@@ -80,6 +82,11 @@ export default function ContactsPage({ focusContactId = null, onFocusDone }: { /
   const reachable: Colleague | undefined = member ? (isSelf(member.email) ? undefined : find(member.email)) : contact ? contact.emails.map((e) => find(e.address)).find((p) => p && !isSelf(p.email)) : undefined;
   const person: PersonContext = { contact, member: member ? { name: member.name, email: member.email } : undefined, colleague: member ? find(member.email) : contact ? colleagueOf(contact) : undefined, reachable, self: !!selfSel };
 
+  // Anniversaire du profil public d'un collegue (s'il le montre a ceux de son entreprise ou a tous) : propose a la fiche de contact, jamais dans l'info-bulle de profil.
+  const colleagueCard = useProfileCard(person.colleague && !person.self ? person.colleague.id : undefined, true);
+  const bp = colleagueCard?.profile;
+  const offeredBirthday = bp?.birthdayMonth && bp.birthdayDay && !contact?.birthday ? { month: bp.birthdayMonth, day: bp.birthdayDay, year: null } : null;
+
   // Loader dans la zone des contacts seulement (jamais un overlay plein ecran : la barre laterale de l'app reste en place).
   if (state === "loading") return <div className="flex min-h-[50vh] items-center justify-center p-8"><div className="w-48"><Loader full /></div></div>;
   if (state === "unavailable") return <div className="mx-auto max-w-lg p-6"><Notice tone="info">{t("contacts.noMailbox")}</Notice></div>;
@@ -95,6 +102,19 @@ export default function ContactsPage({ focusContactId = null, onFocusDone }: { /
     notify.success(t(sel.kind === "contact" ? "contacts.deleted" : "contacts.list.deleted"));
     setSel(null);
     await reload();
+  };
+
+  /** Ajoute l'anniversaire du collegue a son contact (cree le contact au besoin) : il apparait alors dans le calendrier. */
+  const addBirthday = async () => {
+    if (!offeredBirthday) return;
+    const email = (person.colleague?.email ?? member?.email ?? "").toLowerCase();
+    const { data, error } = contact
+      ? await contactsApi.update(contact.id, { firstName: contact.firstName, lastName: contact.lastName, company: contact.company, jobTitle: contact.jobTitle, notes: contact.notes, emails: contact.emails, phones: contact.phones, addresses: contact.addresses, birthday: offeredBirthday })
+      : await contactsApi.create({ ...splitName(person.colleague?.name ?? member?.name ?? email, email), company: colleagueCard?.organization?.name ?? "", jobTitle: colleagueCard?.jobTitle ?? "", notes: "", emails: [{ address: email, label: "work" }], phones: [], addresses: [], birthday: offeredBirthday });
+    if (error || !data) return notify.error(t("contacts.actionFailed"));
+    notify.success(t("contacts.birthday.added"));
+    await reload();
+    open({ kind: "contact", id: data.contact.id });
   };
 
   /** Action sur la selection (100 par appel) ; l'etat est recharge depuis le serveur. */
@@ -282,6 +302,15 @@ export default function ContactsPage({ focusContactId = null, onFocusDone }: { /
             {selfSel && <Notice tone="info" dense action={<a href={manageAccountUrl} className="text-sm font-medium text-vc-main hover:underline">{t("contacts.self.open")}</a>}>{t("contacts.self.note")}</Notice>}
             {member?.external && <Notice tone="info" dense>{t("contacts.external.note")}</Notice>}
             {host.renderProfile?.(person)}
+            {offeredBirthday && (
+              <section aria-label={t("contacts.field.birthday")}>
+                <h3 className="mb-1 text-sm font-semibold">{t("contacts.field.birthday")}</h3>
+                <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-vc-line px-3 py-2 text-sm">
+                  <span>{formatBirthday(offeredBirthday, locale)}</span>
+                  <Button variant="secondary" onClick={() => void addBirthday()}>{t("contacts.birthday.add")}</Button>
+                </div>
+              </section>
+            )}
             {member && (
               <section aria-label={t("contacts.field.emails")}>
                 <h3 className="mb-1 text-sm font-semibold">{t("contacts.field.emails")}</h3>

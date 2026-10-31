@@ -6,6 +6,9 @@ import Tabs, { TabItem } from "./Tabs";
 import { useLanguage } from "../../utils/useLanguage";
 import PresenceDot, { presenceLabelKey } from "../../presence/PresenceDot";
 import { usePresenceOf } from "../../presence/PresenceProvider";
+import { useProfileCard } from "../../profile/useProfileCard";
+import ProfileDetails from "../../profile/ProfileDetails";
+import ReportForm from "../../profile/ReportForm";
 
 /** Onglet de la fiche. Son `content` peut être une fonction recevant `goTo` (bouton « Afficher plus » qui ouvre un autre onglet). */
 export interface ProfileTab extends Omit<TabItem, "content"> {
@@ -23,6 +26,8 @@ export interface ProfilePopoverProps {
   avatarSrc?: string | null;
   /** Compte Volcanium de la personne : affiche son statut (rond sur la photo + libellé) quand l'app est dans un `PresenceProvider` et qu'il est visible. */
   userId?: string | null;
+  /** Affiche le profil public lu sur Compte (poste, entreprise, bio, lieu, site ; l'anniversaire se propose dans la fiche de contact, pas ici) quand l'app est dans un `PresenceProvider`. Mettre `false` si l'hôte les affiche déjà lui-même (le nom d'affichage et le bouton « Signaler » restent). @default true */
+  showProfile?: boolean;
   /** Étiquette à côté du nom (« Externe », « Interne »…), par exemple un `<Tag>`. */
   tag?: ReactNode;
   /** Courte description (poste, bio) : n'est affichée que si elle est fournie. */
@@ -50,7 +55,7 @@ const MARGIN = 8;
  * si elle manque de place en dessous, se ferme avec Échap, un clic à l'extérieur ou la croix.
  * @see {@link https://vcomponents.tmenv.fr/?path=/docs/ui-profilepopover--docs}
  */
-export default function ProfilePopover({ children, name, email, avatarSrc, userId, tag, bio, actions, tabs, defaultTab, onOpenChange, triggerClassName = "", triggerLabel }: ProfilePopoverProps) {
+export default function ProfilePopover({ children, name, email, avatarSrc, userId, showProfile = true, tag, bio, actions, tabs, defaultTab, onOpenChange, triggerClassName = "", triggerLabel }: ProfilePopoverProps) {
   const { t } = useLanguage();
   const id = useId();
   const trigger = useRef<HTMLButtonElement>(null);
@@ -58,11 +63,16 @@ export default function ProfilePopover({ children, name, email, avatarSrc, userI
   const [open, setOpen] = useState(false);
   const [place, setPlace] = useState<Placement | null>(null);
   const [tab, setTab] = useState(defaultTab ?? tabs[0]?.id ?? "");
+  const [reporting, setReporting] = useState(false);
   const status = usePresenceOf(userId);
+  // Fiche lue sur Compte a l'ouverture : nom d'affichage, poste, entreprise et profil public, SELON ce que la personne montre a celui qui regarde.
+  const profileCard = useProfileCard(userId, open);
+  const shownName = profileCard?.profile?.displayName?.trim() || name;
+  const headline = bio ?? ((showProfile && (profileCard?.jobTitle || profileCard?.organization)) ? [profileCard?.jobTitle, profileCard?.organization?.name].filter(Boolean).join(" · ") : undefined);
 
   const change = useCallback((next: boolean) => {
     setOpen(next);
-    if (!next) setPlace(null);
+    if (!next) { setPlace(null); setReporting(false); }
     onOpenChange?.(next);
   }, [onOpenChange]);
 
@@ -127,7 +137,7 @@ export default function ProfilePopover({ children, name, email, avatarSrc, userI
           ref={card}
           id={id}
           role="dialog"
-          aria-label={name}
+          aria-label={shownName}
           style={{ left: place?.left ?? 0, top: place?.top ?? 0, visibility: place ? "visible" : "hidden" }}
           className="fixed z-50 flex max-h-[min(36rem,calc(100dvh-1rem))] w-[26rem] max-w-[calc(100vw-1rem)] flex-col overflow-hidden rounded-xl border border-vc-line-strong bg-vc-container text-vc-text shadow-2xl"
         >
@@ -135,9 +145,9 @@ export default function ProfilePopover({ children, name, email, avatarSrc, userI
             <IconX size={16} aria-hidden />
           </button>
           <div className="flex items-start gap-4 p-4 pb-3 pr-10">
-            <Avatar name={name} {...(email ? { email } : {})} src={avatarSrc ?? null} size={72} {...(status ? { status } : {})} />
+            <Avatar name={shownName} {...(email ? { email } : {})} src={avatarSrc ?? null} size={72} {...(status ? { status } : {})} />
             <div className="min-w-0 flex-1">
-              <h2 className="break-words text-lg font-semibold leading-tight">{name}</h2>
+              <h2 className="break-words text-lg font-semibold leading-tight">{shownName}</h2>
               {email && email !== name && <p className="break-all text-sm text-vc-text/60">{email}</p>}
               {status && (
                 <p className="mt-1 flex items-center gap-1.5 text-sm text-vc-text/80">
@@ -146,12 +156,20 @@ export default function ProfilePopover({ children, name, email, avatarSrc, userI
                 </p>
               )}
               {tag && <div className="mt-1.5">{tag}</div>}
-              {bio && <p className="mt-2 text-sm text-vc-text/80">{bio}</p>}
+              {headline && <p className="mt-2 text-sm text-vc-text/80">{headline}</p>}
               {actions && <div className="mt-3 flex flex-wrap items-center gap-2">{actions}</div>}
             </div>
           </div>
           {tabs.length > 1 && <Tabs tabs={tabs.map(({ content: _content, ...rest }) => rest)} value={active?.id ?? ""} onChange={setTab} className="px-2" />}
-          <div role="tabpanel" className="min-h-0 flex-1 overflow-y-auto p-4 vc-scroll-hover">{typeof active?.content === "function" ? active.content({ goTo: setTab }) : active?.content}</div>
+          <div role="tabpanel" className="min-h-0 flex-1 overflow-y-auto p-4 vc-scroll-hover">{showProfile && profileCard && active?.id === tabs[0]?.id && <ProfileDetails card={profileCard} />}{typeof active?.content === "function" ? active.content({ goTo: setTab }) : active?.content}</div>
+          {/* Signalement a la moderation : seulement pour une autre personne dont Compte a fourni la fiche. */}
+          {profileCard && !profileCard.isSelf && (
+            <div className="border-t border-vc-line px-4 py-2">
+              {reporting
+                ? <ReportForm userId={profileCard.userId} onDone={() => setReporting(false)} />
+                : <button type="button" onClick={() => setReporting(true)} className="cursor-pointer text-xs text-vc-text/60 hover:text-vc-text hover:underline">{t("report_action")}</button>}
+            </div>
+          )}
         </div>,
         document.body,
       )}

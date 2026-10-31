@@ -100,6 +100,8 @@ export { default as PresenceDot, PRESENCE_STATUSES, presenceLabelKey } from "./p
 export type { PresenceStatus, ManualPresence, PresenceDotProps } from "./presence/PresenceDot";
 export { PresenceProvider, usePresence, usePresenceOf } from "./presence/PresenceProvider";
 export type { PresenceProviderProps, PresenceApi } from "./presence/PresenceProvider";
+export { useProfileCard } from "./profile/useProfileCard";
+export type { ProfileCard, PublicProfileFields } from "./profile/useProfileCard";
 export { NotificationProvider, useNotifications } from "./notifications/NotificationProvider";
 export type { NotificationProviderProps, NotificationsApi, NotificationItem, NotificationAction } from "./notifications/NotificationProvider";
 export { default as NotificationCard } from "./notifications/NotificationCard";

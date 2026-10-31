@@ -17,6 +17,23 @@ export type TranslationKey =
   | "cancel"
   | "confirm"
   | "close"
+  | "profile_company"
+  | "profile_pronouns"
+  | "profile_location"
+  | "profile_website"
+  | "profile_bio"
+  | "report_action"
+  | "report_title"
+  | "report_reason_harassment"
+  | "report_reason_impersonation"
+  | "report_reason_inappropriate"
+  | "report_reason_privacy"
+  | "report_reason_other"
+  | "report_details"
+  | "report_send"
+  | "report_sent"
+  | "report_failed"
+  | "report_limit"
   | "select_placeholder"
   | "select_search_placeholder"
   | "select_loading"
@@ -120,6 +137,23 @@ const dictionaries: Record<"fr" | "en", Dictionary> = {
     cancel: "Annuler",
     confirm: "Confirmer",
     close: "Fermer",
+    profile_company: "Entreprise",
+    profile_pronouns: "Pronoms",
+    profile_location: "Lieu",
+    profile_website: "Site web",
+    profile_bio: "À propos",
+    report_action: "Signaler ce profil",
+    report_title: "Signaler ce profil à la modération",
+    report_reason_harassment: "Harcèlement ou menaces",
+    report_reason_impersonation: "Usurpation d'identité",
+    report_reason_inappropriate: "Contenu inapproprié",
+    report_reason_privacy: "Données personnelles d'un tiers",
+    report_reason_other: "Autre",
+    report_details: "Précisions (facultatif, 1000 caractères max)",
+    report_send: "Envoyer le signalement",
+    report_sent: "Signalement envoyé à la modération. Merci.",
+    report_failed: "Envoi impossible pour le moment. Réessayez plus tard.",
+    report_limit: "Trop de signalements envoyés. Réessayez plus tard.",
     select_placeholder: "Sélectionner…",
     select_search_placeholder: "Rechercher…",
     select_loading: "Chargement…",
@@ -220,6 +254,23 @@ const dictionaries: Record<"fr" | "en", Dictionary> = {
     cancel: "Cancel",
     confirm: "Confirm",
     close: "Close",
+    profile_company: "Company",
+    profile_pronouns: "Pronouns",
+    profile_location: "Location",
+    profile_website: "Website",
+    profile_bio: "About",
+    report_action: "Report this profile",
+    report_title: "Report this profile to moderation",
+    report_reason_harassment: "Harassment or threats",
+    report_reason_impersonation: "Impersonation",
+    report_reason_inappropriate: "Inappropriate content",
+    report_reason_privacy: "Someone else's personal data",
+    report_reason_other: "Other",
+    report_details: "Details (optional, 1000 characters max)",
+    report_send: "Send report",
+    report_sent: "Report sent to moderation. Thank you.",
+    report_failed: "Could not send right now. Please try again later.",
+    report_limit: "Too many reports sent. Please try again later.",
     select_placeholder: "Select...",
     select_search_placeholder: "Search...",
     select_loading: "Loading...",
@@ -309,6 +360,24 @@ const dictionaries: Record<"fr" | "en", Dictionary> = {
 const es: Dictionary = {
   ...dictionaries.en,
   notif_answer: "Contestar",
+  profile_company: "Empresa",
+  profile_pronouns: "Pronombres",
+  profile_location: "Lugar",
+  profile_website: "Sitio web",
+  profile_bio: "Acerca de",
+  report_action: "Denunciar este perfil",
+  report_title: "Denunciar este perfil a moderación",
+  report_reason_harassment: "Acoso o amenazas",
+  report_reason_impersonation: "Suplantación de identidad",
+  report_reason_inappropriate: "Contenido inapropiado",
+  report_reason_privacy: "Datos personales de un tercero",
+  report_reason_other: "Otro",
+  report_details: "Detalles (opcional, máx. 1000 caracteres)",
+  report_send: "Enviar la denuncia",
+  report_sent: "Denuncia enviada a moderación. Gracias.",
+  report_failed: "No se pudo enviar ahora. Inténtelo más tarde.",
+  report_limit: "Demasiadas denuncias enviadas. Inténtelo más tarde.",
+
   notif_decline: "Rechazar",
   notif_messages: "Mensajes",
   notif_open: "Abrir",
