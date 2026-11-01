@@ -340,23 +340,25 @@ function AppSwitcherPanel({
           <div className="w-5 h-5 border-2 border-vc-main border-t-transparent rounded-full animate-spin" />
         </div>
       ) : (
-        <div className="flex flex-col gap-0.5 max-h-72 overflow-y-auto vc-scroll-hover">
+        // Grille façon « applications Google » : 3 logos par rangée, nom plus petit sous le logo.
+        <div className="grid grid-cols-3 gap-1 max-h-80 overflow-y-auto vc-scroll-hover">
           {apps.map((app) => (
             <button
               key={app.id}
               type="button"
               disabled={app.active}
               onClick={() => go(app)}
+              title={app.name}
+              aria-current={app.active ? "true" : undefined}
               className={clsx(
-                "flex items-center gap-2.5 rounded-xl p-2 max-sm:min-h-11 text-left transition-colors",
+                "flex min-w-0 flex-col items-center gap-1.5 rounded-xl px-1 py-2.5 max-sm:min-h-11 text-center transition-colors",
                 app.active ? "bg-vc-veil-strong" : "cursor-pointer hover:bg-vc-veil",
               )}
             >
-              <div className="w-8 h-8 rounded-lg shrink-0 overflow-hidden ring-1 ring-vc-line bg-vc-back flex items-center justify-center">
+              <div className="w-12 h-12 rounded-xl shrink-0 overflow-hidden ring-1 ring-vc-line bg-vc-back flex items-center justify-center">
                 <AppLogo app={app} />
               </div>
-              <p className="flex-1 min-w-0 text-[13px] font-medium truncate">{app.name}</p>
-              {app.active && <IconCheck size={16} className="shrink-0 text-vc-main" />}
+              <p className={clsx("w-full text-[11px] leading-tight truncate", app.active ? "font-semibold text-vc-main" : "font-medium")}>{app.name}</p>
             </button>
           ))}
         </div>
