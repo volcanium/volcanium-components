@@ -243,6 +243,8 @@ function Header({ openFnc, open, title, subtitle }: any) {
   );
 }
 
+// Logo d'une app : l'image telle quelle (les logos sont déjà des tuiles arrondies : ni anneau ni fond autour) ; à défaut, ou si l'image ne charge pas,
+// l'initiale de l'app dans une tuile encadrée.
 function AppLogo({ app }: { app: AppSwitcherApp }) {
   const [failedUrl, setFailedUrl] = useState<string | null>(null);
   if (app.logoUrl && failedUrl !== app.logoUrl) {
@@ -252,11 +254,15 @@ function AppLogo({ app }: { app: AppSwitcherApp }) {
         alt=""
         referrerPolicy="no-referrer"
         onError={() => setFailedUrl(app.logoUrl ?? null)}
-        className="w-full h-full object-contain"
+        className="w-12 h-12 shrink-0 object-contain"
       />
     );
   }
-  return <span className="text-sm font-bold text-vc-main">{app.name.trim().charAt(0).toUpperCase()}</span>;
+  return (
+    <span className="w-12 h-12 shrink-0 rounded-xl ring-1 ring-vc-line bg-vc-back flex items-center justify-center text-lg font-bold text-vc-main">
+      {app.name.trim().charAt(0).toUpperCase()}
+    </span>
+  );
 }
 
 function AppSwitcherPanel({
@@ -355,9 +361,7 @@ function AppSwitcherPanel({
                 app.active ? "bg-vc-veil-strong" : "cursor-pointer hover:bg-vc-veil",
               )}
             >
-              <div className="w-12 h-12 rounded-xl shrink-0 overflow-hidden ring-1 ring-vc-line bg-vc-back flex items-center justify-center">
-                <AppLogo app={app} />
-              </div>
+              <AppLogo app={app} />
               <p className={clsx("w-full text-[11px] leading-tight truncate", app.active ? "font-semibold text-vc-main" : "font-medium")}>{app.name}</p>
             </button>
           ))}
