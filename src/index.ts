@@ -183,3 +183,6 @@ export { default as ContactAvatar } from "./contacts/ContactAvatar";
 export { default as ContactDialog } from "./contacts/ContactDialog";
 export { default as FilterPopover } from "./contacts/FilterPopover";
 export { default as OriginTag } from "./contacts/OriginTag";
+
+export { legalLinkLabel, LEGAL_LINK_LABELS, LEGAL_LINK_IDS } from "./components/layout/legalLabels";
+export type { LegalLinkId } from "./components/layout/legalLabels";

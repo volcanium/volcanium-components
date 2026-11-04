@@ -48,6 +48,9 @@ Sous **640 px** (point de rupture `sm` de Tailwind), les composants passent en m
 
 ## Changelog
 
+### 3.23.0
+- `legalLinkLabel(id, langue)`, `LEGAL_LINK_LABELS`, `LEGAL_LINK_IDS` : libellés courts uniques des liens légaux du pied de sidebar (CGU, Confidentialité, Mentions légales, Cookies, Vos droits ; fr/en/es), à utiliser dans toutes les apps.
+
 ### 3.22.1
 - `Sidebar` : pied légal sur 3 liens par ligne au maximum (5 liens = 3 + 2).
 
