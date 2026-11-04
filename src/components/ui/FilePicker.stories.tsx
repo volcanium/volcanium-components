@@ -1,3 +1,4 @@
+import { useState } from "react";
 import type { Meta, StoryObj } from "@storybook/react";
 import { IconUpload } from "@tabler/icons-react";
 import FilePicker from "./FilePicker";
@@ -18,4 +19,19 @@ export const Default: Story = {
       <FilePicker icon={<IconUpload size={18} />} accept=".zip" onPick={() => undefined}>Déployer un zip</FilePicker>
     </div>
   ),
+};
+
+/** Les fichiers choisis restent dans la liste de l'app (`onPick`) ; passés en `previewFiles`, ils s'affichent avec miniature, et un clic ouvre la visionneuse. */
+export const WithPreview: Story = {
+  args: { children: "Joindre des fichiers", onPick: () => undefined },
+  render: () => {
+    const [files, setFiles] = useState<File[]>([]);
+    return (
+      <div className="p-10 bg-vc-back min-h-screen text-vc-text">
+        <FilePicker multiple icon={<IconUpload size={18} />} onPick={(f) => setFiles((l) => [...l, f])} previewFiles={files} onRemoveFile={(_, i) => setFiles((l) => l.filter((_, j) => j !== i))}>
+          Joindre des fichiers
+        </FilePicker>
+      </div>
+    );
+  },
 };

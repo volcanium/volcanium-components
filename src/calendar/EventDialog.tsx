@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Button, Checkbox, Chip, ConfirmModal, Input, Modal, Notice, SegmentedControl, Select, Textarea, notify } from "./ui";
+import { Button, Checkbox, Chip, ConfirmModal, DatePicker, Input, Modal, Notice, SegmentedControl, Select, Textarea, TimePicker, notify } from "./ui";
 import { useCalendarHost, useI18n } from "./host";
 import type { CalendarKey as MessageKey } from "./messages";
 import type { CalEvent, CalendarInfo, Status } from "./types";
@@ -38,7 +38,8 @@ function ReadOnly({ label, value }: { label: string; value: string }) {
 
 /** Creation, modification et consultation d'un evenement ; reponse d'un invite. Une serie est lue et modifiee EN ENTIER (v1). */
 export default function EventDialog({ target, calendars, onClose, onChanged, onBirthdaysChanged }: { target: DialogTarget | null; calendars: CalendarInfo[]; onClose: () => void; onChanged: () => void; onBirthdaysChanged: () => void }) {
-  const { t } = useI18n();
+  const { t, locale } = useI18n();
+  const pickerLang = locale.toLowerCase().startsWith("en") ? "en" : locale.toLowerCase().startsWith("es") ? "es" : "fr";
   const { api: calendarApi, members, videoMeetings } = useCalendarHost();
   const [form, setForm] = useState<FormState | null>(null);
   const [source, setSource] = useState<CalEvent | null>(null); // evenement affiche (le maitre de la serie pour une occurrence)
@@ -136,10 +137,10 @@ export default function EventDialog({ target, calendars, onClose, onChanged, onB
           {cal && <p className="-mt-2 flex items-center gap-2 text-xs text-vc-text-secondary"><span aria-hidden className="inline-block size-3 rounded-full" style={{ backgroundColor: colorOf(cal) }} />{cal.name}</p>}
           <Checkbox checked={form.allDay} disabled={readOnly} onChange={(v) => set("allDay", v)} label={t("cal.event.allDay")} />
           <div className="grid grid-cols-2 gap-3">
-            <Input type="date" label={t("cal.event.startDate")} value={form.startDate} disabled={readOnly} onChange={(e) => set("startDate", e.target.value)} />
-            {!form.allDay && <Input type="time" label={t("cal.event.startTime")} value={form.startTime} disabled={readOnly} onChange={(e) => set("startTime", e.target.value)} />}
-            <Input type="date" label={t("cal.event.endDate")} value={form.endDate} disabled={readOnly} onChange={(e) => set("endDate", e.target.value)} />
-            {!form.allDay && <Input type="time" label={t("cal.event.endTime")} value={form.endTime} disabled={readOnly} onChange={(e) => set("endTime", e.target.value)} />}
+            <DatePicker label={t("cal.event.startDate")} value={form.startDate} disabled={readOnly} language={pickerLang} onChange={(v) => set("startDate", v)} />
+            {!form.allDay && <TimePicker label={t("cal.event.startTime")} value={form.startTime} disabled={readOnly} onChange={(v) => set("startTime", v)} />}
+            <DatePicker label={t("cal.event.endDate")} value={form.endDate} disabled={readOnly} language={pickerLang} onChange={(v) => set("endDate", v)} />
+            {!form.allDay && <TimePicker label={t("cal.event.endTime")} value={form.endTime} disabled={readOnly} onChange={(v) => set("endTime", v)} />}
           </div>
           {showErrors && error === "time" && <p role="alert" className="text-sm text-vc-danger">{t("cal.event.timeInvalid")}</p>}
           {!form.allDay && (readOnly
@@ -170,7 +171,7 @@ export default function EventDialog({ target, calendars, onClose, onChanged, onB
                   <Input type="number" min={1} max={99} label={`${t(`cal.event.rec.${form.repeat}` as MessageKey)} ×`} value={String(form.interval)} onChange={(e) => set("interval", Math.min(99, Math.max(1, Number(e.target.value) || 1)))} />
                   <SegmentedControl<FormState["endKind"]> label={t("cal.event.rec.end")} value={form.endKind} options={(["never", "count", "date"] as const).map((v) => ({ value: v, label: t(`cal.event.rec.end${v === "never" ? "Never" : v === "count" ? "Count" : "Date"}` as MessageKey) }))} onChange={(v) => set("endKind", v)} />
                   {form.endKind === "count" && <Input type="number" min={1} max={999} label={t("cal.event.rec.count")} value={String(form.count)} onChange={(e) => set("count", Math.min(999, Math.max(1, Number(e.target.value) || 1)))} />}
-                  {form.endKind === "date" && <Input type="date" label={t("cal.event.rec.until")} value={form.until} onChange={(e) => set("until", e.target.value)} />}
+                  {form.endKind === "date" && <DatePicker label={t("cal.event.rec.until")} value={form.until} language={pickerLang} onChange={(v) => set("until", v)} />}
                 </div>
               )}
             </>

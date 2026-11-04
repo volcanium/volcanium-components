@@ -101,6 +101,20 @@ export type TranslationKey =
   | "previous_month"
   | "next_month"
   | "open_calendar"
+  | "time_placeholder"
+  | "open_time_list"
+  | "date_invalid"
+  | "time_invalid"
+  | "legal_links"
+  | "file_download"
+  | "file_open_original"
+  | "file_previous"
+  | "file_next"
+  | "file_no_preview"
+  | "file_no_preview_hint"
+  | "file_counter"
+  | "file_preview"
+  | "file_remove"
   | "confirm_retype"
   | "presence_label"
   | "presence_online"
@@ -221,6 +235,20 @@ const dictionaries: Record<"fr" | "en", Dictionary> = {
     previous_month: "Mois précédent",
     next_month: "Mois suivant",
     open_calendar: "Ouvrir le calendrier",
+    time_placeholder: "hh:mm",
+    open_time_list: "Choisir l'heure",
+    date_invalid: "Date invalide",
+    time_invalid: "Heure invalide",
+    legal_links: "Informations légales",
+    file_download: "Télécharger",
+    file_open_original: "Ouvrir l'original",
+    file_previous: "Fichier précédent",
+    file_next: "Fichier suivant",
+    file_no_preview: "Pas d'aperçu",
+    file_no_preview_hint: "Ce type de fichier ne peut pas être affiché ici. Téléchargez-le pour l'ouvrir.",
+    file_counter: "{current} sur {total}",
+    file_preview: "Aperçu de {name}",
+    file_remove: "Retirer {name}",
     confirm_retype: "Pour confirmer, saisissez : {text}",
     presence_label: "Statut",
     presence_online: "En ligne",
@@ -338,6 +366,20 @@ const dictionaries: Record<"fr" | "en", Dictionary> = {
     previous_month: "Previous month",
     next_month: "Next month",
     open_calendar: "Open calendar",
+    time_placeholder: "hh:mm",
+    open_time_list: "Pick a time",
+    date_invalid: "Invalid date",
+    time_invalid: "Invalid time",
+    legal_links: "Legal information",
+    file_download: "Download",
+    file_open_original: "Open original",
+    file_previous: "Previous file",
+    file_next: "Next file",
+    file_no_preview: "No preview",
+    file_no_preview_hint: "This file type can't be shown here. Download it to open it.",
+    file_counter: "{current} of {total}",
+    file_preview: "Preview {name}",
+    file_remove: "Remove {name}",
     confirm_retype: "To confirm, type: {text}",
     presence_label: "Status",
     presence_online: "Online",

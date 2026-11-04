@@ -148,7 +148,10 @@ export default function Modal(props: ModalProps) {
     },
   };
 
-  useKeyPress("Enter", () => {
+  useKeyPress("Enter", (e) => {
+    // Entrée dans un champ multiligne ajoute une ligne : elle ne valide pas la modale.
+    const target = e.target as HTMLElement | null;
+    if (target && (target.tagName === "TEXTAREA" || target.isContentEditable)) return;
     if (isOpen) handleConfrimBtn?.();
   });
 

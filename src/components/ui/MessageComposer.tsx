@@ -1,6 +1,7 @@
 import { useEffect, useRef, type ReactNode, type Ref, type TextareaHTMLAttributes } from "react";
 import clsx from "clsx";
 import { IconSend2 } from "@tabler/icons-react";
+import FilePreviewStrip from "./FilePreviewStrip";
 
 export interface MessageComposerProps extends Omit<TextareaHTMLAttributes<HTMLTextAreaElement>, "value" | "onChange" | "rows"> {
   value: string;
@@ -17,6 +18,10 @@ export interface MessageComposerProps extends Omit<TextareaHTMLAttributes<HTMLTe
   toolbar?: ReactNode;
   /** Au-dessus du champ : pièces jointes en attente, bandeau « modification en cours ». */
   top?: ReactNode;
+  /** Fichiers choisis, en attente d'envoi : un bandeau de vignettes (miniature des images, icône sinon, clic = visionneuse plein écran) s'affiche au-dessus du champ, avant `top`. */
+  attachments?: File[];
+  /** Avec `attachments` : retire un fichier (croix sur chaque vignette). */
+  onRemoveAttachment?: (file: File, index: number) => void;
   /** Fenêtre flottante ancrée au composeur (suggestions de mentions, sélecteur d'emoji). */
   popover?: ReactNode;
   textareaRef?: Ref<HTMLTextAreaElement>;
@@ -28,7 +33,7 @@ export interface MessageComposerProps extends Omit<TextareaHTMLAttributes<HTMLTe
 const LINE = 24;
 
 /** Zone de saisie d'un message de chat : champ à hauteur automatique, barre d'outils, bouton d'envoi, emplacements pour pièces jointes et suggestions. */
-export default function MessageComposer({ value, onChange, onSend, canSend, sending = false, sendLabel, toolbar, top, popover, textareaRef, maxRows = 8, className, disabled, ...props }: MessageComposerProps) {
+export default function MessageComposer({ value, onChange, onSend, canSend, sending = false, sendLabel, toolbar, top, attachments, onRemoveAttachment, popover, textareaRef, maxRows = 8, className, disabled, ...props }: MessageComposerProps) {
   const local = useRef<HTMLTextAreaElement | null>(null);
   useEffect(() => {
     const el = local.current;
@@ -40,6 +45,7 @@ export default function MessageComposer({ value, onChange, onSend, canSend, send
   return (
     <div className={clsx("relative rounded-lg border border-vc-line-strong bg-vc-container focus-within:border-vc-main/60", disabled && "opacity-60", className)}>
       {popover}
+      {attachments && attachments.length > 0 && <FilePreviewStrip files={attachments} onRemove={onRemoveAttachment} disabled={disabled || sending} className="px-3 pt-3" />}
       {top}
       <textarea
         {...props}

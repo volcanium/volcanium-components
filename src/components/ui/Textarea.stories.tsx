@@ -1,4 +1,4 @@
-﻿import type { Meta, StoryObj } from "@storybook/react";
+import type { Meta, StoryObj } from "@storybook/react";
 import Textarea from "./Textarea";
 import { Container } from "./Container";
 
@@ -57,4 +57,22 @@ export const Disabled: Story = {
     disabled: true,
     rows: 3,
   },
+};
+
+export const AutoGrow: Story = {
+  args: {
+    label: "Hauteur automatique",
+    placeholder: "Tapez plusieurs lignes : le champ grandit jusqu'à 6 lignes puis défile.",
+    autoGrow: true,
+    maxRows: 6,
+  },
+};
+
+export const InModalForm: Story = {
+  name: "Dans un formulaire (pleine largeur)",
+  render: () => (
+    <div className="flex w-full max-w-md flex-col gap-3">
+      <Textarea label="Description (facultative)" placeholder="Décrivez le projet…" />
+    </div>
+  ),
 };

@@ -45,3 +45,13 @@ Depuis 3.11.0 : petit son synthétisé (`chime`, défaut `true`) pour les notifi
 
 ## Mobile (3.10.0)
 Sous **640 px** (point de rupture `sm` de Tailwind), les composants passent en mode téléphone : cibles tactiles de 40 à 44 px, champs à 16 px (pas de zoom iOS), menus, calendrier et fenêtres qui ne sortent pas de l'écran, `dvh`, zones sûres (`env(safe-area-inset-*)`), tableaux qui défilent à l'horizontale, infobulles désactivées (pas de survol). **À partir de 640 px rien ne change.** Ajouts facultatifs : `Sidebar` `hideMobileTrigger`, `MessageItem` `actionsVisible`, `MessageItem` `renderAuthor` (photo et nom de l'auteur cliquables, ex. dans un `ProfilePopover`), `VideoTile` `deafened` / `deafenedLabel` / `actionsVisible`. Utilitaire interne `isMobileViewport()` (`src/utils/viewport.ts`). Pour que les zones sûres s'appliquent, l'app met `viewport-fit=cover` dans sa balise `viewport`.
+
+## Changelog
+
+### 3.22.0
+- `Textarea` : pleine largeur, 3 lignes par défaut (`rows`), poignée verticale, `autoGrow` / `maxRows`, mêmes bordure/rayon/marges que `Input`, `ref` transmis.
+- `DatePicker` : saisie clavier plus tolérante (`4/11/26`, `04.11.2026`, ISO), validation à Entrée / perte de focus, bordure rouge si invalide, vidage = `onChange("")`, flèche bas ouvre le calendrier. Nouveaux : `TimePicker` (heure saisissable + liste de créneaux) et `DateTimePicker`.
+- Calendrier : dates et heures de l'événement via `DatePicker` / `TimePicker`, saisie directe d'une date dans le sélecteur de période.
+- `Modal` : Entrée dans un `<textarea>` n'envoie plus la modale.
+- `Sidebar` : prop `legalLinks` (pied de page unifié, « Volcanium » vers https://volcanium.eu), plus de lien englobant tout le pied.
+- Aperçu de fichiers : `FilePreviewModal`, `FilePreviewStrip`, `MessageAttachments`, `canPreviewMime` ; `FilePicker` (`previewFiles`) et `MessageComposer` (`attachments`) affichent les fichiers en attente.

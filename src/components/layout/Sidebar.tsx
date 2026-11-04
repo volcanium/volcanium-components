@@ -4,7 +4,6 @@ import clsx from "clsx";
 import { AnimatePresence, motion } from "framer-motion";
 import { Link, useInRouterContext } from "react-router-dom";
 import { Squircle } from "@squircle-js/react";
-import LinkV from "../ui/Link";
 import {
   IconLayoutSidebarLeftCollapse,
   IconLayoutSidebarLeftExpand,
@@ -176,8 +175,15 @@ export interface SidebarProps {
   appSwitcher?: AppSwitcherProps;
   /** Whether to show the "Panel powered by volcanium studio" branding at the bottom of the sidebar. Defaults to true. */
   showBranding?: boolean;
-  /** Replaces the branding line ("Panel powered by volcanium studio") by a custom label, e.g. "Volcanium". */
+  /** Replaces the branding line ("Panel powered by volcanium studio") by a custom label, e.g. "Volcanium".
+   *  A string becomes a plain link to https://volcanium.eu (new tab); any other node is rendered as is, with no clickable wrapper (the app owns its links). */
   brandingLabel?: React.ReactNode;
+  /** Legal links shown at the bottom of the sidebar (e.g. terms, privacy, legal notice), identical in every app: small muted centered text that wraps,
+   *  then "Volcanium" (link to https://volcanium.eu, new tab) underneath. Each item is a real `<a>`; only the hovered one is underlined.
+   *  Absolute links to another site open in a new tab (`newTab` forces or forbids it). Hidden while the sidebar is collapsed, like the branding line. */
+  legalLinks?: SidebarLegalLink[];
+  /** Accessible name of the legal links navigation. Defaults to the translated "Legal information". */
+  legalAriaLabel?: string;
   /** Content shown right under the user card, at the card's width (e.g. a mailbox selector). Hidden while the sidebar is collapsed to icons. */
   belowUser?: React.ReactNode;
   /** Mobile (< 640 px) : masque le bouton hamburger flottant (l'app ouvre le tiroir elle-même via `isOpen` / `onToggle`, par exemple depuis une barre d'onglets) et retire la réserve de place qu'il occupait en haut du contenu. @default false */
@@ -1047,6 +1053,26 @@ function UserMenuPanel({
 // Sidebar Main Component
 // ---------------------------------------------
 
+export interface SidebarLegalLink {
+  label: string;
+  href: string;
+  /** Force (`true`) or forbid (`false`) opening in a new tab. Default: new tab only for absolute links to another origin. */
+  newTab?: boolean;
+}
+
+const VOLCANIUM_URL = "https://volcanium.eu";
+const FOOTER_LINK = "hover:underline focus-visible:underline cursor-pointer rounded-sm outline-none focus-visible:ring-1 focus-visible:ring-vc-main/50";
+
+function opensInNewTab(link: SidebarLegalLink): boolean {
+  if (link.newTab !== undefined) return link.newTab;
+  if (!/^https?:\/\//i.test(link.href)) return false;
+  try {
+    return typeof window === "undefined" || new URL(link.href).origin !== window.location.origin;
+  } catch {
+    return false;
+  }
+}
+
 export default function Sidebar({
   isOpen = true,
   onToggle,
@@ -1063,6 +1089,8 @@ export default function Sidebar({
   appSwitcher,
   showBranding = true,
   brandingLabel,
+  legalLinks,
+  legalAriaLabel,
   belowUser,
   hideMobileTrigger = false,
   children,
@@ -1266,27 +1294,57 @@ export default function Sidebar({
               <Nav open={open} activePath={activePath} tabs={bottomTabs} />
             </div>
           )}
-          {showBranding && (
-            // Collapsed: the block must not keep its height (a multi-line `brandingLabel` would leave a gap under the last tab), hence max-h-0.
-            <small
-              className={clsx(
-                "text-center text-[11px] tracking-wide transition-opacity duration-200 overflow-hidden",
-                open ? "opacity-100 delay-150 truncate" : "opacity-0 max-h-0 -mt-3",
-                open && brandingLabel && "border-t border-vc-line pt-3",
-              )}
-            >
-              {brandingLabel ? (
-                <LinkV onClick={() => window.open("https://volcanium-studio.com/")}>{brandingLabel}</LinkV>
-              ) : (
-                <>
-                  Propulsé par{" "}
-                  <LinkV onClick={() => window.open("https://volcanium-studio.com/")}>
-                    volcanium studio
-                  </LinkV>
-                </>
-              )}
-            </small>
-          )}
+          {showBranding && (() => {
+            const hasLegal = !!legalLinks && legalLinks.length > 0;
+            const tab = open ? undefined : -1;
+            const brandLink = (label: React.ReactNode) => (
+              <a href={VOLCANIUM_URL} target="_blank" rel="noopener noreferrer" tabIndex={tab} className={FOOTER_LINK}>
+                {label}
+              </a>
+            );
+            // Collapsed: the block must not keep its height (a multi-line footer would leave a gap under the last tab), hence max-h-0.
+            const shell = clsx(
+              "text-center transition-opacity duration-200 overflow-hidden",
+              open ? "opacity-100 delay-150" : "opacity-0 max-h-0 -mt-3",
+            );
+            if (hasLegal) {
+              return (
+                <div
+                  aria-hidden={open ? undefined : true}
+                  className={clsx(shell, "flex flex-col items-center gap-1 text-[10px] leading-4 text-vc-text/50", open && "border-t border-vc-line pt-3")}
+                >
+                  <nav aria-label={legalAriaLabel ?? t("legal_links")} className="flex flex-wrap items-center justify-center gap-x-3 gap-y-0.5">
+                    {legalLinks!.map((link, i) => {
+                      const newTab = opensInNewTab(link);
+                      return (
+                        <a
+                          key={`${link.href}-${i}`}
+                          href={link.href}
+                          tabIndex={tab}
+                          {...(newTab ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                          className={FOOTER_LINK}
+                        >
+                          {link.label}
+                        </a>
+                      );
+                    })}
+                  </nav>
+                  <span className="text-[11px] tracking-wide">{typeof brandingLabel === "string" ? brandLink(brandingLabel) : brandingLabel ?? brandLink("Volcanium")}</span>
+                </div>
+              );
+            }
+            return (
+              <small className={clsx(shell, "text-[11px] tracking-wide", open && "truncate", open && brandingLabel && "border-t border-vc-line pt-3")}>
+                {brandingLabel ? (
+                  typeof brandingLabel === "string" ? brandLink(brandingLabel) : brandingLabel
+                ) : (
+                  <>
+                    Propulsé par {brandLink("volcanium studio")}
+                  </>
+                )}
+              </small>
+            );
+          })()}
         </div>
       </div>
 

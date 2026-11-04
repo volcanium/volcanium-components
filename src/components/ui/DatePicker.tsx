@@ -89,6 +89,34 @@ function resolveLanguage(lang: string): DatePickerLanguage {
   return lang === "en" || lang === "es" ? lang : "fr";
 }
 
+/**
+ * Lenient parse of what a person types: `4/11/2026`, `04.11.26`, `4-11-2026`, `04112026`, or ISO `2026-11-04`.
+ * Day/month order follows the locale pattern; a 2-digit year means 20xx. Returns `null` when it isn't a real date.
+ */
+export function parseTypedDate(raw: string, pattern: string): Date | null {
+  const text = raw.trim();
+  if (!text) return null;
+  const iso = /^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(text);
+  let day: number, month: number, year: number;
+  if (iso) {
+    [year, month, day] = [Number(iso[1]), Number(iso[2]), Number(iso[3])];
+  } else {
+    let parts = text.split(/[^\d]+/).filter(Boolean);
+    if (parts.length === 1 && /^\d{6,8}$/.test(parts[0])) {
+      const d = parts[0];
+      parts = [d.slice(0, 2), d.slice(2, 4), d.slice(4)];
+    }
+    if (parts.length !== 3) return null;
+    const [a, b, c] = parts.map(Number);
+    if (parts[2].length !== 2 && parts[2].length !== 4) return null;
+    year = parts[2].length === 2 ? 2000 + c : c;
+    [day, month] = pattern.startsWith("MM") ? [b, a] : [a, b];
+  }
+  const date = new Date(year, month - 1, day);
+  if (date.getFullYear() !== year || date.getMonth() !== month - 1 || date.getDate() !== day) return null;
+  return date;
+}
+
 const CURRENT_YEAR = new Date().getFullYear();
 // Generous range so far-off dates (e.g. a birth date) are always one dropdown
 // pick away instead of hundreds of "previous month" clicks.
@@ -98,9 +126,11 @@ const YEAR_RANGE = { min: CURRENT_YEAR - 120, max: CURRENT_YEAR + 20 };
  * A calendar date picker replacing the native `<input type="date">`.
  *
  * The value can always be typed directly, as plain text in the locale's
- * usual order (`dd/MM/yyyy` fr/es, `MM/dd/yyyy` en) — the calendar itself is
- * optional, opened only by clicking the calendar icon. Keeps the native
- * `onChange` contract: an ISO `"yyyy-MM-dd"` string.
+ * usual order (`dd/MM/yyyy` fr/es, `MM/dd/yyyy` en): separators are inserted
+ * while typing digits, `4/11/26`, `04.11.2026` or an ISO date are understood on
+ * Enter / blur, and an invalid entry is flagged (red border) then reverted.
+ * The calendar is optional: calendar icon, or Arrow Down in the field. Keeps the
+ * native `onChange` contract: an ISO `"yyyy-MM-dd"` string (`""` when cleared).
  */
 export default function DatePicker({
   value,
@@ -127,6 +157,7 @@ export default function DatePicker({
   const [text, setText] = useState(() => (selected ? format(selected, pattern) : ""));
   const [yearText, setYearText] = useState(() => String((selected ?? new Date()).getFullYear()));
   const [monthMenuOpen, setMonthMenuOpen] = useState(false);
+  const [invalid, setInvalid] = useState(false);
   const wrapperRef = useRef<HTMLDivElement>(null);
   const panelRef = useRef<HTMLDivElement>(null);
   const monthPickerRef = useRef<HTMLDivElement>(null);
@@ -259,14 +290,28 @@ export default function DatePicker({
   };
 
   const handleTextChange = (raw: string) => {
-    // Auto-insert separators as the user types digits (e.g. "0109" -> "01/09").
-    const digits = raw.replace(/[^\d]/g, "").slice(0, 8);
-    let next = digits;
-    if (digits.length > 4) next = `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
-    else if (digits.length > 2) next = `${digits.slice(0, 2)}/${digits.slice(2)}`;
+    if (raw === "") {
+      setText("");
+      setInvalid(false);
+      if (selected) onChange?.("");
+      return;
+    }
+    // Digits only (or separators sitting where auto-insert puts them, i.e. `12/34/5678`): auto-insert separators as the user types ("0109" -> "01/09").
+    // Anything else (`4/11/26`, `04.11.2026`, a pasted ISO date) is kept as typed and parsed on Enter / blur.
+    const canonical = /^[\d/]*$/.test(raw) && [...raw].every((c, i) => c !== "/" || i === 2 || i === 5);
+    let next: string;
+    if (canonical) {
+      const digits = raw.replace(/[^\d]/g, "").slice(0, 8);
+      next = digits;
+      if (digits.length > 4) next = `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4)}`;
+      else if (digits.length > 2) next = `${digits.slice(0, 2)}/${digits.slice(2)}`;
+    } else {
+      next = raw.replace(/[^\d/.\-\s]/g, "").slice(0, 10);
+    }
     setText(next);
+    setInvalid(false);
 
-    if (next.length === pattern.length) {
+    if (canonical && next.length === pattern.length) {
       const parsed = parse(next, pattern, new Date());
       if (isValid(parsed) && !isDisabled(parsed)) {
         onChange?.(format(parsed, "yyyy-MM-dd"));
@@ -275,13 +320,26 @@ export default function DatePicker({
     }
   };
 
-  const handleTextBlur = () => {
-    // Revert to the last valid value's formatting if what's typed doesn't parse.
-    if (text && text.length === pattern.length) {
-      const parsed = parse(text, pattern, new Date());
-      if (isValid(parsed) && !isDisabled(parsed)) return;
+  /** Enter / blur: turn what was typed into a date (lenient), or flag it invalid and revert on blur. */
+  const settleText = (revert: boolean) => {
+    if (!text.trim()) {
+      setInvalid(false);
+      return;
     }
-    setText(selected ? format(selected, pattern) : "");
+    const parsed = parseTypedDate(text, pattern);
+    if (parsed && !isDisabled(parsed)) {
+      setInvalid(false);
+      setText(format(parsed, pattern));
+      setCursor(parsed);
+      if (!selected || !isSameDay(parsed, selected)) onChange?.(format(parsed, "yyyy-MM-dd"));
+      return;
+    }
+    if (revert) {
+      setInvalid(false);
+      setText(selected ? format(selected, pattern) : "");
+    } else {
+      setInvalid(true);
+    }
   };
 
   const panel = createPortal(
@@ -427,7 +485,7 @@ export default function DatePicker({
     <div ref={wrapperRef} className="relative flex w-full font-vc-main text-vc-text">
       <Squircle asChild cornerRadius={7} cornerSmoothing={1}>
         <div
-          className={`flex items-center w-full gap-2 pl-3.5 pr-2 border border-vc-line-strong bg-vc-container transition-colors duration-200 focus-within:border-vc-main/60 ${disabled ? "opacity-50" : ""} ${className}`}
+          className={`flex items-center w-full gap-2 pl-3.5 pr-2 border bg-vc-container transition-colors duration-200 ${invalid ? "border-vc-danger/60 focus-within:border-vc-danger" : "border-vc-line-strong focus-within:border-vc-main/60"} ${disabled ? "opacity-50" : ""} ${className}`}
         >
           <input
             id={pickerId}
@@ -437,7 +495,20 @@ export default function DatePicker({
             disabled={disabled}
             placeholder={placeholder || PLACEHOLDERS[lang]}
             onChange={(e) => handleTextChange(e.target.value)}
-            onBlur={handleTextBlur}
+            onBlur={() => settleText(true)}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") settleText(false);
+              else if (e.key === "ArrowDown" && (e.altKey || !open)) {
+                e.preventDefault();
+                setOpen(true);
+              } else if (e.key === "Escape" && open) {
+                e.stopPropagation();
+                setOpen(false);
+              }
+            }}
+            autoComplete="off"
+            aria-invalid={invalid || undefined}
+            title={invalid ? t("date_invalid") : undefined}
             className="flex-1 w-full min-w-0 bg-transparent py-2 max-sm:py-2.5 max-sm:text-base outline-none placeholder:text-vc-secondary/40 disabled:cursor-not-allowed"
           />
           <button

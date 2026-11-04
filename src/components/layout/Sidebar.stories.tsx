@@ -161,3 +161,25 @@ export const WithoutBranding: Story = {
     showBranding: false,
   },
 };
+
+/** Pied unifié des applications : liens légaux (petit texte atténué, retour à la ligne), puis « Volcanium » vers volcanium.eu. Seul le lien survolé se souligne. */
+export const WithLegalLinks: Story = {
+  ...Default,
+  args: {
+    ...Default.args,
+    legalLinks: [
+      { label: "Mentions légales", href: "https://legal.volcanium.eu/mentions-legales" },
+      { label: "Conditions d'utilisation", href: "https://legal.volcanium.eu/cgu" },
+      { label: "Confidentialité", href: "https://legal.volcanium.eu/confidentialite" },
+      { label: "Cookies", href: "https://legal.volcanium.eu/cookies" },
+    ],
+  },
+};
+
+export const WithBrandingString: Story = {
+  ...Default,
+  args: {
+    ...Default.args,
+    brandingLabel: "Volcanium",
+  },
+};
