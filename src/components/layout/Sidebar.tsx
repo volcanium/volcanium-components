@@ -1061,6 +1061,8 @@ export interface SidebarLegalLink {
 }
 
 const VOLCANIUM_URL = "https://volcanium.eu";
+/** Nombre maximal de liens legaux par ligne dans le pied de la sidebar. */
+const LEGAL_LINKS_PER_ROW = 3;
 const FOOTER_LINK = "hover:underline focus-visible:underline cursor-pointer rounded-sm outline-none focus-visible:ring-1 focus-visible:ring-vc-main/50";
 
 function opensInNewTab(link: SidebarLegalLink): boolean {
@@ -1313,21 +1315,26 @@ export default function Sidebar({
                   aria-hidden={open ? undefined : true}
                   className={clsx(shell, "flex flex-col items-center gap-1 text-[10px] leading-4 text-vc-text/50", open && "border-t border-vc-line pt-3")}
                 >
-                  <nav aria-label={legalAriaLabel ?? t("legal_links")} className="flex flex-wrap items-center justify-center gap-x-3 gap-y-0.5">
-                    {legalLinks!.map((link, i) => {
-                      const newTab = opensInNewTab(link);
-                      return (
-                        <a
-                          key={`${link.href}-${i}`}
-                          href={link.href}
-                          tabIndex={tab}
-                          {...(newTab ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-                          className={FOOTER_LINK}
-                        >
-                          {link.label}
-                        </a>
-                      );
-                    })}
+                  <nav aria-label={legalAriaLabel ?? t("legal_links")} className="flex flex-col items-center gap-y-0.5">
+                    {/* 3 liens par ligne au maximum (5 liens = 3 + 2), la meme repartition dans toutes les apps. */}
+                    {Array.from({ length: Math.ceil(legalLinks!.length / LEGAL_LINKS_PER_ROW) }, (_, row) => (
+                      <div key={row} className="flex items-center justify-center gap-x-3">
+                        {legalLinks!.slice(row * LEGAL_LINKS_PER_ROW, (row + 1) * LEGAL_LINKS_PER_ROW).map((link, i) => {
+                          const newTab = opensInNewTab(link);
+                          return (
+                            <a
+                              key={`${link.href}-${i}`}
+                              href={link.href}
+                              tabIndex={tab}
+                              {...(newTab ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                              className={FOOTER_LINK}
+                            >
+                              {link.label}
+                            </a>
+                          );
+                        })}
+                      </div>
+                    ))}
                   </nav>
                   <span className="text-[11px] tracking-wide">{typeof brandingLabel === "string" ? brandLink(brandingLabel) : brandingLabel ?? brandLink("Volcanium")}</span>
                 </div>

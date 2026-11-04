@@ -48,6 +48,9 @@ Sous **640 px** (point de rupture `sm` de Tailwind), les composants passent en m
 
 ## Changelog
 
+### 3.22.1
+- `Sidebar` : pied légal sur 3 liens par ligne au maximum (5 liens = 3 + 2).
+
 ### 3.22.0
 - `Textarea` : pleine largeur, 3 lignes par défaut (`rows`), poignée verticale, `autoGrow` / `maxRows`, mêmes bordure/rayon/marges que `Input`, `ref` transmis.
 - `DatePicker` : saisie clavier plus tolérante (`4/11/26`, `04.11.2026`, ISO), validation à Entrée / perte de focus, bordure rouge si invalide, vidage = `onChange("")`, flèche bas ouvre le calendrier. Nouveaux : `TimePicker` (heure saisissable + liste de créneaux) et `DateTimePicker`.
