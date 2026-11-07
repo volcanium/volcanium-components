@@ -17,16 +17,18 @@ export interface FilePreviewModalProps {
   onIndexChange?: (index: number) => void;
   /** Remplace le téléchargement par défaut (lien `download`) : utile quand les fichiers sont servis par une API authentifiée. */
   onDownload?: (item: FilePreviewItem) => void;
+  /** Envoi des cookies pour lire un fichier TEXTE servi par une API d'une autre origine (`include`). Les images, PDF, vidéos et audios sont chargés par le navigateur, qui envoie déjà les cookies de même site. @default "same-origin" */
+  credentials?: RequestCredentials;
 }
 
 const TEXT_LIMIT = 200_000;
 
-function TextPreview({ url, onFail, label }: { url: string; onFail: () => void; label: string }) {
+function TextPreview({ url, onFail, label, credentials }: { url: string; onFail: () => void; label: string; credentials?: RequestCredentials }) {
   const [text, setText] = useState<string | null>(null);
   useEffect(() => {
     let cancelled = false;
     setText(null);
-    fetch(url)
+    fetch(url, credentials ? { credentials } : undefined)
       .then((r) => (r.ok ? r.text() : Promise.reject(new Error(String(r.status)))))
       .then((body) => !cancelled && setText(body.length > TEXT_LIMIT ? `${body.slice(0, TEXT_LIMIT)}\n…` : body))
       .catch(() => !cancelled && onFail());
@@ -47,7 +49,7 @@ function TextPreview({ url, onFail, label }: { url: string; onFail: () => void; 
  * nom + taille, boutons Télécharger / Ouvrir l'original / Fermer, flèches ← → et Échap au clavier, navigation entre plusieurs fichiers.
  * Les types non affichables montrent « Pas d'aperçu » et un bouton Télécharger. Voir `canPreviewMime` pour savoir à l'avance.
  */
-export default function FilePreviewModal({ open, onClose, items, index = 0, onIndexChange, onDownload }: FilePreviewModalProps) {
+export default function FilePreviewModal({ open, onClose, items, index = 0, onIndexChange, onDownload, credentials }: FilePreviewModalProps) {
   const { t, language } = useLanguage();
   const [inner, setInner] = useState(index);
   const [failedUrl, setFailedUrl] = useState<string | null>(null);
@@ -205,7 +207,7 @@ export default function FilePreviewModal({ open, onClose, items, index = 0, onIn
               )}
               {showable && kind === "text" && (
                 <div className="h-full w-full max-w-4xl">
-                  <TextPreview key={item.url} url={item.url} onFail={fail} label={item.name} />
+                  <TextPreview key={item.url} url={item.url} onFail={fail} label={item.name} credentials={credentials} />
                 </div>
               )}
               {!showable && (
