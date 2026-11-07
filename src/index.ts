@@ -84,6 +84,10 @@ export { default as FileTypeIcon, fileTypeKind } from "./components/ui/FileTypeI
 export type { FileTypeIconProps, FileTypeKind } from "./components/ui/FileTypeIcon";
 export { default as Breadcrumb } from "./components/ui/Breadcrumb";
 export type { BreadcrumbProps, BreadcrumbItem } from "./components/ui/Breadcrumb";
+export { default as ProgressBar } from "./components/ui/ProgressBar";
+export type { ProgressBarProps } from "./components/ui/ProgressBar";
+export { default as ActionMenu } from "./components/ui/ActionMenu";
+export type { ActionMenuProps, ActionMenuItem } from "./components/ui/ActionMenu";
 export { default as StorageMeter } from "./components/ui/StorageMeter";
 export type { StorageMeterProps } from "./components/ui/StorageMeter";
 export { canPreviewMime, previewKind, formatFileSize } from "./components/ui/filePreview";
