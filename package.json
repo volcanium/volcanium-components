@@ -1,5 +1,8 @@
 {
   "name": "@volcanium/volcanium-components",
+  "license": "MIT",
+  "author": "Volcanium Studio (https://volcanium.eu)",
+  "homepage": "https://volcanium.eu",
   "version": "3.25.0",
   "description": "UI Components Library for Volcanium",
   "main": "dist/index.js",

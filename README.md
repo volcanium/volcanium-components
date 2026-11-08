@@ -61,3 +61,7 @@ Sous **640 px** (point de rupture `sm` de Tailwind), les composants passent en m
 - `Modal` : Entrée dans un `<textarea>` n'envoie plus la modale.
 - `Sidebar` : prop `legalLinks` (pied de page unifié, « Volcanium » vers https://volcanium.eu), plus de lien englobant tout le pied.
 - Aperçu de fichiers : `FilePreviewModal`, `FilePreviewStrip`, `MessageAttachments`, `canPreviewMime` ; `FilePicker` (`previewFiles`) et `MessageComposer` (`attachments`) affichent les fichiers en attente.
+
+
+## Licence / License
+MIT © 2026 [Volcanium Studio](https://volcanium.eu). Vous pouvez cloner, modifier et utiliser cette bibliothèque, y compris à des fins commerciales, à condition de **mentionner l'auteur original : Volcanium Studio et volcanium.eu** (conservez le fichier `LICENSE` ou l'avis de copyright dans vos copies). / You may clone, modify and use this library, including commercially, provided you **credit the original author: Volcanium Studio and volcanium.eu** (keep the `LICENSE` file or copyright notice in your copies).
