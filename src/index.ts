@@ -156,6 +156,8 @@ export type { ProfilePopoverProps, ProfileTab } from "./components/ui/ProfilePop
 export { default as Center } from "./components/layout/Center";
 export { default as Grid } from "./components/layout/Grid";
 export { default as TopNav } from "./components/layout/TopNav";
+export { default as AppBar, AppBarTitle } from "./components/layout/AppBar";
+export type { AppBarPerson } from "./components/layout/AppBar";
 export { default as Sidebar } from "./components/layout/Sidebar";
 export type { SidebarProps, SidebarLegalLink, UserMenuProps, AccountSwitcherProps, AppSwitcherProps, AppSwitcherApp } from "./components/layout/Sidebar";
 export { default as Hero } from "./components/layout/Hero";
