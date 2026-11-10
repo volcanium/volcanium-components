@@ -46,7 +46,7 @@ export default function AppBar({ title, backLabel, onBack, tag, status, people, 
   title: ReactNode; backLabel: string; onBack?: () => void; tag?: ReactNode; status?: ReactNode; people?: AppBarPerson[]; peopleLabel?: string; children?: ReactNode;
 }) {
   return (
-    <header className="flex shrink-0 items-center gap-1.5 border-b border-vc-line bg-vc-back px-2 pb-2 pt-[calc(0.5rem+var(--vcm-top,0px))] sm:gap-2 sm:px-3">
+    <header className="flex shrink-0 items-center gap-1.5 border-b border-vc-line bg-vc-back px-2 pb-2 pt-[calc(8px+var(--vcm-top,0px))] sm:gap-2 sm:px-3">
       {onBack && <IconButton label={backLabel} onClick={onBack}><IconArrowLeft size={16} /></IconButton>}
       {title}
       {tag}
