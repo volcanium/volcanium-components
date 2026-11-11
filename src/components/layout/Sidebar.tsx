@@ -50,6 +50,11 @@ export interface TabDef {
   onReorderChildren?: (from: number, to: number) => void;
   /** Child entries only: `false` pins the entry (e.g. a trailing "New folder" action). @default true */
   reorderable?: boolean;
+  /** Child entries only: makes the entry a drop target for items dragged from the app (e.g. a mail onto a folder). `dropType` is the
+   *  (lowercase) MIME type the app sets with `dataTransfer.setData`; only drags carrying it are accepted, and `onDropData` receives
+   *  its value when dropped. Independent from `reorderable`. */
+  dropType?: string;
+  onDropData?: (data: string) => void;
 }
 
 export interface SpecificTabsDef {
@@ -122,6 +127,9 @@ export interface AppSwitcherProps {
   onSelect?: (app: AppSwitcherApp) => void;
   loading?: boolean;
   labels?: { title?: string; button?: string };
+  /** Makes the apps re-orderable (drag and drop, or Alt + arrow keys on a focused app). Called once, with the ids in their new order,
+   *  when the move ends; the host persists it and passes `apps` back in that order. */
+  onReorder?: (ids: string[]) => void;
 }
 
 export interface SidebarProps {
@@ -277,11 +285,31 @@ function AppSwitcherPanel({
   loading,
   onSelect,
   labels,
+  onReorder,
   onClose,
 }: AppSwitcherProps & { anchorRef: React.RefObject<HTMLElement | null>; onClose: () => void }) {
   const { t } = useLanguage();
   const panelRef = useRef<HTMLDivElement>(null);
   const [coords, setCoords] = useState<{ top: number; left: number } | null>(null);
+  // Re-ordering: while an app is dragged the grid shows the order it would have; it is committed (onReorder) on drop.
+  const [dragId, setDragId] = useState<string | null>(null);
+  const [preview, setPreview] = useState<string[] | null>(null);
+  const ids = preview ?? apps.map((a) => a.id);
+  const shown = ids.map((id) => apps.find((a) => a.id === id)).filter((a): a is AppSwitcherApp => !!a);
+  const moveId = (list: string[], id: string, to: number) => {
+    const from = list.indexOf(id);
+    if (from < 0 || to < 0 || to >= list.length || from === to) return list;
+    const next = [...list];
+    next.splice(from, 1);
+    next.splice(to, 0, id);
+    return next;
+  };
+  const endDrag = (commit: boolean) => {
+    const next = preview;
+    setDragId(null);
+    setPreview(null);
+    if (commit && next && next.join("|") !== apps.map((a) => a.id).join("|")) onReorder?.(next);
+  };
 
   // Same technique as AccountSwitcherPanel: the sidebar clips its overflow, so the panel is portaled to <body>
   // and pinned next to the header row.
@@ -354,17 +382,33 @@ function AppSwitcherPanel({
       ) : (
         // Grille façon « applications Google » : 3 logos par rangée, nom plus petit sous le logo.
         <div className="grid grid-cols-3 gap-1 max-h-80 overflow-y-auto vc-scroll-hover">
-          {apps.map((app) => (
+          {shown.map((app) => (
             <button
               key={app.id}
               type="button"
-              disabled={app.active}
-              onClick={() => go(app)}
+              // An active (current) app stays draggable: a disabled button would swallow the drag.
+              aria-disabled={app.active || undefined}
+              draggable={Boolean(onReorder)}
+              onDragStart={onReorder ? (e) => { e.dataTransfer.effectAllowed = "move"; e.dataTransfer.setData("text/plain", app.id); setDragId(app.id); setPreview(apps.map((a) => a.id)); } : undefined}
+              onDragOver={onReorder && dragId ? (e) => { e.preventDefault(); e.dataTransfer.dropEffect = "move"; setPreview((p) => { const list = p ?? apps.map((a) => a.id); return moveId(list, dragId, list.indexOf(app.id)); }); } : undefined}
+              onDrop={onReorder && dragId ? (e) => { e.preventDefault(); endDrag(true); } : undefined}
+              onDragEnd={onReorder ? () => endDrag(false) : undefined}
+              onKeyDown={onReorder ? (e) => {
+                if (!e.altKey || !["ArrowLeft", "ArrowRight", "ArrowUp", "ArrowDown"].includes(e.key)) return;
+                const list = apps.map((a) => a.id);
+                const step = e.key === "ArrowLeft" ? -1 : e.key === "ArrowRight" ? 1 : e.key === "ArrowUp" ? -3 : 3;
+                const next = moveId(list, app.id, list.indexOf(app.id) + step);
+                if (next === list) return;
+                e.preventDefault();
+                onReorder(next);
+              } : undefined}
+              onClick={() => { if (!app.active) go(app); }}
               title={app.name}
               aria-current={app.active ? "true" : undefined}
               className={clsx(
                 "flex min-w-0 flex-col items-center gap-1.5 rounded-xl px-1 py-2.5 max-sm:min-h-11 text-center transition-colors",
                 app.active ? "bg-vc-veil-strong" : "cursor-pointer hover:bg-vc-veil",
+                dragId === app.id && "opacity-50",
               )}
             >
               <AppLogo app={app} />
@@ -584,6 +628,8 @@ function Nav({
 }: any) {
   // Drag and drop of sub-menu entries (see `TabDef.onReorderChildren`): index being dragged and index hovered.
   const [drag, setDrag] = useState<{ from: number; over: number | null } | null>(null);
+  // Entry hovered by an item dragged from the app (see `TabDef.dropType`).
+  const [extOver, setExtOver] = useState<number | null>(null);
   const isPageActive = (btn: any) => {
     if (btn.notActive) return false;
     const normalizedPath = (activePath || "/").replace(/\/+$/, "") || "/";
@@ -638,14 +684,22 @@ function Nav({
                 {btn.children.map((child: any, index: number) => {
                   const childActive = isPageActive(child);
                   const canMove = typeof btn.onReorderChildren === "function" && child.reorderable !== false;
-                  const dropTarget = drag !== null && drag.over === index && drag.from !== index && canMove;
+                  const dropTarget = (drag !== null && drag.over === index && drag.from !== index && canMove) || extOver === index;
+                  const accepts = (e: React.DragEvent) => typeof child.dropType === "string" && typeof child.onDropData === "function" && Array.from(e.dataTransfer.types).includes(child.dropType);
                   return (
                     <div
                       key={child.page ?? child.name}
                       draggable={canMove}
                       onDragStart={canMove ? (e) => { e.dataTransfer.effectAllowed = "move"; e.dataTransfer.setData("text/plain", String(index)); setDrag({ from: index, over: null }); } : undefined}
-                      onDragOver={canMove && drag ? (e) => { e.preventDefault(); e.dataTransfer.dropEffect = "move"; if (drag.over !== index) setDrag({ ...drag, over: index }); } : undefined}
-                      onDrop={canMove && drag ? (e) => { e.preventDefault(); if (drag.from !== index) btn.onReorderChildren(drag.from, index); setDrag(null); } : undefined}
+                      onDragOver={(e) => {
+                        if (canMove && drag) { e.preventDefault(); e.dataTransfer.dropEffect = "move"; if (drag.over !== index) setDrag({ ...drag, over: index }); }
+                        else if (accepts(e)) { e.preventDefault(); e.dataTransfer.dropEffect = "move"; if (extOver !== index) setExtOver(index); }
+                      }}
+                      onDragLeave={(e) => { if (extOver === index && !e.currentTarget.contains(e.relatedTarget as Node | null)) setExtOver(null); }}
+                      onDrop={(e) => {
+                        if (canMove && drag) { e.preventDefault(); if (drag.from !== index) btn.onReorderChildren(drag.from, index); setDrag(null); }
+                        else if (accepts(e)) { e.preventDefault(); const data = e.dataTransfer.getData(child.dropType); setExtOver(null); child.onDropData(data); }
+                      }}
                       onDragEnd={canMove ? () => setDrag(null) : undefined}
                       onKeyDown={canMove ? (e) => {
                         if (!e.altKey || (e.key !== "ArrowUp" && e.key !== "ArrowDown")) return;
