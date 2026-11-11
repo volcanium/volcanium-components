@@ -2,46 +2,15 @@
 //   message : « pop » a deux notes montantes · mail : « ding » cristallin (une note + harmonique) · autre : deux notes douces descendantes.
 // `priority: "high"` (mention, message direct) = un peu plus marque : volume +, courte note en plus.
 // Les navigateurs refusent le son avant un geste de la personne : si c'est le cas on ne joue RIEN (un son joue en retard serait perime) ;
-// le contexte est reveille au premier clic / a la premiere touche pour les suivants.
+// le contexte (partage, `audio.ts`) est prepare des l'ouverture de l'app et reveille au premier clic / a la premiere touche.
+
+import { armAudioUnlock, sharedAudio } from "./audio";
 
 export type ChimeTimbre = "message" | "mail" | "other";
-
-type AudioCtor = typeof AudioContext;
-let shared: { ctx: AudioContext; master: GainNode } | null = null;
-let listening = false;
 
 /** Timbre associe a un `kind` de notification. */
 export function chimeTimbreFor(kind: string): ChimeTimbre {
   return kind === "message" ? "message" : kind === "mail" ? "mail" : "other";
-}
-
-function audio(): { ctx: AudioContext; master: GainNode } | null {
-  if (shared) return shared;
-  if (typeof window === "undefined") return null;
-  const Ctor: AudioCtor | undefined = window.AudioContext ?? (window as unknown as { webkitAudioContext?: AudioCtor }).webkitAudioContext;
-  if (!Ctor) return null;
-  try {
-    const ctx = new Ctor();
-    const master = ctx.createGain();
-    master.gain.value = 0.55;
-    master.connect(ctx.destination);
-    shared = { ctx, master };
-    return shared;
-  } catch {
-    return null;
-  }
-}
-
-function armGestureUnlock(ctx: AudioContext): void {
-  if (listening || typeof window === "undefined") return;
-  listening = true;
-  const events = ["pointerdown", "keydown", "touchstart"] as const;
-  const onGesture = () => {
-    void ctx.resume().then(() => {
-      if (ctx.state === "running") for (const e of events) window.removeEventListener(e, onGesture, true);
-    }).catch(() => undefined);
-  };
-  for (const e of events) window.addEventListener(e, onGesture, true);
 }
 
 /** Une note : fondamentale + partiels (`[multiplicateur, niveau, duree relative]`), attaque 8 ms puis extinction exponentielle. */
@@ -73,12 +42,11 @@ const SOFT = [[1, 1, 1], [3, 0.08, 0.4]] as const;
  * `false` s'il est ignore (pas de WebAudio, ou aucun geste de la personne depuis l'ouverture de la page : on ne le rejoue pas plus tard).
  */
 export function playChime(timbre: ChimeTimbre, priority: "normal" | "high" = "normal"): boolean {
-  const a = audio();
+  const a = sharedAudio();
   if (!a) return false;
   const { ctx, master } = a;
   if (ctx.state !== "running") {
-    armGestureUnlock(ctx);
-    void ctx.resume().catch(() => undefined); // reussit seulement s'il y a eu un geste ; ce son-ci est de toute facon abandonne
+    armAudioUnlock(); // pas encore debloque (aucun geste depuis l'ouverture) : ce son-ci est abandonne, le prochain geste debloquera les suivants
     return false;
   }
   try {

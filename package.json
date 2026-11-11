@@ -3,7 +3,7 @@
   "license": "MIT",
   "author": "Volcanium Studio (https://volcanium.eu)",
   "homepage": "https://volcanium.eu",
-  "version": "3.27.0",
+  "version": "3.28.0",
   "description": "UI Components Library for Volcanium",
   "main": "dist/index.js",
   "module": "dist/index.mjs",

@@ -3,6 +3,7 @@ import NotificationCard from "./NotificationCard";
 import { CompteStreamBusContext } from "../presence/PresenceProvider";
 import { startRingtone } from "./ringtone";
 import { chimeTimbreFor, playChime } from "./chime";
+import { armAudioUnlock } from "./audio";
 
 /** Action d'une notification : adresse a ouvrir (`href`) ou requete a envoyer (`request`, sans cookie : l'adresse porte son jeton). */
 export interface NotificationAction {
@@ -253,6 +254,10 @@ export function NotificationProvider({ compteUrl, userId, showCards = true, ring
     document.addEventListener("visibilitychange", bump);
     return () => { window.removeEventListener("focus", bump); document.removeEventListener("visibilitychange", bump); };
   }, []);
+
+  // Prepare le son des l'ouverture de l'app : le premier clic ou la premiere touche (n'importe ou dans la page) le debloque pour toutes les notifications a venir
+  // (sinon, notamment sur Safari, une notification qui arrive dans un onglet « deja clique » reste muette).
+  useEffect(() => { if (ringtone || chime) armAudioUnlock(); }, [ringtone, chime]);
 
   const ringNow = ringtone && ringing.size > 0;
   useEffect(() => (ringNow ? startRingtone() : undefined), [ringNow]);
